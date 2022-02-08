@@ -3,6 +3,7 @@ zombie
 
 #Human
   -hunger
+  
   -water
   -health
   -bitten
