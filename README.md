@@ -32,7 +32,7 @@ zombie
 
 #HUMAN VS HUMAN
 
-  -prob of dispute
+  -prob of conflict
   -prob of reproduction based on age etc
   -tendancy of beco;ing a group
 
