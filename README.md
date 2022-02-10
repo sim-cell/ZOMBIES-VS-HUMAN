@@ -51,7 +51,8 @@ zombie
   -food 
     -animal or plant based doesnt really matter
     
-
+    
+#TO DO:
 
 STEP :
 
@@ -72,9 +73,8 @@ AGENTS:
   
   -Food :
     -random drop(method, iteration sayiyla food listesine ajout)
-    
-#TO DO:
 
+pythona bir goz at
 -sacma baglantilar :
   Human/zombie - agent - UniqueDynamicObject
 -Agents'i WorldOffTree'e ekleyecegiz (initte)
