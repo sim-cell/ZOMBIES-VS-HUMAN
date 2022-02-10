@@ -81,10 +81,13 @@ AGENTS:
     - renkler degisecek her agent icin
     - food tree gibi olacak
     - fuit ve catch eklenecek (optimum hiz)
+      -ayni casedalarsa : silah ve vurma prob u eger vuramazsa bite
     -CA icin ne yapilacak ? 
       -ya FOrestCA dan devam ya da yeni CA hepsi icin
       
   -github online yenileme zimbirtisi ayarla 
+  
+  -
   
 
 
