@@ -4,22 +4,21 @@ zombie
 
 #Human
 
-  -hunger
-  -water
-  -health
-  -bitten
-  -hides it if bitten
-  -gun
-  -dead alive
-  -age
-  -reproduction
-  -8 goz
-  -prob of noise
+  -hunger attribut
+  -water attribut
+  -health att
+  -bitten att
+  -hides it if bitten prob
+  -gun att
+  -dead alive att
+  -age att
+  -reproduction prob
+  -8 goz -- bruh
+  -prob of noise prob
   
 
 #Zombie
 
-  -noise or smell
   -4lu hareket
   -onunu goruyor
   -if dead then time of decomposition
