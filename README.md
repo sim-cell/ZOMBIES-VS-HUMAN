@@ -51,4 +51,28 @@ zombie
   -food 
     -animal or plant based doesnt really matter
     
+
+
+STEP :
+
+  -Engel varsa gidememek (tree listesini gezecegiz)
+
+AGENTS:
+
+  -Human:
+    - 8 case goruyor
+    - zombie gorunce kaciyor (zombie listesini , CA)
+    - food gorurse ona gidecek ( zombie oncelikle ; food listesini, CA)
+    - yoksa random
+    
+  -Zombie:
+    -4 case (simdilik)
+    -human gorunce ona gidecek ( human listesi, CA)
+    - hicbir sey yoksa random hareket
   
+  -Food :
+    -random drop(method, iteration sayiyla food listesine ajout)
+    
+  
+
+
