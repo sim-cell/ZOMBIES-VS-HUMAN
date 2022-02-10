@@ -73,6 +73,18 @@ AGENTS:
   -Food :
     -random drop(method, iteration sayiyla food listesine ajout)
     
+#TO DO:
+
+-sacma baglantilar :
+  Human/zombie - agent - UniqueDynamicObject
+-Agents'i WorldOffTree'e ekleyecegiz (initte)
+    - renkler degisecek her agent icin
+    - food tree gibi olacak
+    - fuit ve catch eklenecek (optimum hiz)
+    -CA icin ne yapilacak ? 
+      -ya FOrestCA dan devam ya da yeni CA hepsi icin
+      
+  -github online yenileme zimbirtisi ayarla 
   
 
 
