@@ -1,5 +1,9 @@
-# projet13 
+
 GAME OF LIFE : QUITE LITERALLY
+SPRINT THINGS
+Sprint goal : créer un environnement ou les zombies essaient de manger les humains mais les humains ils peuvent se battre. 
+
+-Dans cet environnement il y a des trees et des « food drops » . 
 
 
 #Human
