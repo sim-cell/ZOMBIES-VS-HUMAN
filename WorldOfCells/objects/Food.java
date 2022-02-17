@@ -9,6 +9,8 @@ import com.jogamp.opengl.GL2;
 import worlds.World;
 
 public class Food extends CommonObject {
+	private int nutri;
+	private static final double PROBD = 0.2
 
     public static void displayObjectAt(World myWorld, GL2 gl, int cellState, float x, float y, double height, float offset, float stepX, float stepY, float lenX, float lenY, float normalizeHeight )
     {
