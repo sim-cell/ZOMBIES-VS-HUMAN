@@ -37,6 +37,9 @@ import datetime
 from random import *
 import math
 import time
+from playsound import playsound
+  
+
 
 import pygame
 from pygame.locals import *
@@ -54,6 +57,8 @@ versionTag = "2018-12-24_15h06"
 ### ### ### ### ### ### ### ### ### ### ### ### ### ### ### ###
 
 # all values are for initialisation. May change during runtime.
+
+#numbers of elements
 nbTrees = 35 #350
 nbBurningTrees = 1 #15
 nbAgents = 10
@@ -67,7 +72,7 @@ nbAgents = 10
 ### ### ### ### ### ### ### ### ### ### ### ### ### ### ### ###
 
 # display screen dimensions
-screenWidth = 930 # 1400
+screenWidth =  930 # 1400
 screenHeight = 640 #900
 
 # world dimensions (ie. nb of cells in total)
@@ -78,7 +83,7 @@ worldHeight = 32#64
 viewWidth = 32 #32
 viewHeight = 32 #32
 
-scaleMultiplier = 0.25 # re-scaling of loaded images
+scaleMultiplier = 0.25 # re-scaling of loaded images = zoom
 
 objectMapLevels = 8 # number of levels for the objectMap. This determines how many objects you can pile upon one another.
 
@@ -105,7 +110,7 @@ pygame.init()
 #pygame.key.set_repeat(5,5)
 fpsClock = pygame.time.Clock()
 screen = pygame.display.set_mode((screenWidth, screenHeight), DOUBLEBUF)
-pygame.display.set_caption('World of Isotiles')
+pygame.display.set_caption('Zombieland')
 
 ### ### ### ### ### ### ### ### ### ### ### ### ### ### ### ###
 ### ### ### ### ### ### ### ### ### ### ### ### ### ### ### ###
@@ -120,7 +125,7 @@ def loadImage(filename):
     image = pygame.image.load(filename).convert_alpha()
     image = pygame.transform.scale(image, (int(tileTotalWidthOriginal*scaleMultiplier), int(tileTotalHeightOriginal*scaleMultiplier)))
     return image
-
+#downloading all images
 def loadAllImages():
     global tileType, objectType, agentType
 
@@ -128,20 +133,20 @@ def loadAllImages():
     objectType = []
     agentType = []
 
-    tileType.append(loadImage('assets/basic111x128/platformerTile_48_ret.png')) # grass
-    tileType.append(loadImage('assets/ext/isometric-blocks/PNG/Platformer tiles/platformerTile_33.png')) # brick
-    tileType.append(loadImage('assets/ext/isometric-blocks/PNG/Abstract tiles/abstractTile_12.png')) # blue grass (?)
-    tileType.append(loadImage('assets/ext/isometric-blocks/PNG/Abstract tiles/abstractTile_09.png')) # grey brock
+    tileType.append(loadImage('isoworld/assets/basic111x128/plat.png')) # grass
+    tileType.append(loadImage('isoworld/assets/ext/isometric-blocks/PNG/Platformer tiles/platformerTile_33.png')) # brick
+    tileType.append(loadImage('isoworld/assets/ext/isometric-blocks/PNG/Abstract tiles/abstractTile_12.png')) # blue grass (?)
+    tileType.append(loadImage('isoworld/assets/ext/isometric-blocks/PNG/Abstract tiles/abstractTile_09.png')) # grey brock
 
     objectType.append(None) # default -- never drawn
-    objectType.append(loadImage('assets/basic111x128/tree_small_NW_ret.png')) # normal tree
-    objectType.append(loadImage('assets/basic111x128/blockHuge_N_ret.png')) # construction block
-    objectType.append(loadImage('assets/basic111x128/tree_small_NW_ret_red.png')) # burning tree
-
+    objectType.append(loadImage('isoworld/assets/basic111x128/tree_small_NW_ret.png')) # normal tree
+    objectType.append(loadImage('isoworld/assets/basic111x128/blockHuge_N_ret.png')) # construction block
+    objectType.append(loadImage('isoworld/assets/basic111x128/tree_small_NW_ret_red.png')) # burning tree
+    #agent images
     agentType.append(None) # default -- never drawn
-    agentType.append(loadImage('assets/basic111x128/invader_ret.png')) # invader
-    agentType.append(loadImage('assets/basic111x128/zomb.png')) # zombie
-    agentType.append(loadImage('assets/basic111x128/baby.png')) # baby
+    agentType.append(loadImage('isoworld/assets/basic111x128/panic.png')) # invader
+    agentType.append(loadImage('isoworld/assets/basic111x128/zomb.png')) # zombie
+    agentType.append(loadImage('isoworld/assets/basic111x128/baby.png')) # baby
 
 def resetImages():
     global tileTotalWidth, tileTotalHeight, tileTotalWidthOriginal, tileTotalHeightOriginal, scaleMultiplier, heightMultiplier, tileVisibleHeight
@@ -171,7 +176,7 @@ tileVisibleHeightOriginal = 64 # height "visible" part of the image, i.e. top pa
 tileType = []
 objectType = []
 agentType = []
-
+#ID
 noObjectId = noAgentId = 0
 grassId = 0
 treeId = 1
@@ -253,7 +258,7 @@ def getViewHeight():
 
 def getTerrainAt(x,y):
     return terrainMap[y][x]
-
+#changing the type
 def setTerrainAt(x,y,type):
     terrainMap[y][x] = type
 
@@ -403,20 +408,25 @@ def initWorld():
     global nbTrees, nbBurningTrees, agents
 
     # add a pyramid-shape building
+    #type of object
     building1TerrainMap = [
     [ 2, 2, 2, 2 ],
     [ 2, 3, 3, 2 ],
     [ 2, 3, 3, 2 ],
     [ 2, 2, 2, 2 ]
     ]
+    #height of building
     building1HeightMap = [
     [ 1, 1, 1, 1 ],
+    [ 1, 2, 2, 2 ],
     [ 1, 2, 2, 1 ],
-    [ 1, 2, 2, 1 ],
-    [ 1, 1, 1, 1 ]
+    [ 1, 1, 2, 1 ]
     ]
+    #place of building
     x_offset = 3
     y_offset = 3
+
+    #putting the building 
     for x in range( len( building1TerrainMap[0] ) ):
         for y in range( len( building1TerrainMap ) ):
             setTerrainAt( x+x_offset, y+y_offset, building1TerrainMap[x][y] )
@@ -454,11 +464,12 @@ def initWorld():
             setHeightAt( x+x_offset, y+y_offset, building2HeightMap[y][x] )
             setObjectAt( x+x_offset, y+y_offset, -1 ) # add a virtual object: not displayed, but used to forbid agent(s) to come here.
     setObjectAt( x_offset+3, y_offset+4, treeId )
-
+    #orange thing collumn
     for c in [(20,2),(30,2),(30,12),(20,12)]:
         for level in range(0,objectMapLevels):
             setObjectAt(c[0],c[1],blockId,level)
-    for i in range(9):
+            #koprusu
+    for i in range(9): 
         setObjectAt(21+i,2,blockId,objectMapLevels-1)
         setObjectAt(21+i,12,blockId,objectMapLevels-1)
         setObjectAt(20,3+i,blockId,objectMapLevels-1)
@@ -466,6 +477,7 @@ def initWorld():
 
     for i in range(nbAgents):
         agents.append(BasicAgent(ghostId))
+        agents.append(BasicAgent(babyId))
 
     for i in range(nbTrees):
         x = randint(0,getWorldWidth()-1)
@@ -564,6 +576,8 @@ while userExit == False:
     for a in agents:
         if a.getPosition() == player.getPosition():
             perdu = True
+            # for playing note.wav file
+            playsound('isoworld/sounds/VOXScrm_Wilhelm scream (ID 0477)_BSB.wav')
             break
 
     if perdu == True:
