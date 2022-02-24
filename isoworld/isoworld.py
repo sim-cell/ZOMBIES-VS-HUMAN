@@ -474,11 +474,12 @@ def initWorld():
         setObjectAt(21+i,12,blockId,objectMapLevels-1)
         setObjectAt(20,3+i,blockId,objectMapLevels-1)
         setObjectAt(30,3+i,blockId,objectMapLevels-1)
-
+    #adding agents
     for i in range(nbAgents):
         agents.append(BasicAgent(ghostId))
         agents.append(BasicAgent(babyId))
 
+    #adding trees
     for i in range(nbTrees):
         x = randint(0,getWorldWidth()-1)
         y = randint(0,getWorldHeight()-1)
@@ -486,7 +487,7 @@ def initWorld():
             x = randint(0,getWorldWidth()-1)
             y = randint(0,getWorldHeight()-1)
         setObjectAt(x,y,treeId)
-
+    #adding burning trees
     for i in range(nbBurningTrees):
         x = randint(0,getWorldWidth()-1)
         y = randint(0,getWorldHeight()-1)
@@ -505,9 +506,10 @@ def initAgents():
 ### ### ### ### ###
 
 def stepWorld( it = 0 ):
-    if it % (maxFps/60) == 0: #velocity 
+    if it % (maxFps/60) == 0: #tour speed
         for x in range(worldWidth):
             for y in range(worldHeight):
+                #burning the trees
                 if getObjectAt(x,y) == treeId:
                     for neighbours in ((-1,0),(+1,0),(0,-1),(0,+1)):
                         if getObjectAt((x+neighbours[0]+worldWidth)%worldWidth,(y+neighbours[1]+worldHeight)%worldHeight) == burningTreeId:
