@@ -298,13 +298,14 @@ def setAgentAt(x,y,type):
 ###
 ###
 PSHOOT=0.5
+MAXHUNGER=20
 class Human:
 #,age,dead,hunger,gun
     def __init__(self,imageId):
         self.type = imageId
         self.age=0
         self.dead=False
-        self.hunger=10
+        self.hunger=MAXHUNGER
         if random()<0.5:
             self.gun=randint(1,10)
         self.reset()
@@ -363,6 +364,29 @@ class Human:
             else:
                 print ("agent of type ",str(self.type)," moved to (",self.x,",",self.y,")")
         return
+    
+    def move3(self):
+        if random()<0.5:
+            if getAgentAt((self.x+1+worldWidth)%worldWidth, (self.y+worldHeight)%worldHeight ) == zombieId: #x+1 y
+                self.move2(-1,0)
+            elif getAgentAt((self.x-1+worldWidth)%worldWidth, (self.y+worldHeight)%worldHeight ) == zombieId: #x-1 y
+                self.move2(1,0)
+            elif getAgentAt((self.x+worldWidth)%worldWidth, (self.y+1+worldHeight)%worldHeight ) == zombieId: #x y+1
+                self.move2(0,-1)
+            elif getAgentAt((self.x+worldWidth)%worldWidth, (self.y-1+worldHeight)%worldHeight ) == zombieId: #x y-1
+                self.move2(0,1)
+            elif getAgentAt((self.x-1+worldWidth)%worldWidth, (self.y-1+worldHeight)%worldHeight ) == zombieId: #x-1 y-1
+                self.move2(1,1)
+            elif getAgentAt((self.x+1+worldWidth)%worldWidth, (self.y-1+worldHeight)%worldHeight ) == zombieId: #x+1 y-1
+                self.move2(-1,1)
+            elif getAgentAt((self.x+1+worldWidth)%worldWidth, (self.y+1+worldHeight)%worldHeight ) == zombieId: #x+1 y+1
+                self.move2(-1,-1)
+            elif getAgentAt((self.x-1+worldWidth)%worldWidth, (self.y+1+worldHeight)%worldHeight ) == zombieId: #x-1 y+1
+                self.move2(1,-1)
+            else :
+                self.move()
+        return
+        
 
     def getType(self):
         return self.type
@@ -372,9 +396,20 @@ class Zombie:
     def __init__(self,imageId):
         self.decomp=0
         self.dead=False
+        self.direction=randint(0,3) 
         self.type = imageId
         self.reset()
         return
+
+    def init(self, imageId, x, y):
+        self.decomp=0
+        self.dead=False
+        self.direction=randint(0,3) 
+        self.type = imageId
+        self.x=x
+        self.y=y
+        return
+
 
     def reset(self):
         self.x = randint(0,getWorldWidth()-1)
@@ -420,6 +455,46 @@ class Zombie:
                 print ("agent of type ",str(self.type)," cannot move.")
             else:
                 print ("agent of type ",str(self.type)," moved to (",self.x,",",self.y,")")
+        return
+
+    def move3(self):
+        if random()<0.8:
+            if self.direction==0:
+                if getAgentAt((self.x+1+worldWidth)%worldWidth,(self.y+worldHeight)%worldHeight) == humanId :
+                    self.move2(1,0)
+                elif getAgentAt((self.x+1+worldWidth)%worldWidth,(self.y+1+worldHeight)%worldHeight) == humanId :
+                    self.move2(1,1)  
+                elif getAgentAt((self.x+1+worldWidth)%worldWidth,(self.y-1+worldHeight)%worldHeight) == humanId :
+                    self.move2(1,-1)
+                else :
+                    self.move()
+            elif self.direction==2:
+                if getAgentAt((self.x-1+worldWidth)%worldWidth,(self.y+worldHeight)%worldHeight) == humanId :
+                    self.move2(-1,0)
+                elif getAgentAt((self.x-1+worldWidth)%worldWidth,(self.y+1+worldHeight)%worldHeight) == humanId :
+                    self.move2(-1,1)  
+                elif getAgentAt((self.x-1+worldWidth)%worldWidth,(self.y-1+worldHeight)%worldHeight) == humanId :
+                    self.move2(-1,-1)
+                else :
+                    self.move()
+            elif self.direction==1:
+                if getAgentAt((self.x+worldWidth)%worldWidth,(self.y+1+worldHeight)%worldHeight) == humanId :
+                    self.move2(0,1)
+                elif getAgentAt((self.x+1+worldWidth)%worldWidth,(self.y+1+worldHeight)%worldHeight) == humanId :
+                    self.move2(1,1)  
+                elif getAgentAt((self.x-1+worldWidth)%worldWidth,(self.y+1+worldHeight)%worldHeight) == humanId :
+                    self.move2(1,1)
+                else :
+                    self.move()
+            elif self.direction==3:
+                if getAgentAt((self.x+worldWidth)%worldWidth,(self.y-1+worldHeight)%worldHeight) == humanId :
+                    self.move2(0,-1)
+                elif getAgentAt((self.x+1+worldWidth)%worldWidth,(self.y-1+worldHeight)%worldHeight) == humanId :
+                    self.move2(1,-1)  
+                elif getAgentAt((self.x-1+worldWidth)%worldWidth,(self.y-1+worldHeight)%worldHeight) == humanId :
+                    self.move2(-1,-1)
+                else :
+                    self.move()
         return
 
     def getType(self):
@@ -476,26 +551,7 @@ class BasicAgent:
                 print ("agent of type ",str(self.type)," moved to (",self.x,",",self.y,")")
         return
 
-    def move3(self):
-        if random()<0.5:
-            if getAgentAt((self.x+1+worldWidth)%worldWidth, (self.y+worldHeight)%worldHeight ) == zombieId: #x+1 y
-                self.move2(self,self.x-1,self.y)
-            elif getAgentAt((self.x-1+worldWidth)%worldWidth, (self.y+worldHeight)%worldHeight ) == zombieId: #x-1 y
-                self.move2(self,self.x+1,self.y)
-            elif getAgentAt((self.x+worldWidth)%worldWidth, (self.y+1+worldHeight)%worldHeight ) == zombieId: #x y+1
-                self.move2(self,self.x,self.y-1)
-            elif getAgentAt((self.x+worldWidth)%worldWidth, (self.y-1+worldHeight)%worldHeight ) == zombieId: #x y-1
-                self.move2(self,self.x,self.y+1)
-            elif getAgentAt((self.x-1+worldWidth)%worldWidth, (self.y-1+worldHeight)%worldHeight ) == zombieId: #x-1 y-1
-                self.move2(self,self.x+1,self.y+1)
-            elif getAgentAt((self.x+1+worldWidth)%worldWidth, (self.y-1+worldHeight)%worldHeight ) == zombieId: #x+1 y-1
-                self.move2(self,self.x-1,self.y+1)
-            elif getAgentAt((self.x+1+worldWidth)%worldWidth, (self.y+1+worldHeight)%worldHeight ) == zombieId: #x+1 y+1
-                self.move2(self,self.x-1,self.y-1)
-            elif getAgentAt((self.x-1+worldWidth)%worldWidth, (self.y+1+worldHeight)%worldHeight ) == zombieId: #x-1 y+1
-                self.move2(self,self.x+1,self.y-1)
-        return
-        
+    
         
 
     def getType(self):
@@ -643,7 +699,7 @@ def stepAgents( it = 0 ):
                 zombies.remove(z)
             elif z.dead==False:
                 z.decomp+=1
-                z.move()
+                z.move3()
 
         for h in humans:
             if h.age>MAXAGE:
@@ -655,7 +711,9 @@ def stepAgents( it = 0 ):
             elif h.dead==False :
                 h.age+=1
                 h.hunger-=1
-                h.move()
+                h.move3()
+
+        
 
     return
 
