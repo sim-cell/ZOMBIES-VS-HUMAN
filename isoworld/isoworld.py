@@ -11,7 +11,7 @@
 #
 # Credits for third party resources used in this project:
 # - Assets: https://www.kenney.nl/ (great assets by Kenney Vleugels with *public domain license*)
-# - https://www.uihere.com/free-cliparts/space-invaders-extreme-2-video-game-arcade-game-8-bit-space-invaders-3996521
+# - https://www.uihere.com/free-cliparts/space-medicines-extreme-2-video-game-arcade-game-8-bit-space-medicines-3996521
 #
 # Random bookmarks:
 # - scaling images: https://stackoverflow.com/questions/43196126/how-do-you-scale-a-design-resolution-to-other-resolutions-with-pygame
@@ -144,9 +144,9 @@ def loadAllImages():
     objectType.append(loadImage('isoworld/assets/basic111x128/tree_small_NW_ret_red.png')) # burning tree
     #agent images
     agentType.append(None) # default -- never drawn
-    agentType.append(loadImage('isoworld/assets/basic111x128/panic.png')) # invader
+    agentType.append(loadImage('isoworld/assets/basic111x128/vaccine.png')) # medicine
     agentType.append(loadImage('isoworld/assets/basic111x128/zomb.png')) # zombie
-    agentType.append(loadImage('isoworld/assets/basic111x128/baby.png')) # baby
+    agentType.append(loadImage('isoworld/assets/basic111x128/human.png')) # human
 
 def resetImages():
     global tileTotalWidth, tileTotalHeight, tileTotalWidthOriginal, tileTotalHeightOriginal, scaleMultiplier, heightMultiplier, tileVisibleHeight
@@ -181,9 +181,9 @@ noObjectId = noAgentId = 0
 grassId = 0
 treeId = 1
 burningTreeId = 3
-invaderId = 1
-ghostId = 2
-babyId = 3
+medicineId = 1
+zombieId = 2
+humanId = 3
 blockId = 2
 
 ###
@@ -244,6 +244,7 @@ def displayWelcomeMessage():
 
     return
 
+
 def getWorldWidth():
     return worldWidth
 
@@ -288,52 +289,7 @@ def getAgentAt(x,y):
 def setAgentAt(x,y,type):
     agentMap[y][x] = type
 
-### ### ### ### ### ### ### ### ### ### ### ### ### ### ### ###
-### ### ### ### ### ### ### ### ### ### ### ### ### ### ### ###
-### ### ### ### ### ### ### ### ### ### ### ### ### ### ### ###
-### CORE: rendering
-###
-###
 
-def render( it = 0 ):
-    global xViewOffset, yViewOffset
-
-    pygame.draw.rect(screen, (0,0,0), (0, 0, screenWidth, screenHeight), 0) # overkill - can be optimized. (most sprites are already "naturally" overwritten)
-    #pygame.display.update()
-
-    for y in range(getViewHeight()):
-        for x in range(getViewWidth()):
-            # assume: north-is-upper-right
-
-            xTile = ( xViewOffset + x + getWorldWidth() ) % getWorldWidth()
-            yTile = ( yViewOffset + y + getWorldHeight() ) % getWorldHeight()
-
-            heightNoise = 0
-            if addNoise == True: # add sinusoidal noise on height positions
-                if it%int(math.pi*2*199) < int(math.pi*199):
-                    # v1.
-                    heightNoise = math.sin(it/23+yTile) * math.sin(it/7+xTile) * heightMultiplier/10 + math.cos(it/17+yTile+xTile) * math.cos(it/31+yTile) * heightMultiplier
-                    heightNoise = math.sin(it/199) * heightNoise
-                else:
-                    # v2.
-                    heightNoise = math.sin(it/13+yTile*19) * math.cos(it/17+xTile*41) * heightMultiplier
-                    heightNoise = math.sin(it/199) * heightNoise
-
-            height = getHeightAt( xTile , yTile ) * heightMultiplier + heightNoise
-
-            xScreen = xScreenOffset + x * tileTotalWidth / 2 - y * tileTotalWidth / 2
-            yScreen = yScreenOffset + y * tileVisibleHeight / 2 + x * tileVisibleHeight / 2 - height
-
-            screen.blit( tileType[ getTerrainAt( xTile , yTile ) ] , (xScreen, yScreen)) # display terrain
-
-            for level in range(objectMapLevels):
-                if getObjectAt( xTile , yTile , level)  > 0: # object on terrain?
-                    screen.blit( objectType[ getObjectAt( xTile , yTile, level) ] , (xScreen, yScreen - heightMultiplier*(level+1) ))
-
-            if getAgentAt( xTile, yTile ) != 0: # agent on terrain?
-                screen.blit( agentType[ getAgentAt( xTile, yTile ) ] , (xScreen, yScreen - heightMultiplier ))
-
-    return
 
 ### ### ### ### ### ### ### ### ### ### ### ### ### ### ### ###
 ### ### ### ### ### ### ### ### ### ### ### ### ### ### ### ###
@@ -341,6 +297,134 @@ def render( it = 0 ):
 ### Agents
 ###
 ###
+PSHOOT=0.5
+class Human:
+#,age,dead,hunger,gun
+    def __init__(self,imageId):
+        self.type = imageId
+        self.age=0
+        self.dead=False
+        self.hunger=10
+        if random()<0.5:
+            self.gun=randint(1,10)
+        self.reset()
+        return
+
+    def reset(self):
+        self.x = randint(0,getWorldWidth()-1)
+        self.y = randint(0,getWorldWidth()-1)
+        while getTerrainAt(self.x,self.y) != 0 or getObjectAt(self.x,self.y) != 0 or getAgentAt(self.x,self.y) != 0:
+            self.x = randint(0,getWorldWidth()-1)
+            self.y = randint(0,getWorldHeight()-1)
+        setAgentAt(self.x,self.y,self.type)
+        return
+
+    def getPosition(self):
+        return (self.x,self.y)
+
+    def die(self):
+        self.dead=True
+
+    
+    def shoot(self):
+        if random()<PSHOOT :
+            if self.gun>0 :
+                self.gun-=1
+                return True
+        return False 
+
+    def move(self):
+        xNew = self.x
+        yNew = self.y
+        if random() < 0.5:
+            xNew = ( self.x + [-1,+1][randint(0,1)] + getWorldWidth() ) % getWorldWidth()
+        else:
+            yNew = ( self.y + [-1,+1][randint(0,1)] + getWorldHeight() ) % getWorldHeight()
+        if getObjectAt(xNew,yNew) == 0: # dont move if collide with object (note that negative values means cell cannot be walked on)
+            setAgentAt(self.x,self.y,noAgentId)
+            self.x = xNew
+            self.y = yNew
+            setAgentAt(self.x,self.y,self.type)
+        if verbose == True:
+            print ("agent of type ",str(self.type),"located at (",self.x,",",self.y,")")
+        return
+
+    def move2(self,xNew,yNew):
+        success = False
+        if getObjectAt( (self.x+xNew+worldWidth)%worldWidth , (self.y+yNew+worldHeight)%worldHeight ) == 0: # dont move if collide with object (note that negative values means cell cannot be walked on)
+            setAgentAt( self.x, self.y, noAgentId)
+            self.x = ( self.x + xNew + worldWidth ) % worldWidth
+            self.y = ( self.y + yNew + worldHeight ) % worldHeight
+            setAgentAt( self.x, self.y, self.type)
+            success = True
+        if verbose == True:
+            if success == False:
+                print ("agent of type ",str(self.type)," cannot move.")
+            else:
+                print ("agent of type ",str(self.type)," moved to (",self.x,",",self.y,")")
+        return
+
+    def getType(self):
+        return self.type
+
+class Zombie:
+
+    def __init__(self,imageId):
+        self.decomp=0
+        self.dead=False
+        self.type = imageId
+        self.reset()
+        return
+
+    def reset(self):
+        self.x = randint(0,getWorldWidth()-1)
+        self.y = randint(0,getWorldWidth()-1)
+        while getTerrainAt(self.x,self.y) != 0 or getObjectAt(self.x,self.y) != 0 or getAgentAt(self.x,self.y) != 0:
+            self.x = randint(0,getWorldWidth()-1)
+            self.y = randint(0,getWorldHeight()-1)
+        setAgentAt(self.x,self.y,self.type)
+        return
+
+    def die(self): #from a headshot or from decomposition
+        self.dead=True
+
+    def getPosition(self):
+        return (self.x,self.y)
+
+    def move(self):
+        xNew = self.x
+        yNew = self.y
+        if random() < 0.5:
+            xNew = ( self.x + [-1,+1][randint(0,1)] + getWorldWidth() ) % getWorldWidth()
+        else:
+            yNew = ( self.y + [-1,+1][randint(0,1)] + getWorldHeight() ) % getWorldHeight()
+        if getObjectAt(xNew,yNew) == 0: # dont move if collide with object (note that negative values means cell cannot be walked on)
+            setAgentAt(self.x,self.y,noAgentId)
+            self.x = xNew
+            self.y = yNew
+            setAgentAt(self.x,self.y,self.type)
+        if verbose == True:
+            print ("agent of type ",str(self.type),"located at (",self.x,",",self.y,")")
+        return
+
+    def move2(self,xNew,yNew):
+        success = False
+        if getObjectAt( (self.x+xNew+worldWidth)%worldWidth , (self.y+yNew+worldHeight)%worldHeight ) == 0: # dont move if collide with object (note that negative values means cell cannot be walked on)
+            setAgentAt( self.x, self.y, noAgentId)
+            self.x = ( self.x + xNew + worldWidth ) % worldWidth
+            self.y = ( self.y + yNew + worldHeight ) % worldHeight
+            setAgentAt( self.x, self.y, self.type)
+            success = True
+        if verbose == True:
+            if success == False:
+                print ("agent of type ",str(self.type)," cannot move.")
+            else:
+                print ("agent of type ",str(self.type)," moved to (",self.x,",",self.y,")")
+        return
+
+    def getType(self):
+        return self.type
+
 
 class BasicAgent:
 
@@ -395,7 +479,10 @@ class BasicAgent:
     def getType(self):
         return self.type
 
+
 agents = []
+zombies = []
+humans = []
 
 ### ### ### ### ### ### ### ### ### ### ### ### ### ### ### ###
 ### ### ### ### ### ### ### ### ### ### ### ### ### ### ### ###
@@ -403,9 +490,10 @@ agents = []
 ### Initialise world
 ###
 ###
-
+mx = 3
+my = 3
 def initWorld():
-    global nbTrees, nbBurningTrees, agents
+    global nbTrees, nbBurningTrees, zombies, humans, agents
 
     # add a pyramid-shape building
     #type of object
@@ -418,13 +506,15 @@ def initWorld():
     #height of building
     building1HeightMap = [
     [ 1, 1, 1, 1 ],
-    [ 1, 2, 2, 2 ],
-    [ 1, 2, 2, 1 ],
-    [ 1, 1, 2, 1 ]
+    [ 1, 0, 0, 1 ],
+    [ 1, 0, 0, 1 ],
+    [ 1, 0, 0, 1 ]
     ]
     #place of building
-    x_offset = 3
-    y_offset = 3
+
+    x_offset = mx
+    y_offset = my
+   
 
     #putting the building 
     for x in range( len( building1TerrainMap[0] ) ):
@@ -476,8 +566,8 @@ def initWorld():
         setObjectAt(30,3+i,blockId,objectMapLevels-1)
     #adding agents
     for i in range(nbAgents):
-        agents.append(BasicAgent(ghostId))
-        agents.append(BasicAgent(babyId))
+        zombies.append(Zombie(zombieId))
+        humans.append(Human(humanId))
 
     #adding trees
     for i in range(nbTrees):
@@ -514,20 +604,93 @@ def stepWorld( it = 0 ):
                     for neighbours in ((-1,0),(+1,0),(0,-1),(0,+1)):
                         if getObjectAt((x+neighbours[0]+worldWidth)%worldWidth,(y+neighbours[1]+worldHeight)%worldHeight) == burningTreeId:
                             setObjectAt(x,y,burningTreeId)
-                        elif getAgentAt((x+neighbours[0]+worldWidth)%worldWidth,(y+neighbours[1]+worldHeight)%worldHeight) == ghostId:
+                        elif getAgentAt((x+neighbours[0]+worldWidth)%worldWidth,(y+neighbours[1]+worldHeight)%worldHeight) == zombieId:
                             setObjectAt(x,y,burningTreeId)
     return
 
 ### ### ### ### ###
-
+MAXAGE=30
 def stepAgents( it = 0 ):
     # move agent
     if it % (maxFps/10) == 0:
-        shuffle(agents)
-        for a in agents:   # shuffle agents in in-place (i.e. agents is modified)
-            a.move()
+        shuffle(zombies)
+        shuffle(humans)
+        for z in zombies:   # shuffle agents in in-place (i.e. agents is modified)
+            if z.decomp>MAXAGE:
+                z.die()
+                zombies.remove(z)
+            elif z.dead==False:
+                z.decomp+=1
+                z.move()
+
+        for h in humans:
+            if h.age>MAXAGE:
+                h.die()
+                humans.remove(h)
+            elif h.hunger==-1:
+                h.die()
+                humans.remove(h)
+            elif h.dead==False :
+                h.age+=1
+                h.hunger-=1
+                h.move()
+
     return
 
+### ### ### ### ### ### ### ### ### ### ### ### ### ### ### ###
+### ### ### ### ### ### ### ### ### ### ### ### ### ### ### ###
+### ### ### ### ### ### ### ### ### ### ### ### ### ### ### ###
+### CORE: rendering
+###
+###
+
+def render( it = 0 ):
+    global xViewOffset, yViewOffset
+
+    pygame.draw.rect(screen, (0,0,0), (0, 0, screenWidth, screenHeight), 0) # overkill - can be optimized. (most sprites are already "naturally" overwritten)
+    #pygame.display.update()
+
+    for y in range(getViewHeight()):
+        for x in range(getViewWidth()):
+            # assume: north-is-upper-right
+
+            xTile = ( xViewOffset + x + getWorldWidth() ) % getWorldWidth()
+            yTile = ( yViewOffset + y + getWorldHeight() ) % getWorldHeight()
+
+            heightNoise = 0
+            if addNoise == True: # add sinusoidal noise on height positions
+                if it%int(math.pi*2*199) < int(math.pi*199):
+                    # v1.
+                    heightNoise = math.sin(it/23+yTile) * math.sin(it/7+xTile) * heightMultiplier/10 + math.cos(it/17+yTile+xTile) * math.cos(it/31+yTile) * heightMultiplier
+                    heightNoise = math.sin(it/199) * heightNoise
+                else:
+                    # v2.
+                    heightNoise = math.sin(it/13+yTile*19) * math.cos(it/17+xTile*41) * heightMultiplier
+                    heightNoise = math.sin(it/199) * heightNoise
+
+            height = getHeightAt( xTile , yTile ) * heightMultiplier + heightNoise
+
+            xScreen = xScreenOffset + x * tileTotalWidth / 2 - y * tileTotalWidth / 2
+            yScreen = yScreenOffset + y * tileVisibleHeight / 2 + x * tileVisibleHeight / 2 - height
+
+            screen.blit( tileType[ getTerrainAt( xTile , yTile ) ] , (xScreen, yScreen)) # display terrain
+
+            for level in range(objectMapLevels):
+                if getObjectAt( xTile , yTile , level)  > 0: # object on terrain?
+                    screen.blit( objectType[ getObjectAt( xTile , yTile, level) ] , (xScreen, yScreen - heightMultiplier*(level+1) ))
+            if (getAgentAt( xTile, yTile ) != 0) :
+                if (getAgentAt( xTile, yTile ) == humanId) :
+                    for h in humans:
+                        if  h.dead==False and h.x==xTile and h.y==yTile : # agent on terrain?
+                            screen.blit( agentType[ getAgentAt( xTile, yTile ) ] , (xScreen, yScreen - heightMultiplier ))
+                elif (getAgentAt( xTile, yTile ) == zombieId) :
+                    for z in zombies:
+                        if z.dead==False and z.x==xTile and z.y==yTile : # agent on terrain?
+                            screen.blit( agentType[ getAgentAt( xTile, yTile ) ] , (xScreen, yScreen - heightMultiplier ))
+                else :
+                     screen.blit( agentType[ getAgentAt( xTile, yTile ) ] , (xScreen, yScreen - heightMultiplier ))
+
+    return
 
 ### ### ### ### ### ### ### ### ### ### ### ### ### ### ### ###
 ### ### ### ### ### ### ### ### ### ### ### ### ### ### ### ###
@@ -545,7 +708,8 @@ displayWelcomeMessage()
 initWorld()
 initAgents()
 
-player = BasicAgent(invaderId)
+#player = BasicAgent(medicineId)
+setAgentAt( mx+1, my+1, medicineId )
 
 print ("initWorld:",datetime.datetime.now().timestamp()-timestamp,"second(s)")
 timeStampStart = timeStamp = datetime.datetime.now().timestamp()
@@ -568,17 +732,16 @@ while userExit == False:
     stepWorld(it)
 
     perdu = False
-    for a in agents:
-        if a.getPosition() == player.getPosition():
-            perdu = True
-            break
-
+    
     stepAgents(it)
 
-    for a in agents:
-        if a.getPosition() == player.getPosition():
+    if (len(zombies)==0):
+        perdu = True 
+
+    for h in humans:
+        #if h.getPosition() == player.getPosition():
+        if h.getPosition() == (mx,my):
             perdu = True
-            # for playing note.wav file
             playsound('isoworld/sounds/VOXScrm_Wilhelm scream (ID 0477)_BSB.wav')
             break
 
@@ -586,7 +749,7 @@ while userExit == False:
         print ("")
         print ("#### #### #### #### ####")
         print ("####                ####")
-        print ("####     PERDU !    ####")
+        print ("####     HUMANS WIN !    ####")
         print ("####                ####")
         print ("#### #### #### #### ####")
         print ("")
@@ -596,7 +759,7 @@ while userExit == False:
         sys.exit()
 
     if it % 10 == 0:
-        agents.append(BasicAgent(ghostId))
+        humans.append(Human(humanId))
 
     # continuous stroke
     keys = pygame.key.get_pressed()
