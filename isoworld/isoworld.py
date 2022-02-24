@@ -476,6 +476,27 @@ class BasicAgent:
                 print ("agent of type ",str(self.type)," moved to (",self.x,",",self.y,")")
         return
 
+    def move3(self):
+        if getAgentAt((self.x+1+worldWidth)%worldWidth, (self.y+worldHeight)%worldHeight ) == zombieId: #x+1 y
+            self.move2(self,self.x-1,self.y)
+        elif getAgentAt((self.x-1+worldWidth)%worldWidth, (self.y+worldHeight)%worldHeight ) == zombieId: #x-1 y
+            self.move2(self,self.x+1,self.y)
+        elif getAgentAt((self.x+worldWidth)%worldWidth, (self.y+1+worldHeight)%worldHeight ) == zombieId: #x y+1
+            self.move2(self,self.x,self.y-1)
+        elif getAgentAt((self.x+worldWidth)%worldWidth, (self.y-1+worldHeight)%worldHeight ) == zombieId: #x y-1
+            self.move2(self,self.x,self.y+1)
+        elif getAgentAt((self.x-1+worldWidth)%worldWidth, (self.y-1+worldHeight)%worldHeight ) == zombieId: #x-1 y-1
+            self.move2(self,self.x+1,self.y+1)
+        elif getAgentAt((self.x+1+worldWidth)%worldWidth, (self.y-1+worldHeight)%worldHeight ) == zombieId: #x+1 y-1
+            self.move2(self,self.x-1,self.y+1)
+        elif getAgentAt((self.x+1+worldWidth)%worldWidth, (self.y+1+worldHeight)%worldHeight ) == zombieId: #x+1 y+1
+            self.move2(self,self.x-1,self.y-1)
+        elif getAgentAt((self.x-1+worldWidth)%worldWidth, (self.y+1+worldHeight)%worldHeight ) == zombieId: #x-1 y+1
+            self.move2(self,self.x+1,self.y-1)
+        return
+        
+        
+
     def getType(self):
         return self.type
 
