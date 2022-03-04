@@ -310,12 +310,8 @@ class Human:
             self.gun=randint(1,10)
         else :
             self.gun=0
-        if x<0:
-            self.reset()
-        else :
-            self.x=x
-            self.y=y
-            setAgentAt(self.x,self.y,self.type)
+        
+        self.reset()
         return
 
     def reset(self):
@@ -398,15 +394,6 @@ class Human:
     def getType(self):
         return self.type
 
-    def combat (h,zombies):
-        for z in zombies:
-            if h.x==z.x and z.y==h.y :
-                if h.shoot()==True:
-                    z.die()
-                else :
-                    zombies.append(Zombie(zombieId,h.x,h.y))
-                    h.dead=True
-
 class Zombie:
 
     def __init__(self,imageId,x,y):
@@ -414,12 +401,7 @@ class Zombie:
         self.dead=False
         self.direction=randint(0,3) 
         self.type = imageId
-        if x<0 :
-            self.reset()
-        else :
-            self.x = x
-            self.y = y
-            setAgentAt(self.x,self.y,self.type)
+        self.reset()
         return
 
     def init(self, imageId, x, y):
@@ -721,6 +703,8 @@ def stepAgents( it = 0 ):
             elif z.dead==False:
                 z.decomp+=1
                 z.move3()
+            else :
+                zombies.remove(z)
 
         for h in humans:
             if h.age>MAXAGE:
@@ -730,17 +714,13 @@ def stepAgents( it = 0 ):
                 h.die()
                 humans.remove(h)
             elif h.dead==False :
-                Human.combat(h,zombies)
-                if h.dead==False :
-                    h.age+=1
-                    h.hunger-=1
-                    h.move3()
-                else :
-                    humans.remove(h)
+                h.age+=1
+                h.hunger-=1
+                h.move3()
+            else :
+                humans.remove(h)
      
-        for z in zombies:       
-            if z.dead==True :         
-                zombies.remove(z)
+
 
         
 
