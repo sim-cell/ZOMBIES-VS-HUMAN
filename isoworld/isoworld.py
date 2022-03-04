@@ -301,14 +301,21 @@ PSHOOT=0.5
 MAXHUNGER=20
 class Human:
 #,age,dead,hunger,gun
-    def __init__(self,imageId):
+    def __init__(self,imageId,x,y):
         self.type = imageId
         self.age=0
         self.dead=False
         self.hunger=MAXHUNGER
         if random()<0.5:
             self.gun=randint(1,10)
-        self.reset()
+        else :
+            self.gun=0
+        if x<0:
+            self.reset()
+        else :
+            self.x=x
+            self.y=y
+            setAgentAt(self.x,self.y,self.type)
         return
 
     def reset(self):
@@ -391,14 +398,28 @@ class Human:
     def getType(self):
         return self.type
 
+    def combat (h,zombies):
+        for z in zombies:
+            if h.x==z.x and z.y==h.y :
+                if h.shoot()==True:
+                    z.die()
+                else :
+                    zombies.append(Zombie(zombieId,h.x,h.y))
+                    h.dead=True
+
 class Zombie:
 
-    def __init__(self,imageId):
+    def __init__(self,imageId,x,y):
         self.decomp=0
         self.dead=False
         self.direction=randint(0,3) 
         self.type = imageId
-        self.reset()
+        if x<0 :
+            self.reset()
+        else :
+            self.x = x
+            self.y = y
+            setAgentAt(self.x,self.y,self.type)
         return
 
     def init(self, imageId, x, y):
@@ -644,8 +665,8 @@ def initWorld():
         setObjectAt(30,3+i,blockId,objectMapLevels-1)
     #adding agents
     for i in range(nbAgents):
-        zombies.append(Zombie(zombieId))
-        humans.append(Human(humanId))
+        zombies.append(Zombie(zombieId,-1,-1))
+        humans.append(Human(humanId,-1,-1))
 
     #adding trees
     for i in range(nbTrees):
@@ -709,9 +730,17 @@ def stepAgents( it = 0 ):
                 h.die()
                 humans.remove(h)
             elif h.dead==False :
-                h.age+=1
-                h.hunger-=1
-                h.move3()
+                Human.combat(h,zombies)
+                if h.dead==False :
+                    h.age+=1
+                    h.hunger-=1
+                    h.move3()
+                else :
+                    humans.remove(h)
+     
+        for z in zombies:       
+            if z.dead==True :         
+                zombies.remove(z)
 
         
 
@@ -817,6 +846,7 @@ while userExit == False:
 
     if (len(zombies)==0):
         perdu = True 
+        playsound('isoworld/sounds/VOXScrm_Wilhelm scream (ID 0477)_BSB.wav')
 
     for h in humans:
         #if h.getPosition() == player.getPosition():
@@ -838,8 +868,9 @@ while userExit == False:
         pygame.quit()
         sys.exit()
 
+    #lame reproduction
     if it % 10 == 0:
-        humans.append(Human(humanId))
+        humans.append(Human(humanId,-1,-1))
 
     # continuous stroke
     keys = pygame.key.get_pressed()
