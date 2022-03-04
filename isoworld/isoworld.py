@@ -301,16 +301,13 @@ PSHOOT=0.5
 MAXHUNGER=20
 class Human:
 #,age,dead,hunger,gun
-    def __init__(self,imageId,x,y):
+    def __init__(self,imageId):
         self.type = imageId
         self.age=0
         self.dead=False
         self.hunger=MAXHUNGER
         if random()<0.5:
             self.gun=randint(1,10)
-        else :
-            self.gun=0
-        
         self.reset()
         return
 
@@ -396,7 +393,7 @@ class Human:
 
 class Zombie:
 
-    def __init__(self,imageId,x,y):
+    def __init__(self,imageId):
         self.decomp=0
         self.dead=False
         self.direction=randint(0,3) 
@@ -554,9 +551,6 @@ class BasicAgent:
                 print ("agent of type ",str(self.type)," moved to (",self.x,",",self.y,")")
         return
 
-    
-        
-
     def getType(self):
         return self.type
 
@@ -647,8 +641,8 @@ def initWorld():
         setObjectAt(30,3+i,blockId,objectMapLevels-1)
     #adding agents
     for i in range(nbAgents):
-        zombies.append(Zombie(zombieId,-1,-1))
-        humans.append(Human(humanId,-1,-1))
+        zombies.append(Zombie(zombieId))
+        humans.append(Human(humanId))
 
     #adding trees
     for i in range(nbTrees):
@@ -703,8 +697,6 @@ def stepAgents( it = 0 ):
             elif z.dead==False:
                 z.decomp+=1
                 z.move3()
-            else :
-                zombies.remove(z)
 
         for h in humans:
             if h.age>MAXAGE:
@@ -717,10 +709,6 @@ def stepAgents( it = 0 ):
                 h.age+=1
                 h.hunger-=1
                 h.move3()
-            else :
-                humans.remove(h)
-     
-
 
         
 
@@ -807,6 +795,7 @@ it = itStamp = 0
 
 userExit = False
 
+stepWorld(it)
 while userExit == False:
 
     if it != 0 and it % 100 == 0 and verboseFps:
@@ -817,16 +806,15 @@ while userExit == False:
     #screen.blit(pygame.font.render(str(currentFps), True, (255,255,255)), (screenWidth-100, screenHeight-50))
 
     render(it)
-
+    
+    stepAgents(it)
     stepWorld(it)
 
     perdu = False
-    
-    stepAgents(it)
+
 
     if (len(zombies)==0):
         perdu = True 
-        playsound('isoworld/sounds/VOXScrm_Wilhelm scream (ID 0477)_BSB.wav')
 
     for h in humans:
         #if h.getPosition() == player.getPosition():
@@ -848,9 +836,9 @@ while userExit == False:
         pygame.quit()
         sys.exit()
 
-    #lame reproduction
     if it % 10 == 0:
-        humans.append(Human(humanId,-1,-1))
+        humans.append(Human(humanId))
+        zombies.append(Zombie(zombieId))
 
     # continuous stroke
     keys = pygame.key.get_pressed()
