@@ -611,7 +611,7 @@ mx = 3
 my = 3
 
 def rendEnv():
-    
+
 
 def initWorld():
     global nbTrees, nbBurningTrees, zombies, humans, agents
@@ -717,7 +717,7 @@ def initAgents():
 ### ### ### ### ###
 
 def stepWorld( it = 0 ):
-    if it % (maxFps/120) == 0: #tour speed
+    if it % (maxFps/60) == 0: #tour speed
         for x in range(worldWidth):
             for y in range(worldHeight):
                 #burning the trees
