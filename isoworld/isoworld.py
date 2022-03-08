@@ -370,7 +370,9 @@ class Human:
     def test():
         if random()<0.9:
             return 0
-        return 1
+        return 2
+
+    
     def move3(self):
         if random()<0.5:
             if getAgentAt((self.x+1+worldWidth)%worldWidth, (self.y+worldHeight)%worldHeight ) == zombieId: #x+1 y
