@@ -369,7 +369,8 @@ class Human:
     
     def test():
         if random()<0.9:
-            return 0
+            print('Dilyara')
+            return 6
         return 1
     def move3(self):
         if random()<0.5:
