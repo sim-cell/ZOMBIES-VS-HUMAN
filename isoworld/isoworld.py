@@ -132,7 +132,6 @@ def loadAllImages():
     tileType = []
     objectType = []
     agentType = []
-    #test ....
 
     tileType.append(loadImage('isoworld/assets/basic111x128/plat.png')) # grass
     tileType.append(loadImage('isoworld/assets/ext/isometric-blocks/PNG/Platformer tiles/platformerTile_33.png')) # brick
@@ -368,6 +367,10 @@ class Human:
                 print ("agent of type ",str(self.type)," moved to (",self.x,",",self.y,")")
         return
     
+    def test():
+        if random()<0.9:
+            return 0
+        return 1
     def move3(self):
         if random()<0.5:
             if getAgentAt((self.x+1+worldWidth)%worldWidth, (self.y+worldHeight)%worldHeight ) == zombieId: #x+1 y
