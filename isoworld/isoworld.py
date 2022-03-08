@@ -532,7 +532,7 @@ class Zombie:
     def getType(self):
         return self.type
 
-
+#changement
 class BasicAgent:
 
     def __init__(self,imageId):
