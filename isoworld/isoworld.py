@@ -184,7 +184,9 @@ burningTreeId = 3
 medicineId = 1
 zombieId = 2
 humanId = 3
+foodId = 4
 blockId = 2
+
 
 ###
 
@@ -367,11 +369,6 @@ class Human:
                 print ("agent of type ",str(self.type)," moved to (",self.x,",",self.y,")")
         return
     
-    def test():
-        if random()<0.9:
-            print('Dilyara')
-            return 6
-        return 1
     def move3(self):
         if random()<0.5:
             if getAgentAt((self.x+1+worldWidth)%worldWidth, (self.y+worldHeight)%worldHeight ) == zombieId: #x+1 y
@@ -398,7 +395,7 @@ class Human:
     def getType(self):
         return self.type
 
-    def combat(self,zombies,humans):
+    def combat(self,zombies,humans, foods):
         exists=False
         for z in zombies:
             if self.x==z.x and self.y==z.y:
@@ -462,7 +459,8 @@ class Zombie:
 
     def getPosition(self):
         return (self.x,self.y)
-"""painfulpainfulpainful"""
+
+
     def move(self):
         xNew = self.x
         yNew = self.y
@@ -537,11 +535,22 @@ class Zombie:
     def getType(self):
         return self.type
 
+PROBDROP=0.3
+PROBENERGY=0.5
+DROPDAY=9
+DECOMPDAY=15
+NBFOODS=10
 
-class BasicAgent:
+
+class Food:
 
     def __init__(self,imageId):
         self.type = imageId
+        if random()<PROBEN :
+            self.energy=5
+        else :
+            self.energy=2
+        self.decomp=0
         self.reset()
         return
 
@@ -554,45 +563,28 @@ class BasicAgent:
         setAgentAt(self.x,self.y,self.type)
         return
 
+    def randomDrop(it,foods):
+        if (it%DROPDAY==0) :
+            for i in range(NBFOODS):
+                foods.append(Food(foodId))  #DISPLAY KALDI, decomp arttirmak, while it'na koy
+        return 
+
+    def decomposition(foods) :
+        for f in foods :
+            if f.decomp==DECOMPDAY :
+                foods.remove(f)
+            else :
+                f.decomp+=1
+        return
+
     def getPosition(self):
         return (self.x,self.y)
-
-    def move(self):
-        xNew = self.x
-        yNew = self.y
-        if random() < 0.5:
-            xNew = ( self.x + [-1,+1][randint(0,1)] + getWorldWidth() ) % getWorldWidth()
-        else:
-            yNew = ( self.y + [-1,+1][randint(0,1)] + getWorldHeight() ) % getWorldHeight()
-        if getObjectAt(xNew,yNew) == 0: # dont move if collide with object (note that negative values means cell cannot be walked on)
-            setAgentAt(self.x,self.y,noAgentId)
-            self.x = xNew
-            self.y = yNew
-            setAgentAt(self.x,self.y,self.type)
-        if verbose == True:
-            print ("agent of type ",str(self.type),"located at (",self.x,",",self.y,")")
-        return
-
-    def move2(self,xNew,yNew):
-        success = False
-        if getObjectAt( (self.x+xNew+worldWidth)%worldWidth , (self.y+yNew+worldHeight)%worldHeight ) == 0: # dont move if collide with object (note that negative values means cell cannot be walked on)
-            setAgentAt( self.x, self.y, noAgentId)
-            self.x = ( self.x + xNew + worldWidth ) % worldWidth
-            self.y = ( self.y + yNew + worldHeight ) % worldHeight
-            setAgentAt( self.x, self.y, self.type)
-            success = True
-        if verbose == True:
-            if success == False:
-                print ("agent of type ",str(self.type)," cannot move.")
-            else:
-                print ("agent of type ",str(self.type)," moved to (",self.x,",",self.y,")")
-        return
 
     def getType(self):
         return self.type
 
 
-agents = []
+foods = []
 zombies = []
 humans = []
 
@@ -681,6 +673,7 @@ def initWorld():
         zombies.append(Zombie(zombieId,-1,-1))
         humans.append(Human(humanId))
 
+
     #adding trees
     for i in range(nbTrees):
         x = randint(0,getWorldWidth()-1)
@@ -744,10 +737,6 @@ def stepAgents( it = 0 ):
                 humans.remove(h)
             elif h.dead==False :
                 h.combat(zombies,humans)
-
-
-        
-
     return
 
 ### ### ### ### ### ### ### ### ### ### ### ### ### ### ### ###
