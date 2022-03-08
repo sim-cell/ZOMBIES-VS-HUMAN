@@ -132,6 +132,7 @@ def loadAllImages():
     tileType = []
     objectType = []
     agentType = []
+    #test ....
 
     tileType.append(loadImage('isoworld/assets/basic111x128/plat.png')) # grass
     tileType.append(loadImage('isoworld/assets/ext/isometric-blocks/PNG/Platformer tiles/platformerTile_33.png')) # brick
