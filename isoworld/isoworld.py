@@ -59,16 +59,16 @@ versionTag = "2018-12-24_15h06"
 # all values are for initialisation. May change during runtime.
 
 #numbers of elements
-nbTrees = 35 #350
-nbBurningTrees = 1 #15
-nbAgents = 10
+nbTrees = 350 #350
+nbBurningTrees = 0 #15
+nbAgents = 30
 
 ### ### ### ### ### ### ### ### ### ### ### ### ### ### ### ###
 ### ### ### ### ### ### ### ### ### ### ### ### ### ### ### ###
 ### ### ### ### ### ### ### ### ### ### ### ### ### ### ### ###
 ###
 ### PARAMETERS: rendering
-###
+###x
 ### ### ### ### ### ### ### ### ### ### ### ### ### ### ### ###
 
 # display screen dimensions
@@ -76,8 +76,8 @@ screenWidth =  930 # 1400
 screenHeight = 640 #900
 
 # world dimensions (ie. nb of cells in total)
-worldWidth = 32#64
-worldHeight = 32#64
+worldWidth = 64#64
+worldHeight = 64#64
 
 # set surface of displayed tiles (ie. nb of cells that are rendered) -- must be superior to worldWidth and worldHeight
 viewWidth = 32 #32
@@ -147,6 +147,8 @@ def loadAllImages():
     agentType.append(loadImage('isoworld/assets/basic111x128/vaccine.png')) # medicine
     agentType.append(loadImage('isoworld/assets/basic111x128/zomb.png')) # zombie
     agentType.append(loadImage('isoworld/assets/basic111x128/human.png')) # human
+    agentType.append(loadImage('isoworld/assets/basic111x128/combat.png')) #human wins
+    agentType.append(loadImage('isoworld/assets/basic111x128/bite.png')) #zombie wins
 
 def resetImages():
     global tileTotalWidth, tileTotalHeight, tileTotalWidthOriginal, tileTotalHeightOriginal, scaleMultiplier, heightMultiplier, tileVisibleHeight
@@ -183,7 +185,9 @@ treeId = 1
 burningTreeId = 3
 medicineId = 1
 zombieId = 2
+winnerzombieId= 5
 humanId = 3
+winnerhumanId = 4
 blockId = 2
 
 ###
@@ -405,6 +409,7 @@ class Human:
                 exists=True
                 if self.shoot()==True:
                     zombies.remove(z)
+                    self.type=4
                     self.age+=1
                     self.hunger-=1
                     self.move3()
@@ -412,7 +417,7 @@ class Human:
                     Tx=self.x
                     Ty=self.y
                     humans.remove(self)
-                    zombies.append(Zombie(zombieId,Tx,Ty))
+                    zombies.append(Zombie(winnerzombieId,Tx,Ty))
                     break
         if not exists:
             self.age+=1
@@ -462,7 +467,7 @@ class Zombie:
 
     def getPosition(self):
         return (self.x,self.y)
-"""painfulpainfulpainful"""
+
     def move(self):
         xNew = self.x
         yNew = self.y
@@ -604,6 +609,10 @@ humans = []
 ###
 mx = 3
 my = 3
+
+def rendEnv():
+    
+
 def initWorld():
     global nbTrees, nbBurningTrees, zombies, humans, agents
 
@@ -708,7 +717,7 @@ def initAgents():
 ### ### ### ### ###
 
 def stepWorld( it = 0 ):
-    if it % (maxFps/60) == 0: #tour speed
+    if it % (maxFps/120) == 0: #tour speed
         for x in range(worldWidth):
             for y in range(worldHeight):
                 #burning the trees
@@ -727,7 +736,9 @@ def stepAgents( it = 0 ):
     if it % (maxFps/10) == 0:
         shuffle(zombies)
         shuffle(humans)
-        for z in zombies:   # shuffle agents in in-place (i.e. agents is modified)
+        for z in zombies:
+            if z.type!=2:
+                z.type=2   # shuffle agents in in-place (i.e. agents is modified)
             if z.decomp>MAXAGE:
                 z.die()
                 zombies.remove(z)
@@ -736,6 +747,8 @@ def stepAgents( it = 0 ):
                 z.move3()
 
         for h in humans:
+            if h.type!=3:
+                h.type=3 
             if h.age>MAXAGE:
                 h.die()
                 humans.remove(h)
