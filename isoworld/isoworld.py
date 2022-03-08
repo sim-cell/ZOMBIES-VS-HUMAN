@@ -308,6 +308,8 @@ class Human:
         self.hunger=MAXHUNGER
         if random()<0.5:
             self.gun=randint(1,10)
+        else:
+            self.gun=0
         self.reset()
         return
 
@@ -391,14 +393,43 @@ class Human:
     def getType(self):
         return self.type
 
+    def combat(self,zombies,humans):
+        exists=False
+        for z in zombies:
+            if self.x==z.x and self.y==z.y:
+                exists=True
+                if self.shoot()==True:
+                    zombies.remove(z)
+                    self.age+=1
+                    self.hunger-=1
+                    self.move3()
+                else:
+                    Tx=self.x
+                    Ty=self.y
+                    humans.remove(self)
+                    zombies.append(Zombie(zombieId,Tx,Ty))
+                    break
+        if not exists:
+            self.age+=1
+            self.hunger-=1
+            self.move3()
+                    
+
+                
+
 class Zombie:
 
-    def __init__(self,imageId):
+    def __init__(self,imageId,newx,newy):
         self.decomp=0
         self.dead=False
         self.direction=randint(0,3) 
         self.type = imageId
-        self.reset()
+        if newx<0:
+            self.reset()
+        else :
+            self.x=newx
+            self.y=newy
+            setAgentAt(self.x,self.y,self.type)
         return
 
     def init(self, imageId, x, y):
@@ -408,6 +439,7 @@ class Zombie:
         self.type = imageId
         self.x=x
         self.y=y
+        
         return
 
 
@@ -641,7 +673,7 @@ def initWorld():
         setObjectAt(30,3+i,blockId,objectMapLevels-1)
     #adding agents
     for i in range(nbAgents):
-        zombies.append(Zombie(zombieId))
+        zombies.append(Zombie(zombieId,-1,-1))
         humans.append(Human(humanId))
 
     #adding trees
@@ -706,9 +738,8 @@ def stepAgents( it = 0 ):
                 h.die()
                 humans.remove(h)
             elif h.dead==False :
-                h.age+=1
-                h.hunger-=1
-                h.move3()
+                h.combat(zombies,humans)
+
 
         
 
@@ -838,7 +869,7 @@ while userExit == False:
 
     if it % 10 == 0:
         humans.append(Human(humanId))
-        zombies.append(Zombie(zombieId))
+        zombies.append(Zombie(zombieId,-1,-1))
 
     # continuous stroke
     keys = pygame.key.get_pressed()
