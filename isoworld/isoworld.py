@@ -601,7 +601,7 @@ mx = 3
 my = 3
 
 def rendEnv():
-
+	pass
 
 def initWorld():
     global nbTrees, nbBurningTrees, zombies, humans, agents
@@ -746,8 +746,8 @@ def stepAgents( it = 0 ):
             elif h.hunger==-1:
                 h.die()
                 humans.remove(h)
-            elif h.dead==False :
-                h.combat(zombies,humans)
+           # elif h.dead==False :
+           #     h.combat(zombies,humans)
     return
 
 ### ### ### ### ### ### ### ### ### ### ### ### ### ### ### ###
