@@ -149,6 +149,7 @@ def loadAllImages():
     agentType.append(loadImage('isoworld/assets/basic111x128/man.png')) # human
     agentType.append(loadImage('isoworld/assets/basic111x128/combat.png')) #human wins
     agentType.append(loadImage('isoworld/assets/basic111x128/bite.png')) #zombie wins
+    agentType.append(loadImage('isoworld/assets/basic111x128/woman.png')) # human
     
 
 def resetImages():
@@ -189,6 +190,7 @@ zombieId = 2
 winnerzombieId= 5
 humanId = 3
 winnerhumanId = 4
+womanId = 6
 
 blockId = 2
 
