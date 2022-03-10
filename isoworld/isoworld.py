@@ -448,8 +448,8 @@ class Human:
     def reproduire(self, list_humans, imageID):
         if random()<PROB_REPROD:
             coords = self.getPosition()
-            z = Human(imageID, coords[0], coords[1])
-            list_humans.append(z)
+            h = Human(imageID, coords[0], coords[1])
+            list_humans.append(h)
 
                     
 
