@@ -642,6 +642,11 @@ def randEnv():
     for int in randint(0,MAXMOUNT+1):
         wid=randint(0,10)
         len=randint(0,10)
+        buildMap 
+        for w in wid:
+            for l in len:
+                
+
 
     return
 
