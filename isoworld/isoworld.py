@@ -149,6 +149,7 @@ def loadAllImages():
     agentType.append(loadImage('isoworld/assets/basic111x128/human.png')) # human
     agentType.append(loadImage('isoworld/assets/basic111x128/combat.png')) #human wins
     agentType.append(loadImage('isoworld/assets/basic111x128/bite.png')) #zombie wins
+    agentType.append(loadImage('isoworld/assets/basic111x128/baby.png')) #that one guy to experiment on
 
 def resetImages():
     global tileTotalWidth, tileTotalHeight, tileTotalWidthOriginal, tileTotalHeightOriginal, scaleMultiplier, heightMultiplier, tileVisibleHeight
@@ -188,6 +189,7 @@ zombieId = 2
 winnerzombieId= 5
 humanId = 3
 winnerhumanId = 4
+
 blockId = 2
 
 
@@ -333,6 +335,15 @@ class Human:
             self.y = randint(0,getWorldHeight()-1)
         setAgentAt(self.x,self.y,self.type)
         return
+    
+    def setHumanAt(self,x,y):
+        self.x = x
+        self.y = y
+        while getTerrainAt(self.x,self.y) != 0 or getObjectAt(self.x,self.y) != 0 or getAgentAt(self.x,self.y) != 0:
+            self.x = randint(0,getWorldWidth()-1)
+            self.y = randint(0,getWorldHeight()-1)
+        setAgentAt(self.x,self.y,self.type)
+        return
 
     def getPosition(self):
         return (self.x,self.y)
@@ -360,6 +371,12 @@ class Human:
             self.x = xNew
             self.y = yNew
             setAgentAt(self.x,self.y,self.type)
+        elif getObjectAt(xNew,yNew) == 2: # dont move if collide with object (note that negative values means cell cannot be walked on)
+            setAgentAt(self.x,self.y,noAgentId)
+            self.x = xNew
+            self.y = yNew
+            setAgentAt(self.x,self.y,self.type)
+        
         if verbose == True:
             print ("agent of type ",str(self.type),"located at (",self.x,",",self.y,")")
         return
@@ -586,6 +603,8 @@ class Food:
             self.y = randint(0,getWorldHeight()-1)
         setAgentAt(self.x,self.y,self.type)
         return
+    
+    
 
     def randomDrop(it,foods):
         if (it%DROPDAY==0) :
@@ -611,6 +630,7 @@ class Food:
 foods = []
 zombies = []
 humans = []
+
 
 ### ### ### ### ### ### ### ### ### ### ### ### ### ### ### ###
 ### ### ### ### ### ### ### ### ### ### ### ### ### ### ### ###
@@ -701,6 +721,8 @@ def initWorld():
     for i in range(nbAgents):
         zombies.append(Zombie(zombieId,-1,-1))
         humans.append(Human(humanId))
+
+
 
 
     #adding trees
