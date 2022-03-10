@@ -465,6 +465,7 @@ class Human:
         for f in foods :
             if self.x== f.x and self.y==f.y :
                 self.hunger+=f.energy
+                foods.remove(f)
                 food=True
         if not food:
             self.hunger-=1
