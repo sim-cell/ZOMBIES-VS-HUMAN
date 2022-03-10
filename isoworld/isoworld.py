@@ -443,7 +443,7 @@ class Human:
                     break
         if not exists:
             self.age+=1
-            self.hunger-=1
+            self.eat(foods)
             self.move3()
     #return
 
@@ -458,6 +458,18 @@ class Human:
     def getPosition(self):
         return (self.x,self.y)
                 
+        
+    
+    def eat(self, foods) :
+        food=False
+        for f in foods :
+            if self.x== f.x and self.y==f.y :
+                self.hunger+=f.energy
+                foods.remove(f)
+                food=True
+        if not food:
+            self.hunger-=1
+            
 
 class Zombie:
 
