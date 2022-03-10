@@ -149,7 +149,7 @@ def loadAllImages():
     agentType.append(loadImage('isoworld/assets/basic111x128/human.png')) # human
     agentType.append(loadImage('isoworld/assets/basic111x128/combat.png')) #human wins
     agentType.append(loadImage('isoworld/assets/basic111x128/bite.png')) #zombie wins
-    
+    agentType.append(loadImage('isoworld/assets/basic111x128/baby.png'))
 
 def resetImages():
     global tileTotalWidth, tileTotalHeight, tileTotalWidthOriginal, tileTotalHeightOriginal, scaleMultiplier, heightMultiplier, tileVisibleHeight
@@ -189,6 +189,7 @@ zombieId = 2
 winnerzombieId= 5
 humanId = 3
 winnerhumanId = 4
+thatoneguyId = 6
 
 blockId = 2
 
@@ -309,7 +310,7 @@ PROB_REPROD = 0.03
 MAXHUNGER=20
 class Human:
 #,age,dead,hunger,gun
-    def __init__(self,imageId, newx=-1, newy=-1):
+    def __init__(self,imageId, newx=-1, newy=-1,):
         self.type = imageId
         self.age=0
         self.dead=False
@@ -324,6 +325,7 @@ class Human:
             self.x=newx
             self.y=newy
             setAgentAt(self.x,self.y,self.type)
+
         #self.reset()
         return
 
@@ -630,6 +632,7 @@ class Food:
 foods = []
 zombies = []
 humans = []
+thatoneguy = []
 
 
 ### ### ### ### ### ### ### ### ### ### ### ### ### ### ### ###
@@ -674,7 +677,7 @@ def initWorld():
         for y in range( len( building1TerrainMap ) ):
             setTerrainAt( x+x_offset, y+y_offset, building1TerrainMap[x][y] )
             setHeightAt( x+x_offset, y+y_offset, building1HeightMap[x][y] )
-            setObjectAt( x+x_offset, y+y_offset, -1 ) # add a virtual object: not displayed, but used to forbid agent(s) to come here.
+            setObjectAt( x+x_offset, y+y_offset, 0 ) # add a virtual object: not displayed, but used to forbid agent(s) to come here.
 
     # add another pyramid-shape building with a tree on top
     building2TerrainMap = [
@@ -721,6 +724,9 @@ def initWorld():
     for i in range(nbAgents):
         zombies.append(Zombie(zombieId,-1,-1))
         humans.append(Human(humanId))
+
+    thatoneguy.append(Human(thatoneguyId))
+    thatoneguy[0].setHumanAt(mx-2,my-2)
 
 
 
