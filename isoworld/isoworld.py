@@ -187,6 +187,8 @@ medicineId = 1
 zombieId = 2
 winnerzombieId= 5
 humanId = 3
+maleId = 3
+femaleId = 3
 winnerhumanId = 4
 blockId = 2
 
@@ -305,24 +307,17 @@ def setAgentAt(x,y,type):
 PSHOOT=0.5
 PROB_REPROD = 0.03
 MAXHUNGER=20
-class Human:
-#,age,dead,hunger,gun
-    def __init__(self,imageId, newx=-1, newy=-1):
+
+class BasicAgent:
+    def __init__(self,imageId, newx, newy):
         self.type = imageId
-        self.age=0
         self.dead=False
-        self.hunger=MAXHUNGER
-        if random()<0.5:
-            self.gun=randint(1,10)
-        else:
-            self.gun=0
         if newx<0:
             self.reset()
         else :
             self.x=newx
             self.y=newy
             setAgentAt(self.x,self.y,self.type)
-        #self.reset()
         return
 
     def reset(self):
@@ -334,20 +329,14 @@ class Human:
         setAgentAt(self.x,self.y,self.type)
         return
 
-    def getPosition(self):
-        return (self.x,self.y)
-
-    def die(self):
+    def die(self): 
         self.dead=True
 
-    
-    def shoot(self):
-        if random()<PSHOOT :
-            if self.gun>0 :
-                self.gun-=1
-                return True
-        return False 
+    def getType(self):
+        return self.type
 
+    def getPosition(self):
+        return (self.x,self.y)
     def move(self):
         xNew = self.x
         yNew = self.y
@@ -364,6 +353,47 @@ class Human:
             print ("agent of type ",str(self.type),"located at (",self.x,",",self.y,")")
         return
 
+
+    def move2(self,xNew,yNew):
+        success = False
+        if getObjectAt( (self.x+xNew+worldWidth)%worldWidth , (self.y+yNew+worldHeight)%worldHeight ) == 0: # dont move if collide with object (note that negative values means cell cannot be walked on)
+            setAgentAt( self.x, self.y, noAgentId)
+            self.x = ( self.x + xNew + worldWidth ) % worldWidth
+            self.y = ( self.y + yNew + worldHeight ) % worldHeight
+            setAgentAt( self.x, self.y, self.type)
+            success = True
+        if verbose == True:
+            if success == False:
+                print ("agent of type ",str(self.type)," cannot move.")
+            else:
+                print ("agent of type ",str(self.type)," moved to (",self.x,",",self.y,")")
+        return
+    def move3():
+        return
+
+
+class Human(BasicAgent):
+#,age,dead,hunger,gun
+    def __init__(self,imageId, newx=-1, newy=-1):
+        super().__init__(imageId, newx, newy)
+        self.age=0
+        self.sex=null
+        self.hunger=MAXHUNGER
+        if random()<0.5:
+            self.gun=randint(1,10)
+        else:
+            self.gun=0
+        return
+
+    def shoot(self):
+        if random()<PSHOOT :
+            if self.gun>0 :
+                self.gun-=1
+                return True
+        return False 
+
+
+
     def move2(self,xNew,yNew):
         success = False
         if getObjectAt( (self.x+xNew+worldWidth)%worldWidth , (self.y+yNew+worldHeight)%worldHeight ) == 0: # dont move if collide with object (note that negative values means cell cannot be walked on)
@@ -379,6 +409,7 @@ class Human:
                 print ("agent of type ",str(self.type)," moved to (",self.x,",",self.y,")")
         return
     
+
     def move3(self):
         if random()<0.5:
             if getAgentAt((self.x+1+worldWidth)%worldWidth, (self.y+worldHeight)%worldHeight ) == zombieId: #x+1 y
@@ -400,16 +431,11 @@ class Human:
             else :
                 self.move()
         return
-        
 
-    def getType(self):
-        return self.type
 
-    def combat(self,zombies,humans, foods):
-        exists=False
+    def combat(self,zombies,humans,foods,met):
         for z in zombies:
-            if self.x==z.x and self.y==z.y:
-                exists=True
+            if (met(self,z)):
                 if self.shoot()==True:
                     zombies.remove(z)
                     self.type=4
@@ -421,41 +447,52 @@ class Human:
                     Ty=self.y
                     humans.remove(self)
                     zombies.append(Zombie(winnerzombieId,Tx,Ty))
-                    break
-        if not exists:
-            self.age+=1
-            self.hunger-=1
-            self.move3()
-    #return
-
-    def reproduire(self, list_humans, imageID):
-        if random()<PROB_REPROD:
-            coords = self.getPosition()
-            z = Human(imageID, coords[0], coords[1])
-            list_humans.append(z)
-
-                    
-
-    def getPosition(self):
-        return (self.x,self.y)
-                
-
-class Zombie:
-
-    def __init__(self,imageId,newx,newy):
-        self.decomp=0
-        self.dead=False
-        self.direction=randint(0,3) 
-        self.type = imageId
-        if newx<0:
-            self.reset()
-        else :
-            self.x=newx
-            self.y=newy
-            setAgentAt(self.x,self.y,self.type)
+                    return
+        self.age+=1
+        self.hunger-=1
+        self.move3()
         return
 
-    def init(self, imageId, x, y):
+   # def reproduire(self, list_humans, imageIdF, imageIdM, met):
+    def reproduire(self, list_humans, imageIdM, ImageIdF, met):
+        options=[imageIdF, imageIdM]
+        sex = random.choice(options)
+        for h in list_humans:
+            if (met(self, h)):
+                if self.instanceOf(Male)&&h.instanceOf(Female) || self.instanceOf(Female)&&h.instanceOf(Male):
+                    if random()<PROB_REPROD:
+                        coords = self.getPosition()
+                        z=null
+                        if sex == imageIdF:
+                            z = Female(sex, coords[0], coords[1])
+                        else:
+                            z = Male(sex, coords[0], coords[1]) 
+                        list_humans.append(z)
+                    return
+
+
+          
+class Male(Human):
+    def __init__(self,imageId, newx=-1, newy=-1):
+        super().__init__(imageId, newx=-1, newy=-1)
+        self.sex='male'
+class Female(Human):
+    def __init__(self,imageId, newx=-1, newy=-1):
+        super().__init__(imageId, newx=-1, newy=-1)
+        self.sex='female'
+
+
+      
+
+class Zombie(BasicAgent):
+
+    def __init__(self,imageId,newx,newy):
+        super().__init__(imageId, newx, newy)
+        self.decomp=0
+        self.direction=randint(0,3) 
+        return
+
+    """def init(self, imageId, x, y):
         self.decomp=0
         self.dead=False
         self.direction=randint(0,3) 
@@ -464,57 +501,7 @@ class Zombie:
         self.y=y
         
         return
-
-
-
-		
-
-
-    def reset(self):
-        self.x = randint(0,getWorldWidth()-1)
-        self.y = randint(0,getWorldWidth()-1)
-        while getTerrainAt(self.x,self.y) != 0 or getObjectAt(self.x,self.y) != 0 or getAgentAt(self.x,self.y) != 0:
-            self.x = randint(0,getWorldWidth()-1)
-            self.y = randint(0,getWorldHeight()-1)
-        setAgentAt(self.x,self.y,self.type)
-        return
-
-    def die(self): #from a headshot or from decomposition
-        self.dead=True
-
-    def getPosition(self):
-        return (self.x,self.y)
-
-    def move(self):
-        xNew = self.x
-        yNew = self.y
-        if random() < 0.5:
-            xNew = ( self.x + [-1,+1][randint(0,1)] + getWorldWidth() ) % getWorldWidth()
-        else:
-            yNew = ( self.y + [-1,+1][randint(0,1)] + getWorldHeight() ) % getWorldHeight()
-        if getObjectAt(xNew,yNew) == 0: # dont move if collide with object (note that negative values means cell cannot be walked on)
-            setAgentAt(self.x,self.y,noAgentId)
-            self.x = xNew
-            self.y = yNew
-            setAgentAt(self.x,self.y,self.type)
-        if verbose == True:
-            print ("agent of type ",str(self.type),"located at (",self.x,",",self.y,")")
-        return
-
-    def move2(self,xNew,yNew):
-        success = False
-        if getObjectAt( (self.x+xNew+worldWidth)%worldWidth , (self.y+yNew+worldHeight)%worldHeight ) == 0: # dont move if collide with object (note that negative values means cell cannot be walked on)
-            setAgentAt( self.x, self.y, noAgentId)
-            self.x = ( self.x + xNew + worldWidth ) % worldWidth
-            self.y = ( self.y + yNew + worldHeight ) % worldHeight
-            setAgentAt( self.x, self.y, self.type)
-            success = True
-        if verbose == True:
-            if success == False:
-                print ("agent of type ",str(self.type)," cannot move.")
-            else:
-                print ("agent of type ",str(self.type)," moved to (",self.x,",",self.y,")")
-        return
+    """
 
     def move3(self):
         if random()<0.8:
@@ -556,8 +543,7 @@ class Zombie:
                     self.move()
         return
 
-    def getType(self):
-        return self.type
+
 
 PROBDROP=0.3
 PROBENERGY=0.5
@@ -648,7 +634,6 @@ def initWorld():
     x_offset = mx
     y_offset = my
    
-
     #putting the building 
     for x in range( len( building1TerrainMap[0] ) ):
         for y in range( len( building1TerrainMap ) ):
@@ -698,9 +683,12 @@ def initWorld():
         setObjectAt(20,3+i,blockId,objectMapLevels-1)
         setObjectAt(30,3+i,blockId,objectMapLevels-1)
     #adding agents
+    m = Male(maleId)
+    f = Female(femaleId)
     for i in range(nbAgents):
         zombies.append(Zombie(zombieId,-1,-1))
-        humans.append(Human(humanId))
+        choice = random.choice((m,f))
+        humans.append(choice)
 
 
     #adding trees
@@ -741,10 +729,17 @@ def stepWorld( it = 0 ):
                         elif getAgentAt((x+neighbours[0]+worldWidth)%worldWidth,(y+neighbours[1]+worldHeight)%worldHeight) == zombieId:
                             setObjectAt(x,y,burningTreeId)
     return
+### ### ### ### ###
+
+def met(agent1, agent2):
+    exists=False
+    if agent1.x==agent2.x and agent1.y==agent2.y:
+        exists=True
+    return exists
 
 ### ### ### ### ###
 MAXAGE=30
-def stepAgents(humanID, it = 0 ):
+def stepAgents(maleID,femaleId, it = 0 ):
     # move agent
     if it % (maxFps/10) == 0:
         shuffle(zombies)
@@ -772,8 +767,9 @@ def stepAgents(humanID, it = 0 ):
                 humans.remove(h)
 
             elif h.dead==False:
-                h.combat(zombies,humans,foods)
-                h.reproduire(humans, humanID)
+                h.combat(zombies,humans,foods, met)
+                h.reproduire(humans, maleID, femaleID, met)
+
     return
 
 
@@ -862,7 +858,6 @@ stepWorld(it)
 
 while userExit == False:
 
-    ID = humanId
     if it != 0 and it % 100 == 0 and verboseFps:
         print ("[fps] ", ( it - itStamp ) / ( datetime.datetime.now().timestamp()-timeStamp ) )
         timeStamp = datetime.datetime.now().timestamp()
@@ -872,7 +867,7 @@ while userExit == False:
 
     render(it)
     
-    stepAgents(ID, it)
+    stepAgents(maleId, femaleId, it)
     stepWorld(it)
 
     perdu = False
@@ -902,7 +897,10 @@ while userExit == False:
         sys.exit()
 
     if it % 10 == 0:
-        humans.append(Human(humanId))
+        m = Male(maleId)
+        f = Female(femaleId)
+        choice = random.choice((m,f))
+        humans.append(choice)
         zombies.append(Zombie(zombieId,-1,-1))
 
     # continuous stroke
