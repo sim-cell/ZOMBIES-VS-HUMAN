@@ -303,10 +303,11 @@ def setAgentAt(x,y,type):
 ###
 ###
 PSHOOT=0.5
+PROB_REPROD = 0.03
 MAXHUNGER=20
 class Human:
 #,age,dead,hunger,gun
-    def __init__(self,imageId):
+    def __init__(self,imageId, newx=-1, newy=-1):
         self.type = imageId
         self.age=0
         self.dead=False
@@ -315,7 +316,13 @@ class Human:
             self.gun=randint(1,10)
         else:
             self.gun=0
-        self.reset()
+        if newx<0:
+            self.reset()
+        else :
+            self.x=newx
+            self.y=newy
+            setAgentAt(self.x,self.y,self.type)
+        #self.reset()
         return
 
     def reset(self):
@@ -419,8 +426,18 @@ class Human:
             self.age+=1
             self.hunger-=1
             self.move3()
+    #return
+
+    def reproduire(self, list_humans, imageID):
+        if random()<PROB_REPROD:
+            coords = self.getPosition()
+            z = Human(imageID, coords[0], coords[1])
+            list_humans.append(z)
+
                     
 
+    def getPosition(self):
+        return (self.x,self.y)
                 
 
 class Zombie:
@@ -447,6 +464,10 @@ class Zombie:
         self.y=y
         
         return
+
+
+
+		
 
 
     def reset(self):
@@ -722,7 +743,7 @@ def stepWorld( it = 0 ):
 
 ### ### ### ### ###
 MAXAGE=30
-def stepAgents( it = 0 ):
+def stepAgents(humanID, it = 0 ):
     # move agent
     if it % (maxFps/10) == 0:
         shuffle(zombies)
@@ -736,6 +757,7 @@ def stepAgents( it = 0 ):
             elif z.dead==False:
                 z.decomp+=1
                 z.move3()
+	
 
         for h in humans:
             if h.type!=3:
@@ -746,9 +768,12 @@ def stepAgents( it = 0 ):
             elif h.hunger==-1:
                 h.die()
                 humans.remove(h)
+            elif h.dead==False:
+                h.combat(zombies,humans,foods)
+                h.reproduire(humans, humanID)
            # elif h.dead==False :
-           #     h.combat(zombies,humans)
-    return
+           #     
+#return
 
 ### ### ### ### ### ### ### ### ### ### ### ### ### ### ### ###
 ### ### ### ### ### ### ### ### ### ### ### ### ### ### ### ###
@@ -832,8 +857,10 @@ it = itStamp = 0
 userExit = False
 
 stepWorld(it)
+
 while userExit == False:
 
+    ID = humanId
     if it != 0 and it % 100 == 0 and verboseFps:
         print ("[fps] ", ( it - itStamp ) / ( datetime.datetime.now().timestamp()-timeStamp ) )
         timeStamp = datetime.datetime.now().timestamp()
@@ -843,7 +870,7 @@ while userExit == False:
 
     render(it)
     
-    stepAgents(it)
+    stepAgents(ID, it)
     stepWorld(it)
 
     perdu = False
