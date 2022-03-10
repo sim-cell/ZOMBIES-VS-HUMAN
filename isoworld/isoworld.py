@@ -37,7 +37,7 @@ import datetime
 from random import *
 import math
 import time
-from playsound import playsound
+#from playsound import playsound
   
 
 
@@ -133,23 +133,25 @@ def loadAllImages():
     objectType = []
     agentType = []
 
-    tileType.append(loadImage('isoworld/assets/basic111x128/plat.png')) # grass
-    tileType.append(loadImage('isoworld/assets/ext/isometric-blocks/PNG/Platformer tiles/platformerTile_33.png')) # brick
-    tileType.append(loadImage('isoworld/assets/ext/isometric-blocks/PNG/Abstract tiles/abstractTile_12.png')) # blue grass (?)
-    tileType.append(loadImage('isoworld/assets/ext/isometric-blocks/PNG/Abstract tiles/abstractTile_09.png')) # grey brock
+    tileType.append(loadImage('assets/basic111x128/plat.png')) # grass
+    tileType.append(loadImage('assets/ext/isometric-blocks/PNG/Platformer tiles/platformerTile_33.png')) # brick
+    tileType.append(loadImage('assets/ext/isometric-blocks/PNG/Abstract tiles/abstractTile_12.png')) # blue grass (?)
+    tileType.append(loadImage('assets/ext/isometric-blocks/PNG/Abstract tiles/abstractTile_09.png')) # grey brock
 
     objectType.append(None) # default -- never drawn
-    objectType.append(loadImage('isoworld/assets/basic111x128/tree_small_NW_ret.png')) # normal tree
-    objectType.append(loadImage('isoworld/assets/basic111x128/blockHuge_N_ret.png')) # construction block
-    objectType.append(loadImage('isoworld/assets/basic111x128/tree_small_NW_ret_red.png')) # burning tree
+    objectType.append(loadImage('assets/basic111x128/tree_small_NW_ret.png')) # normal tree
+    objectType.append(loadImage('assets/basic111x128/blockHuge_N_ret.png')) # construction block
+    objectType.append(loadImage('assets/basic111x128/tree_small_NW_ret_red.png')) # burning tree
     #agent images
     agentType.append(None) # default -- never drawn
-    agentType.append(loadImage('isoworld/assets/basic111x128/vaccine.png')) # medicine
-    agentType.append(loadImage('isoworld/assets/basic111x128/zomb.png')) # zombie
-    agentType.append(loadImage('isoworld/assets/basic111x128/man.png')) # human
-    agentType.append(loadImage('isoworld/assets/basic111x128/combat.png')) #human wins
-    agentType.append(loadImage('isoworld/assets/basic111x128/bite.png')) #zombie wins
-    agentType.append(loadImage('isoworld/assets/basic111x128/woman.png')) # human
+    agentType.append(loadImage('assets/basic111x128/vaccine.png')) # medicine
+    agentType.append(loadImage('assets/basic111x128/zomb.png')) # zombie
+    agentType.append(loadImage('assets/basic111x128/man.png')) # man
+    agentType.append(loadImage('assets/basic111x128/combat.png')) #human wins
+    agentType.append(loadImage('assets/basic111x128/bite.png')) #zombie wins
+    agentType.append(loadImage('assets/basic111x128/woman.png')) # woman
+    agentType.append(loadImage('assets/basic111x128/burger.png')) # burger
+    agentType.append(loadImage('assets/basic111x128/foods.png')) # foods
     
 
 def resetImages():
@@ -182,18 +184,20 @@ objectType = []
 agentType = []
 #ID
 noObjectId = noAgentId = 0
+#objects
 grassId = 0
 treeId = 1
+blockId = 2
 burningTreeId = 3
+#agents
 medicineId = 1
 zombieId = 2
-winnerzombieId= 5
 humanId = 3
 winnerhumanId = 4
+winnerzombieId= 5
 womanId = 6
-
-blockId = 2
-
+burgerId = 7
+foodsId =8
 
 ###
 
@@ -297,7 +301,6 @@ def getAgentAt(x,y):
 
 def setAgentAt(x,y,type):
     agentMap[y][x] = type
-
 
 
 ### ### ### ### ### ### ### ### ### ### ### ### ### ### ### ###
@@ -590,16 +593,18 @@ PROBENERGY=0.5
 DROPDAY=9
 DECOMPDAY=15
 NBFOODS=10
+MAXFOOD= 20
 
 
 class Food:
 
-    def __init__(self,imageId):
-        self.type = imageId
-        if random()<PROBEN :
+    def __init__(self):
+        if random()<PROBENERGY :
             self.energy=5
+            self.type = burgerId
         else :
             self.energy=2
+            self.type = foodsId
         self.decomp=0
         self.reset()
         return
@@ -616,9 +621,9 @@ class Food:
     
 
     def randomDrop(it,foods):
-        if (it%DROPDAY==0) :
+        if (it%DROPDAY==0 and len(foods)<MAXFOOD) :
             for i in range(NBFOODS):
-                foods.append(Food(foodId))  #DISPLAY KALDI, decomp arttirmak, while it'na koy
+                foods.append(Food())  #DISPLAY KALDI, decomp arttirmak, while it'na koy
         return 
 
     def decomposition(foods) :
@@ -787,8 +792,10 @@ MAXAGE=30
 def stepAgents(humanID, it = 0 ):
     # move agent
     if it % (maxFps/10) == 0:
+        shuffle(foods)
         shuffle(zombies)
         shuffle(humans)
+        Food.randomDrop(it, foods)
         for z in zombies:
             if z.type!=2:
                 z.type=2   # shuffle agents in in-place (i.e. agents is modified)
@@ -799,8 +806,6 @@ def stepAgents(humanID, it = 0 ):
                 z.decomp+=1
                 z.move3()
                 z.direction=randint(0,3)
-
-
         for h in humans:
             if h.type!=3:
                 h.type=3 
@@ -814,6 +819,7 @@ def stepAgents(humanID, it = 0 ):
             elif h.dead==False:
                 h.combat(zombies,humans,foods)
                 h.reproduire(humans, humanID)
+    
     return
 
 
@@ -859,16 +865,21 @@ def render( it = 0 ):
                 if getObjectAt( xTile , yTile , level)  > 0: # object on terrain?
                     screen.blit( objectType[ getObjectAt( xTile , yTile, level) ] , (xScreen, yScreen - heightMultiplier*(level+1) ))
             if (getAgentAt( xTile, yTile ) != 0) :
-                if (getAgentAt( xTile, yTile ) == humanId) :
+                if ((getAgentAt( xTile, yTile ) == humanId) or (getAgentAt( xTile, yTile ) == womanId)) :
                     for h in humans:
                         if  h.dead==False and h.x==xTile and h.y==yTile : # agent on terrain?
                             screen.blit( agentType[ getAgentAt( xTile, yTile ) ] , (xScreen, yScreen - heightMultiplier ))
-                elif (getAgentAt( xTile, yTile ) == zombieId) :
+                
+                if (getAgentAt( xTile, yTile ) == zombieId) :
                     for z in zombies:
                         if z.dead==False and z.x==xTile and z.y==yTile : # agent on terrain?
                             screen.blit( agentType[ getAgentAt( xTile, yTile ) ] , (xScreen, yScreen - heightMultiplier ))
-                else :
-                     screen.blit( agentType[ getAgentAt( xTile, yTile ) ] , (xScreen, yScreen - heightMultiplier ))
+                if ((getAgentAt( xTile, yTile ) == burgerId) or (getAgentAt( xTile, yTile ) == foodsId)) :
+                    for f in foods:
+                        if f.x==xTile and f.y==yTile : # agent on terrain?
+                            screen.blit( agentType[ getAgentAt( xTile, yTile ) ] , (xScreen, yScreen - heightMultiplier ))
+                """else :
+                     screen.blit( agentType[ getAgentAt( xTile, yTile ) ] , (xScreen, yScreen - heightMultiplier ))"""
 
     return
 
@@ -925,7 +936,7 @@ while userExit == False:
         #if h.getPosition() == player.getPosition():
         if h.getPosition() == (mx,my):
             perdu = True
-            playsound('isoworld/sounds/VOXScrm_Wilhelm scream (ID 0477)_BSB.wav')
+            #playsound('isoworld/sounds/VOXScrm_Wilhelm scream (ID 0477)_BSB.wav')
             break
 
     if perdu == True:
