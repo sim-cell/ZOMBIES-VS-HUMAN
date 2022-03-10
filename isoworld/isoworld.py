@@ -149,7 +149,7 @@ def loadAllImages():
     agentType.append(loadImage('isoworld/assets/basic111x128/human.png')) # human
     agentType.append(loadImage('isoworld/assets/basic111x128/combat.png')) #human wins
     agentType.append(loadImage('isoworld/assets/basic111x128/bite.png')) #zombie wins
-    agentType.append(loadImage('isoworld/assets/basic111x128/baby.png')) #that one guy to experiment on
+    
 
 def resetImages():
     global tileTotalWidth, tileTotalHeight, tileTotalWidthOriginal, tileTotalHeightOriginal, scaleMultiplier, heightMultiplier, tileVisibleHeight
