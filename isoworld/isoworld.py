@@ -146,7 +146,7 @@ def loadAllImages():
     agentType.append(None) # default -- never drawn
     agentType.append(loadImage('isoworld/assets/basic111x128/vaccine.png')) # medicine
     agentType.append(loadImage('isoworld/assets/basic111x128/zomb.png')) # zombie
-    agentType.append(loadImage('isoworld/assets/basic111x128/human.png')) # human
+    agentType.append(loadImage('isoworld/assets/basic111x128/man.png')) # human
     agentType.append(loadImage('isoworld/assets/basic111x128/combat.png')) #human wins
     agentType.append(loadImage('isoworld/assets/basic111x128/bite.png')) #zombie wins
     
@@ -482,11 +482,6 @@ class Zombie:
         
         return
 
-
-
-		
-
-
     def reset(self):
         self.x = randint(0,getWorldWidth()-1)
         self.y = randint(0,getWorldWidth()-1)
@@ -640,8 +635,12 @@ humans = []
 ###
 mx = 3
 my = 3
+MAXMOUNT = (int)(worldHeight/10)
+def randEnv():
+    for int in randint(0,MAXMOUNT+1):
+        wid=randint(0,10)
+        len=randint(0,10)
 
-def rendEnv():
     return
 
 
