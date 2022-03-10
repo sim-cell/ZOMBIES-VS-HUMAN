@@ -59,7 +59,7 @@ versionTag = "2018-12-24_15h06"
 # all values are for initialisation. May change during runtime.
 
 #numbers of elements
-nbTrees = 350 #350
+nbTrees = 30 #350
 nbBurningTrees = 0 #15
 nbAgents = 30
 
@@ -76,8 +76,8 @@ screenWidth =  930 # 1400
 screenHeight = 640 #900
 
 # world dimensions (ie. nb of cells in total)
-worldWidth = 64#64
-worldHeight = 64#64
+worldWidth = 32#64
+worldHeight = 32#64
 
 # set surface of displayed tiles (ie. nb of cells that are rendered) -- must be superior to worldWidth and worldHeight
 viewWidth = 32 #32
@@ -601,7 +601,7 @@ mx = 3
 my = 3
 
 def rendEnv():
-
+    return
 
 def initWorld():
     global nbTrees, nbBurningTrees, zombies, humans, agents
@@ -708,7 +708,7 @@ def initAgents():
 ### ### ### ### ###
 
 def stepWorld( it = 0 ):
-    if it % (maxFps/60) == 0: #tour speed
+    if it % (maxFps/180) == 0: #tour speed
         for x in range(worldWidth):
             for y in range(worldHeight):
                 #burning the trees
@@ -736,6 +736,7 @@ def stepAgents( it = 0 ):
             elif z.dead==False:
                 z.decomp+=1
                 z.move3()
+                z.direction=randint(0,3)
 
         for h in humans:
             if h.type!=3:
@@ -747,7 +748,7 @@ def stepAgents( it = 0 ):
                 h.die()
                 humans.remove(h)
             elif h.dead==False :
-                h.combat(zombies,humans)
+                h.combat(zombies,humans,foods)
     return
 
 ### ### ### ### ### ### ### ### ### ### ### ### ### ### ### ###
