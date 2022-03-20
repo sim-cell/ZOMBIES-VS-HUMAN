@@ -37,7 +37,7 @@ import datetime
 from random import *
 import math
 import time
-from playsound import playsound
+#from playsound import playsound
   
 
 
@@ -133,23 +133,25 @@ def loadAllImages():
     objectType = []
     agentType = []
 
-    tileType.append(loadImage('isoworld/assets/basic111x128/plat.png')) # grass
-    tileType.append(loadImage('isoworld/assets/ext/isometric-blocks/PNG/Platformer tiles/platformerTile_33.png')) # brick
-    tileType.append(loadImage('isoworld/assets/ext/isometric-blocks/PNG/Abstract tiles/abstractTile_12.png')) # blue grass (?)
-    tileType.append(loadImage('isoworld/assets/ext/isometric-blocks/PNG/Abstract tiles/abstractTile_09.png')) # grey brock
+    tileType.append(loadImage('assets/basic111x128/plat.png')) # grass
+    tileType.append(loadImage('assets/ext/isometric-blocks/PNG/Platformer tiles/platformerTile_33.png')) # brick
+    tileType.append(loadImage('assets/ext/isometric-blocks/PNG/Abstract tiles/abstractTile_12.png')) # blue grass (?)
+    tileType.append(loadImage('assets/ext/isometric-blocks/PNG/Abstract tiles/abstractTile_09.png')) # grey brock
 
     objectType.append(None) # default -- never drawn
-    objectType.append(loadImage('isoworld/assets/basic111x128/tree_small_NW_ret.png')) # normal tree
-    objectType.append(loadImage('isoworld/assets/basic111x128/blockHuge_N_ret.png')) # construction block
-    objectType.append(loadImage('isoworld/assets/basic111x128/tree_small_NW_ret_red.png')) # burning tree
+    objectType.append(loadImage('assets/basic111x128/tree_small_NW_ret.png')) # normal tree
+    objectType.append(loadImage('assets/basic111x128/blockHuge_N_ret.png')) # construction block
+    objectType.append(loadImage('assets/basic111x128/tree_small_NW_ret_red.png')) # burning tree
     #agent images
     agentType.append(None) # default -- never drawn
-    agentType.append(loadImage('isoworld/assets/basic111x128/vaccine.png')) # medicine
-    agentType.append(loadImage('isoworld/assets/basic111x128/zomb.png')) # zombie
-    agentType.append(loadImage('isoworld/assets/basic111x128/man.png')) # human
-    agentType.append(loadImage('isoworld/assets/basic111x128/combat.png')) #human wins
-    agentType.append(loadImage('isoworld/assets/basic111x128/bite.png')) #zombie wins
-    agentType.append(loadImage('isoworld/assets/basic111x128/woman.png')) # human
+    agentType.append(loadImage('assets/basic111x128/vaccine.png')) # medicine
+    agentType.append(loadImage('assets/basic111x128/zomb.png')) # zombie
+    agentType.append(loadImage('assets/basic111x128/man.png')) # man
+    agentType.append(loadImage('assets/basic111x128/combat.png')) #human wins
+    agentType.append(loadImage('assets/basic111x128/bite.png')) #zombie wins
+    agentType.append(loadImage('assets/basic111x128/woman.png')) # woman
+    agentType.append(loadImage('assets/basic111x128/burger.png')) # burger
+    agentType.append(loadImage('assets/basic111x128/foods.png')) # foods
     
 
 def resetImages():
@@ -182,18 +184,22 @@ objectType = []
 agentType = []
 #ID
 noObjectId = noAgentId = 0
+#objects
 grassId = 0
 treeId = 1
+blockId = 2
 burningTreeId = 3
+#agents
 medicineId = 1
 zombieId = 2
-winnerzombieId= 5
 humanId = 3
+maleId = 3
+femaleId = 3
 winnerhumanId = 4
+winnerzombieId= 5
 womanId = 6
-
-blockId = 2
-
+burgerId = 7
+foodsId =8
 
 ###
 
@@ -299,7 +305,6 @@ def setAgentAt(x,y,type):
     agentMap[y][x] = type
 
 
-
 ### ### ### ### ### ### ### ### ### ### ### ### ### ### ### ###
 ### ### ### ### ### ### ### ### ### ### ### ### ### ### ### ###
 ### ### ### ### ### ### ### ### ### ### ### ### ### ### ### ###
@@ -309,24 +314,17 @@ def setAgentAt(x,y,type):
 PSHOOT=0.5
 PROB_REPROD = 0.03
 MAXHUNGER=20
-class Human:
-#,age,dead,hunger,gun
-    def __init__(self,imageId, newx=-1, newy=-1):
+
+class BasicAgent:
+    def __init__(self,imageId, newx, newy):
         self.type = imageId
-        self.age=0
         self.dead=False
-        self.hunger=MAXHUNGER
-        if random()<0.5:
-            self.gun=randint(1,10)
-        else:
-            self.gun=0
         if newx<0:
             self.reset()
         else :
             self.x=newx
             self.y=newy
             setAgentAt(self.x,self.y,self.type)
-        #self.reset()
         return
 
     def reset(self):
@@ -347,20 +345,14 @@ class Human:
         setAgentAt(self.x,self.y,self.type)
         return
 
-    def getPosition(self):
-        return (self.x,self.y)
-
-    def die(self):
+    def die(self): 
         self.dead=True
 
-    
-    def shoot(self):
-        if random()<PSHOOT :
-            if self.gun>0 :
-                self.gun-=1
-                return True
-        return False 
+    def getType(self):
+        return self.type
 
+    def getPosition(self):
+        return (self.x,self.y)
     def move(self):
         xNew = self.x
         yNew = self.y
@@ -383,6 +375,47 @@ class Human:
             print ("agent of type ",str(self.type),"located at (",self.x,",",self.y,")")
         return
 
+
+    def move2(self,xNew,yNew):
+        success = False
+        if getObjectAt( (self.x+xNew+worldWidth)%worldWidth , (self.y+yNew+worldHeight)%worldHeight ) == 0: # dont move if collide with object (note that negative values means cell cannot be walked on)
+            setAgentAt( self.x, self.y, noAgentId)
+            self.x = ( self.x + xNew + worldWidth ) % worldWidth
+            self.y = ( self.y + yNew + worldHeight ) % worldHeight
+            setAgentAt( self.x, self.y, self.type)
+            success = True
+        if verbose == True:
+            if success == False:
+                print ("agent of type ",str(self.type)," cannot move.")
+            else:
+                print ("agent of type ",str(self.type)," moved to (",self.x,",",self.y,")")
+        return
+    def move3():
+        return
+
+
+class Human(BasicAgent):
+#,age,dead,hunger,gun
+    def __init__(self,imageId, newx=-1, newy=-1):
+        super().__init__(imageId, newx, newy)
+        self.age=0
+        self.sex=null
+        self.hunger=MAXHUNGER
+        if random()<0.5:
+            self.gun=randint(1,10)
+        else:
+            self.gun=0
+        return
+
+    def shoot(self):
+        if random()<PSHOOT :
+            if self.gun>0 :
+                self.gun-=1
+                return True
+        return False 
+
+
+
     def move2(self,xNew,yNew):
         success = False
         if getObjectAt( (self.x+xNew+worldWidth)%worldWidth , (self.y+yNew+worldHeight)%worldHeight ) == 0: # dont move if collide with object (note that negative values means cell cannot be walked on)
@@ -398,6 +431,7 @@ class Human:
                 print ("agent of type ",str(self.type)," moved to (",self.x,",",self.y,")")
         return
     
+
     def move3(self):
         if random()<0.5:
             if getAgentAt((self.x+1+worldWidth)%worldWidth, (self.y+worldHeight)%worldHeight ) == zombieId: #x+1 y
@@ -419,16 +453,11 @@ class Human:
             else :
                 self.move()
         return
-        
 
-    def getType(self):
-        return self.type
 
-    def combat(self,zombies,humans, foods):
-        exists=False
+    def combat(self,zombies,humans,foods,met):
         for z in zombies:
-            if self.x==z.x and self.y==z.y:
-                exists=True
+            if (met(self,z)):
                 if self.shoot()==True:
                     zombies.remove(z)
                     self.type=4
@@ -440,26 +469,28 @@ class Human:
                     Ty=self.y
                     humans.remove(self)
                     zombies.append(Zombie(winnerzombieId,Tx,Ty))
-                    break
-        if not exists:
-            self.age+=1
-            self.eat(foods)
-            self.move3()
-    #return
+                    return
+        self.age+=1
+        self.hunger-=1
+        self.move3()
+        return
 
-    def reproduire(self, list_humans, imageID):
-        if random()<PROB_REPROD:
-            coords = self.getPosition()
-            h = Human(imageID, coords[0], coords[1])
-            list_humans.append(h)
-
-                    
-
-    def getPosition(self):
-        return (self.x,self.y)
-                
-        
-    
+   # def reproduire(self, list_humans, imageIdF, imageIdM, met):
+    def reproduire(self, list_humans, imageIdM, ImageIdF, met):
+        options=[imageIdF, imageIdM]
+        sex = random.choice(options)
+        for h in list_humans:
+            if (met(self, h)):
+                if self.instanceOf(Male)&&h.instanceOf(Female) || self.instanceOf(Female)&&h.instanceOf(Male):
+                    if random()<PROB_REPROD:
+                        coords = self.getPosition()
+                        z=null
+                        if sex == imageIdF:
+                            z = Female(sex, coords[0], coords[1])
+                        else:
+                            z = Male(sex, coords[0], coords[1]) 
+                        list_humans.append(z)
+                    return
     def eat(self, foods) :
         food=False
         for f in foods :
@@ -469,78 +500,27 @@ class Human:
                 food=True
         if not food:
             self.hunger-=1
-            
 
-class Zombie:
+          
+class Male(Human):
+    def __init__(self,imageId, newx=-1, newy=-1):
+        super().__init__(imageId, newx=-1, newy=-1)
+        self.sex='male'
+class Female(Human):
+    def __init__(self,imageId, newx=-1, newy=-1):
+        super().__init__(imageId, newx=-1, newy=-1)
+        self.sex='female'
+
+ 
+
+class Zombie(BasicAgent):
 
     def __init__(self,imageId,newx,newy):
+        super().__init__(imageId, newx, newy)
         self.decomp=0
-        self.dead=False
         self.direction=randint(0,3) 
-        self.type = imageId
-        if newx<0:
-            self.reset()
-        else :
-            self.x=newx
-            self.y=newy
-            setAgentAt(self.x,self.y,self.type)
         return
 
-    def init(self, imageId, x, y):
-        self.decomp=0
-        self.dead=False
-        self.direction=randint(0,3) 
-        self.type = imageId
-        self.x=x
-        self.y=y
-        
-        return
-
-    def reset(self):
-        self.x = randint(0,getWorldWidth()-1)
-        self.y = randint(0,getWorldWidth()-1)
-        while getTerrainAt(self.x,self.y) != 0 or getObjectAt(self.x,self.y) != 0 or getAgentAt(self.x,self.y) != 0:
-            self.x = randint(0,getWorldWidth()-1)
-            self.y = randint(0,getWorldHeight()-1)
-        setAgentAt(self.x,self.y,self.type)
-        return
-
-    def die(self): #from a headshot or from decomposition
-        self.dead=True
-
-    def getPosition(self):
-        return (self.x,self.y)
-
-    def move(self):
-        xNew = self.x
-        yNew = self.y
-        if random() < 0.5:
-            xNew = ( self.x + [-1,+1][randint(0,1)] + getWorldWidth() ) % getWorldWidth()
-        else:
-            yNew = ( self.y + [-1,+1][randint(0,1)] + getWorldHeight() ) % getWorldHeight()
-        if getObjectAt(xNew,yNew) == 0: # dont move if collide with object (note that negative values means cell cannot be walked on)
-            setAgentAt(self.x,self.y,noAgentId)
-            self.x = xNew
-            self.y = yNew
-            setAgentAt(self.x,self.y,self.type)
-        if verbose == True:
-            print ("agent of type ",str(self.type),"located at (",self.x,",",self.y,")")
-        return
-
-    def move2(self,xNew,yNew):
-        success = False
-        if getObjectAt( (self.x+xNew+worldWidth)%worldWidth , (self.y+yNew+worldHeight)%worldHeight ) == 0: # dont move if collide with object (note that negative values means cell cannot be walked on)
-            setAgentAt( self.x, self.y, noAgentId)
-            self.x = ( self.x + xNew + worldWidth ) % worldWidth
-            self.y = ( self.y + yNew + worldHeight ) % worldHeight
-            setAgentAt( self.x, self.y, self.type)
-            success = True
-        if verbose == True:
-            if success == False:
-                print ("agent of type ",str(self.type)," cannot move.")
-            else:
-                print ("agent of type ",str(self.type)," moved to (",self.x,",",self.y,")")
-        return
 
     def move3(self):
         if random()<0.8:
@@ -582,24 +562,25 @@ class Zombie:
                     self.move()
         return
 
-    def getType(self):
-        return self.type
+
 
 PROBDROP=0.3
 PROBENERGY=0.5
 DROPDAY=9
 DECOMPDAY=15
 NBFOODS=10
+MAXFOOD= 20
 
 
 class Food:
 
-    def __init__(self,imageId):
-        self.type = imageId
-        if random()<PROBEN :
+    def __init__(self):
+        if random()<PROBENERGY :
             self.energy=5
+            self.type = burgerId
         else :
             self.energy=2
+            self.type = foodsId
         self.decomp=0
         self.reset()
         return
@@ -616,9 +597,9 @@ class Food:
     
 
     def randomDrop(it,foods):
-        if (it%DROPDAY==0) :
+        if (it%DROPDAY==0 and len(foods)<MAXFOOD) :
             for i in range(NBFOODS):
-                foods.append(Food(foodId))  #DISPLAY KALDI, decomp arttirmak, while it'na koy
+                foods.append(Food())  #DISPLAY KALDI, decomp arttirmak, while it'na koy
         return 
 
     def decomposition(foods) :
@@ -686,7 +667,6 @@ def initWorld():
     x_offset = mx
     y_offset = my
    
-
     #putting the building 
     for x in range( len( building1TerrainMap[0] ) ):
         for y in range( len( building1TerrainMap ) ):
@@ -736,9 +716,12 @@ def initWorld():
         setObjectAt(20,3+i,blockId,objectMapLevels-1)
         setObjectAt(30,3+i,blockId,objectMapLevels-1)
     #adding agents
+    m = Male(maleId)
+    f = Female(femaleId)
     for i in range(nbAgents):
         zombies.append(Zombie(zombieId,-1,-1))
-        humans.append(Human(humanId))
+        choice = random.choice((m,f))
+        humans.append(choice)
 
 
 
@@ -781,14 +764,23 @@ def stepWorld( it = 0 ):
                         elif getAgentAt((x+neighbours[0]+worldWidth)%worldWidth,(y+neighbours[1]+worldHeight)%worldHeight) == zombieId:
                             setObjectAt(x,y,burningTreeId)
     return
+### ### ### ### ###
+
+def met(agent1, agent2):
+    exists=False
+    if agent1.x==agent2.x and agent1.y==agent2.y:
+        exists=True
+    return exists
 
 ### ### ### ### ###
 MAXAGE=30
-def stepAgents(humanID, it = 0 ):
+def stepAgents(maleID,femaleId, it = 0 ):
     # move agent
     if it % (maxFps/10) == 0:
+        shuffle(foods)
         shuffle(zombies)
         shuffle(humans)
+        Food.randomDrop(it, foods)
         for z in zombies:
             if z.type!=2:
                 z.type=2   # shuffle agents in in-place (i.e. agents is modified)
@@ -799,8 +791,6 @@ def stepAgents(humanID, it = 0 ):
                 z.decomp+=1
                 z.move3()
                 z.direction=randint(0,3)
-
-
         for h in humans:
             if h.type!=3:
                 h.type=3 
@@ -812,8 +802,10 @@ def stepAgents(humanID, it = 0 ):
                 humans.remove(h)
 
             elif h.dead==False:
-                h.combat(zombies,humans,foods)
-                h.reproduire(humans, humanID)
+
+                h.combat(zombies,humans,foods, met)
+                h.reproduire(humans, maleID, femaleID, met)
+
     return
 
 
@@ -859,16 +851,21 @@ def render( it = 0 ):
                 if getObjectAt( xTile , yTile , level)  > 0: # object on terrain?
                     screen.blit( objectType[ getObjectAt( xTile , yTile, level) ] , (xScreen, yScreen - heightMultiplier*(level+1) ))
             if (getAgentAt( xTile, yTile ) != 0) :
-                if (getAgentAt( xTile, yTile ) == humanId) :
+                if ((getAgentAt( xTile, yTile ) == humanId) or (getAgentAt( xTile, yTile ) == womanId)) :
                     for h in humans:
                         if  h.dead==False and h.x==xTile and h.y==yTile : # agent on terrain?
                             screen.blit( agentType[ getAgentAt( xTile, yTile ) ] , (xScreen, yScreen - heightMultiplier ))
-                elif (getAgentAt( xTile, yTile ) == zombieId) :
+                
+                if (getAgentAt( xTile, yTile ) == zombieId) :
                     for z in zombies:
                         if z.dead==False and z.x==xTile and z.y==yTile : # agent on terrain?
                             screen.blit( agentType[ getAgentAt( xTile, yTile ) ] , (xScreen, yScreen - heightMultiplier ))
-                else :
-                     screen.blit( agentType[ getAgentAt( xTile, yTile ) ] , (xScreen, yScreen - heightMultiplier ))
+                if ((getAgentAt( xTile, yTile ) == burgerId) or (getAgentAt( xTile, yTile ) == foodsId)) :
+                    for f in foods:
+                        if f.x==xTile and f.y==yTile : # agent on terrain?
+                            screen.blit( agentType[ getAgentAt( xTile, yTile ) ] , (xScreen, yScreen - heightMultiplier ))
+                """else :
+                     screen.blit( agentType[ getAgentAt( xTile, yTile ) ] , (xScreen, yScreen - heightMultiplier ))"""
 
     return
 
@@ -902,7 +899,6 @@ stepWorld(it)
 
 while userExit == False:
 
-    ID = humanId
     if it != 0 and it % 100 == 0 and verboseFps:
         print ("[fps] ", ( it - itStamp ) / ( datetime.datetime.now().timestamp()-timeStamp ) )
         timeStamp = datetime.datetime.now().timestamp()
@@ -912,7 +908,7 @@ while userExit == False:
 
     render(it)
     
-    stepAgents(ID, it)
+    stepAgents(maleId, femaleId, it)
     stepWorld(it)
 
     perdu = False
@@ -925,7 +921,7 @@ while userExit == False:
         #if h.getPosition() == player.getPosition():
         if h.getPosition() == (mx,my):
             perdu = True
-            playsound('isoworld/sounds/VOXScrm_Wilhelm scream (ID 0477)_BSB.wav')
+            #playsound('isoworld/sounds/VOXScrm_Wilhelm scream (ID 0477)_BSB.wav')
             break
 
     if perdu == True:
@@ -942,7 +938,10 @@ while userExit == False:
         sys.exit()
 
     if it % 10 == 0:
-        humans.append(Human(humanId))
+        m = Male(maleId)
+        f = Female(femaleId)
+        choice = random.choice((m,f))
+        humans.append(choice)
         zombies.append(Zombie(zombieId,-1,-1))
 
     # continuous stroke
