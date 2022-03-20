@@ -1,97 +1,48 @@
+WHAT HAPPENS IN THE SIMULATION (BY FAR)
+  If humans see a zombie close to them they run away, if a zombie sees a human in front of them (depends on their random  direction) they run towards them. PROBABILITY TO MOVE for humans is lower so that zombies can catch up. When a zombie and a human are on the same coords : explained in combat function in DONE list. If two opposite sexes of humans REPRODUCE a baby is born (might add the aging factors) and human couples tend to move together.
 
-GAME OF LIFE : QUITE LITERALLY
-SPRINT THINGS
-Sprint goal : créer un environnement ou les zombies essaient de manger les humains mais les humains ils peuvent se battre. 
+DONE:
 
--Dans cet environnement il y a des trees et des « food drops » . 
-
-
-#Human
-
-  -hunger attribut
-  -water attribut
-  -health att
-  -bitten att
-  -hides it if bitten prob
-  -gun att
-  -dead alive att
-  -age att
-  -reproduction prob
-  -8 goz -- bruh
-  -prob of noise prob
+  -attributs of agents (zombies and humans)
+    -age decomp hunger etc...
+  -combat function
+    -if human has a gun and PROBSHOOT (shoot function) then zombie dies and gets removed
+    -else if zombie bites human, human gets deleted from humans list and a zombie in the same coordinates gets added to the zombies list
+    -else human gets older, energy -- etc.
+  -move functions
+    -move -> random movement
+    -move2 -> movement to given coords
+    -move 3
+      -humans -> if there is a zombie in north, south, east or west moves to opposite direction
+      -zombies -> if there is a human in front of them they go towards the human
+  -stepAgents function
+    -scroll through humans and zombies lists and remove them if necessary (death from hunger, combat etc.)
+  -render
+    -for level in range...
+      goes through agents lists and implements them on the program
+  
   
 
-#Zombie
+  -food drops
 
-  -4lu hareket
-  -onunu goruyor
-  -if dead then time of decomposition
-  -if contaminated but alive then hunger
-  
-#ZOMBIE VS HUMAN
 
-  - prob of shooting the z
-  - prob of biting 
-  - human runs away (hiz farki)
+TO DO:
 
-#HUMAN VS HUMAN
+  -gun drops (D)
+  -reproduction (K)
+  -couples becoming groups (-)
+  -adding day and night (S)
+  -visual changements concerning agents and objects (S)
+  -adding environmental changes
+    -random mountains (S)
+    -environmental changes (D)
+  -environment x agents x objects 
+    -climbing a mountain etc (S-D)
+  -changing the transitioning process from human to zombie (-)
+    -a transitioning period
+    -immunity
+  -working on a player (-)
 
-  -prob of conflict
-  -prob of reproduction based on age etc
-  -tendancy of beco;ing a group
 
-#ANIMAL
-
-  -food for human
-  if pred exists then attack human and prey
-  -prey runs away 
-  -prey 4 lu hareket
-  
- #ENVIRONEMENT
- 
-  -trees flowers water source wall 
-  -market
-  -gece gunduz optional
-  -food 
-    -animal or plant based doesnt really matter
-    
-    
-#TO DO:
-
-STEP :
-
-  -Engel varsa gidememek (tree listesini gezecegiz)
-
-AGENTS:
-
-  -Human:
-    - 8 case goruyor
-    - zombie gorunce kaciyor (zombie listesini , CA)
-    - food gorurse ona gidecek ( zombie oncelikle ; food listesini, CA)
-    - yoksa random
-    
-  -Zombie:
-    -4 case (simdilik)
-    -human gorunce ona gidecek ( human listesi, CA)
-    - hicbir sey yoksa random hareket
-  
-  -Food :
-    -random drop(method, iteration sayiyla food listesine ajout)
-
-pythona bir goz at
--sacma baglantilar :
-  Human/zombie - agent - UniqueDynamicObject
--Agents'i WorldOffTree'e ekleyecegiz (initte)
-    - renkler degisecek her agent icin
-    - food tree gibi olacak
-    - fuit ve catch eklenecek (optimum hiz)
-      -ayni casedalarsa : silah ve vurma prob u eger vuramazsa bite
-    -CA icin ne yapilacak ? 
-      -ya FOrestCA dan devam ya da yeni CA hepsi icin
-      
-  -github online yenileme zimbirtisi ayarla 
-  
-  -
-  
 
 
