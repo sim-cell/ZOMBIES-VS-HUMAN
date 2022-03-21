@@ -3,13 +3,13 @@
 ##WHAT HAPPENS IN THE SIMULATION (BY FAR)
   If humans see a zombie close to them they run away, if a zombie sees a human in front of them (depends on their random  direction) they run towards them. PROBABILITY TO MOVE for humans is lower so that zombies can catch up. When a zombie and a human are on the same coords : explained in combat function in DONE list. If two opposite sexes of humans REPRODUCE a baby is born (might add the aging factors) and human couples tend to move together.
 
-##DONE:
+## DONE:
 
-  -attributs of agents (zombies and humans)<br>
-    -age decomp hunger etc...<br>
-  -combat function
-    -if human has a gun and PROBSHOOT (shoot function) then zombie dies and gets removed
-    -else if zombie bites human, human gets deleted from humans list and a zombie in the same coordinates gets added to the zombies list
+  - attributs of agents (zombies and humans)<br>
+    - age decomp hunger etc...<br>
+  - combat function
+    - if human has a gun and PROBSHOOT (shoot function) then zombie dies and gets removed
+    - else if zombie bites human, human gets deleted from humans list and a zombie in the same coordinates gets added to the zombies list
     -else human gets older, energy -- etc.
   -move functions
     -move -> random movement
@@ -28,7 +28,7 @@
   -food drops
 
 
-##TO DO:
+## TO DO:
 
   -gun drops (D)
   -reproduction (DONE)
