@@ -35,6 +35,7 @@
 import sys
 import datetime
 from random import *
+#import random
 import math
 import time
 #from playsound import playsound
@@ -192,9 +193,10 @@ burningTreeId = 3
 #agents
 medicineId = 1
 zombieId = 2
-humanId = 3
-maleId = 3
-femaleId = 3
+# ---HUMAN-ICONS---
+# the icon depends on Male/Female human
+#humanId = 3
+manId = 3
 winnerhumanId = 4
 winnerzombieId= 5
 womanId = 6
@@ -399,7 +401,7 @@ class Human(BasicAgent):
     def __init__(self,imageId, newx=-1, newy=-1):
         super().__init__(imageId, newx, newy)
         self.age=0
-        self.sex=null
+        self.sex=None
         self.hunger=MAXHUNGER
         if random()<0.5:
             self.gun=randint(1,10)
@@ -414,23 +416,6 @@ class Human(BasicAgent):
                 return True
         return False 
 
-
-
-    def move2(self,xNew,yNew):
-        success = False
-        if getObjectAt( (self.x+xNew+worldWidth)%worldWidth , (self.y+yNew+worldHeight)%worldHeight ) == 0: # dont move if collide with object (note that negative values means cell cannot be walked on)
-            setAgentAt( self.x, self.y, noAgentId)
-            self.x = ( self.x + xNew + worldWidth ) % worldWidth
-            self.y = ( self.y + yNew + worldHeight ) % worldHeight
-            setAgentAt( self.x, self.y, self.type)
-            success = True
-        if verbose == True:
-            if success == False:
-                print ("agent of type ",str(self.type)," cannot move.")
-            else:
-                print ("agent of type ",str(self.type)," moved to (",self.x,",",self.y,")")
-        return
-    
 
     def move3(self):
         if random()<0.5:
@@ -476,21 +461,21 @@ class Human(BasicAgent):
         return
 
    # def reproduire(self, list_humans, imageIdF, imageIdM, met):
-    def reproduire(self, list_humans, imageIdM, ImageIdF, met):
-        options=[imageIdF, imageIdM]
-        sex = random.choice(options)
+    def reproduire(self, list_humans, ImageIdM, ImageIdF, met):
+        options=[ImageIdF, ImageIdM]
+        sex_choice = choice(options)
         for h in list_humans:
             if (met(self, h)):
-                if self.instanceOf(Male)&&h.instanceOf(Female) || self.instanceOf(Female)&&h.instanceOf(Male):
+                if self.getType()!=h.getType():#self.instanceOf(Male)&&h.instanceOf(Female) || self.instanceOf(Female)&&h.instanceOf(Male):
                     if random()<PROB_REPROD:
                         coords = self.getPosition()
-                        z=null
-                        if sex == imageIdF:
+                        z=Male(sex, coords[0], coords[1])
+                        if sex_choice == imageIdF:
                             z = Female(sex, coords[0], coords[1])
-                        else:
-                            z = Male(sex, coords[0], coords[1]) 
                         list_humans.append(z)
-                    return
+                    break
+        return
+
     def eat(self, foods) :
         food=False
         for f in foods :
@@ -505,11 +490,11 @@ class Human(BasicAgent):
 class Male(Human):
     def __init__(self,imageId, newx=-1, newy=-1):
         super().__init__(imageId, newx=-1, newy=-1)
-        self.sex='male'
+        self.sex='M'
 class Female(Human):
     def __init__(self,imageId, newx=-1, newy=-1):
         super().__init__(imageId, newx=-1, newy=-1)
-        self.sex='female'
+        self.sex='F'
 
  
 
@@ -524,42 +509,48 @@ class Zombie(BasicAgent):
 
     def move3(self):
         if random()<0.8:
-            if self.direction==0:
-                if getAgentAt((self.x+1+worldWidth)%worldWidth,(self.y+worldHeight)%worldHeight) == humanId :
-                    self.move2(1,0)
-                elif getAgentAt((self.x+1+worldWidth)%worldWidth,(self.y+1+worldHeight)%worldHeight) == humanId :
-                    self.move2(1,1)  
-                elif getAgentAt((self.x+1+worldWidth)%worldWidth,(self.y-1+worldHeight)%worldHeight) == humanId :
-                    self.move2(1,-1)
-                else :
-                    self.move()
-            elif self.direction==2:
-                if getAgentAt((self.x-1+worldWidth)%worldWidth,(self.y+worldHeight)%worldHeight) == humanId :
-                    self.move2(-1,0)
-                elif getAgentAt((self.x-1+worldWidth)%worldWidth,(self.y+1+worldHeight)%worldHeight) == humanId :
-                    self.move2(-1,1)  
-                elif getAgentAt((self.x-1+worldWidth)%worldWidth,(self.y-1+worldHeight)%worldHeight) == humanId :
-                    self.move2(-1,-1)
-                else :
-                    self.move()
-            elif self.direction==1:
-                if getAgentAt((self.x+worldWidth)%worldWidth,(self.y+1+worldHeight)%worldHeight) == humanId :
-                    self.move2(0,1)
-                elif getAgentAt((self.x+1+worldWidth)%worldWidth,(self.y+1+worldHeight)%worldHeight) == humanId :
-                    self.move2(1,1)  
-                elif getAgentAt((self.x-1+worldWidth)%worldWidth,(self.y+1+worldHeight)%worldHeight) == humanId :
-                    self.move2(1,1)
-                else :
-                    self.move()
-            elif self.direction==3:
-                if getAgentAt((self.x+worldWidth)%worldWidth,(self.y-1+worldHeight)%worldHeight) == humanId :
-                    self.move2(0,-1)
-                elif getAgentAt((self.x+1+worldWidth)%worldWidth,(self.y-1+worldHeight)%worldHeight) == humanId :
-                    self.move2(1,-1)  
-                elif getAgentAt((self.x-1+worldWidth)%worldWidth,(self.y-1+worldHeight)%worldHeight) == humanId :
-                    self.move2(-1,-1)
-                else :
-                    self.move()
+            for agentId in [manId, womanId]:
+                if self.direction==0:
+                    if getAgentAt((self.x+1+worldWidth)%worldWidth,(self.y+worldHeight)%worldHeight) == agentId :
+                        self.move2(1,0)
+                        return
+                    elif getAgentAt((self.x+1+worldWidth)%worldWidth,(self.y+1+worldHeight)%worldHeight) == agentId :
+                        self.move2(1,1)
+                        return
+                    elif getAgentAt((self.x+1+worldWidth)%worldWidth,(self.y-1+worldHeight)%worldHeight) == agentId :
+                        self.move2(1,-1)
+                        return
+                elif self.direction==2:
+                    if getAgentAt((self.x-1+worldWidth)%worldWidth,(self.y+worldHeight)%worldHeight) == agentId :
+                        self.move2(-1,0)
+                        return
+                    elif getAgentAt((self.x-1+worldWidth)%worldWidth,(self.y+1+worldHeight)%worldHeight) == agentId :
+                        self.move2(-1,1)
+                        return
+                    elif getAgentAt((self.x-1+worldWidth)%worldWidth,(self.y-1+worldHeight)%worldHeight) == agentId :
+                        self.move2(-1,-1)
+                        return
+                elif self.direction==1:
+                    if getAgentAt((self.x+worldWidth)%worldWidth,(self.y+1+worldHeight)%worldHeight) == agentId :
+                        self.move2(0,1)
+                        return
+                    elif getAgentAt((self.x+1+worldWidth)%worldWidth,(self.y+1+worldHeight)%worldHeight) == agentId :
+                        self.move2(1,1)
+                        return
+                    elif getAgentAt((self.x-1+worldWidth)%worldWidth,(self.y+1+worldHeight)%worldHeight) == agentId :
+                        self.move2(1,1)
+                        return
+                elif self.direction==3:
+                    if getAgentAt((self.x+worldWidth)%worldWidth,(self.y-1+worldHeight)%worldHeight) == agentId :
+                        self.move2(0,-1)
+                        return
+                    elif getAgentAt((self.x+1+worldWidth)%worldWidth,(self.y-1+worldHeight)%worldHeight) == agentId :
+                        self.move2(1,-1)
+                        return
+                    elif getAgentAt((self.x-1+worldWidth)%worldWidth,(self.y-1+worldHeight)%worldHeight) == agentId :
+                        self.move2(-1,-1)
+                        return
+        self.move()
         return
 
 
@@ -632,15 +623,24 @@ mx = 3
 my = 3
 MAXMOUNT = (int)(worldHeight/10)
 def randEnv():
-    for int in randint(0,MAXMOUNT+1):
+    for ind in range(0,randint(0,MAXMOUNT+1)):
         wid=randint(0,10)
         len=randint(0,10)
-        buildMap 
-        for w in wid:
-            for l in len:
-                
+        terrainMap=[[]]
+        for i in range(wid) :
+            terrainMap[i] = [3 for j in range(len)]
+        heightMap=[[]]
+        for w in range(wid):
+            for l in range(len):
+                heightMap[w][l]=randint(1,3)
 
-
+        x_offset = randint(0,32)
+        y_offset = randint(0,32)
+        for x in range(wid):
+            for y in range(len):
+                setTerrainAt( x+x_offset, y+y_offset, terrainMap[x][y] )
+                setHeightAt( x+x_offset, y+y_offset, heightMap[x][y] )
+                setObjectAt( x+x_offset, y+y_offset, 0)
     return
 
 
@@ -716,12 +716,16 @@ def initWorld():
         setObjectAt(20,3+i,blockId,objectMapLevels-1)
         setObjectAt(30,3+i,blockId,objectMapLevels-1)
     #adding agents
-    m = Male(maleId)
-    f = Female(femaleId)
+    m = Male(manId)
+    f = Female(womanId)
     for i in range(nbAgents):
         zombies.append(Zombie(zombieId,-1,-1))
-        choice = random.choice((m,f))
-        humans.append(choice)
+        if random()<0.5:
+            humans.append(f)
+        else:
+            humans.append(m)
+        #ch = choice((m,f))
+        #humans.append(ch)
 
 
 
@@ -774,7 +778,7 @@ def met(agent1, agent2):
 
 ### ### ### ### ###
 MAXAGE=30
-def stepAgents(maleID,femaleId, it = 0 ):
+def stepAgents(maleID,womanId, it = 0 ):
     # move agent
     if it % (maxFps/10) == 0:
         shuffle(foods)
@@ -792,8 +796,12 @@ def stepAgents(maleID,femaleId, it = 0 ):
                 z.move3()
                 z.direction=randint(0,3)
         for h in humans:
-            if h.type!=3:
-                h.type=3 
+            if not (h.type==3 or h.type==6):
+                if h.sex=='M':
+                    h.type=3
+                else:
+                    h.type=6
+            #    h.type=3
             if h.age>MAXAGE:
                 h.die()
                 humans.remove(h)
@@ -804,7 +812,7 @@ def stepAgents(maleID,femaleId, it = 0 ):
             elif h.dead==False:
 
                 h.combat(zombies,humans,foods, met)
-                h.reproduire(humans, maleID, femaleID, met)
+                h.reproduire(humans, manId, womanId, met)
 
     return
 
@@ -847,11 +855,14 @@ def render( it = 0 ):
 
             screen.blit( tileType[ getTerrainAt( xTile , yTile ) ] , (xScreen, yScreen)) # display terrain
 
+            #for i in humans:
+            #    print(i)
+
             for level in range(objectMapLevels):
                 if getObjectAt( xTile , yTile , level)  > 0: # object on terrain?
                     screen.blit( objectType[ getObjectAt( xTile , yTile, level) ] , (xScreen, yScreen - heightMultiplier*(level+1) ))
             if (getAgentAt( xTile, yTile ) != 0) :
-                if ((getAgentAt( xTile, yTile ) == humanId) or (getAgentAt( xTile, yTile ) == womanId)) :
+                if ((getAgentAt( xTile, yTile ) == manId) or (getAgentAt( xTile, yTile ) == womanId)) :
                     for h in humans:
                         if  h.dead==False and h.x==xTile and h.y==yTile : # agent on terrain?
                             screen.blit( agentType[ getAgentAt( xTile, yTile ) ] , (xScreen, yScreen - heightMultiplier ))
@@ -908,7 +919,7 @@ while userExit == False:
 
     render(it)
     
-    stepAgents(maleId, femaleId, it)
+    stepAgents(manId, womanId, it)
     stepWorld(it)
 
     perdu = False
@@ -938,10 +949,14 @@ while userExit == False:
         sys.exit()
 
     if it % 10 == 0:
-        m = Male(maleId)
-        f = Female(femaleId)
-        choice = random.choice((m,f))
-        humans.append(choice)
+        m = Male(manId)
+        f = Female(womanId)
+        if random()<0.5:
+            humans.append(m)
+        else:
+            humans.append(f)
+        #ch = choice((m,f))
+        #humans.append(ch)
         zombies.append(Zombie(zombieId,-1,-1))
 
     # continuous stroke
