@@ -134,7 +134,7 @@ def loadAllImages():
     objectType = []
     agentType = []
 
-    tileType.append(loadImage('assets/basic111x128/plat.png')) # grass
+    tileType.append(loadImage('assets/basic111x128/plat.png')) # grasss
     tileType.append(loadImage('assets/ext/isometric-blocks/PNG/Platformer tiles/platformerTile_33.png')) # brick
     tileType.append(loadImage('assets/ext/isometric-blocks/PNG/Abstract tiles/abstractTile_12.png')) # blue grass (?)
     tileType.append(loadImage('assets/ext/isometric-blocks/PNG/Abstract tiles/abstractTile_09.png')) # grey brock
@@ -628,12 +628,13 @@ def randEnv():
         len=randint(0,10)
         terrainMap=[[]]
         for i in range(wid) :
+
             terrainMap[i] = [3 for j in range(len)]
+
         heightMap=[[]]
         for w in range(wid):
             for l in range(len):
                 heightMap[w][l]=randint(1,3)
-
         x_offset = randint(0,32)
         y_offset = randint(0,32)
         for x in range(wid):
@@ -644,12 +645,14 @@ def randEnv():
     return
 
 
+
 def initWorld():
     global nbTrees, nbBurningTrees, zombies, humans, agents
 
     # add a pyramid-shape building
     #type of object
-    building1TerrainMap = [
+    randEnv()
+    """building1TerrainMap = [
     [ 2, 2, 2, 2 ],
     [ 2, 3, 3, 2 ],
     [ 2, 3, 3, 2 ],
@@ -668,11 +671,11 @@ def initWorld():
     y_offset = my
    
     #putting the building 
-    for x in range( len( building1TerrainMap[0] ) ):
-        for y in range( len( building1TerrainMap ) ):
+    for x in range( len( building1TerrainMap[0] )):
+        for y in range( len( building1TerrainMap )):
             setTerrainAt( x+x_offset, y+y_offset, building1TerrainMap[x][y] )
             setHeightAt( x+x_offset, y+y_offset, building1HeightMap[x][y] )
-            setObjectAt( x+x_offset, y+y_offset, -1 ) # add a virtual object: not displayed, but used to forbid agent(s) to come here.
+            setObjectAt( x+x_offset, y+y_offset, 0) # add a virtual object: not displayed, but used to forbid agent(s) to come here.
 
     # add another pyramid-shape building with a tree on top
     building2TerrainMap = [
@@ -704,7 +707,7 @@ def initWorld():
             setTerrainAt( x+x_offset, y+y_offset, building2TerrainMap[y][x] )
             setHeightAt( x+x_offset, y+y_offset, building2HeightMap[y][x] )
             setObjectAt( x+x_offset, y+y_offset, -1 ) # add a virtual object: not displayed, but used to forbid agent(s) to come here.
-    setObjectAt( x_offset+3, y_offset+4, treeId )
+    setObjectAt( x_offset+3, y_offset+4, treeId )"""
     #orange thing collumn
     for c in [(20,2),(30,2),(30,12),(20,12)]:
         for level in range(0,objectMapLevels):
