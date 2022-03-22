@@ -320,7 +320,7 @@ def setAgentAt(x,y,type):
 ###
 ###
 PSHOOT=0.5
-PROB_REPROD = 0.03
+PROB_REPROD = 0.1
 MAXHUNGER=20
 
 class BasicAgent:
@@ -476,10 +476,10 @@ class Human(BasicAgent):
                 if self.getType()!=h.getType():#self.instanceOf(Male)&&h.instanceOf(Female) || self.instanceOf(Female)&&h.instanceOf(Male):
                     if random()<PROB_REPROD:
                         coords = self.getPosition()
-                        z=Male(sex_choice, coords[0], coords[1])
                         if sex_choice == ImageIdF:
-                            z = Female(sex_choice, coords[0], coords[1])
-                        list_humans.append(z)
+                            list_humans.append(Female(sex_choice, coords[0], coords[1]))
+                        else :
+                            list_humans.append(Male(sex_choice, coords[0], coords[1]))
                     break
         return
 
@@ -612,9 +612,10 @@ class Food(RandDropAgents):
         return
     
     def randomDrop(it,list):
-        if (it%DROPDAY==0 and len(list)<MAXAGENT) :
-            for i in range(NBSAGENT):
-                list.append(Food())  # decomp arttirmak, while it'na koy
+        if (it != 0):
+            if (it%DROPDAY==0 and len(list)<MAXAGENT) :
+                for i in range(NBSAGENT):
+                    list.append(Food())  # decomp arttirmak, while it'na koy
         return
 
 
@@ -625,9 +626,10 @@ class Gun(RandDropAgents) :
         self.reset()
     
     def randomDrop(it,list):
-        if (it%DROPDAY==0 and len(list)<MAXAGENT) :
-            for i in range(NBSAGENT):
-                list.append(Gun())  # decomp arttirmak, while it'na koy
+        if (it != 0):
+            if (it%DROPDAY==0 and len(list)<MAXAGENT) :
+                for i in range(NBSAGENT):
+                    list.append(Gun())  # decomp arttirmak, while it'na koy
         return
 
 
@@ -744,14 +746,13 @@ def initWorld():
         setObjectAt(20,3+i,blockId,objectMapLevels-1)
         setObjectAt(30,3+i,blockId,objectMapLevels-1)
     #adding agents
-    m = Male(manId)
-    f = Female(womanId)
+
     for i in range(nbAgents):
-        #zombies.append(Zombie(zombieId,-1,-1))
+        zombies.append(Zombie(zombieId,-1,-1))
         if random()<0.5:
-            humans.append(f)
+            humans.append(Male(manId))
         else:
-            humans.append(m)
+            humans.append(Female(womanId))
         #ch = choice((m,f))
         #humans.append(ch)"""
 
@@ -805,10 +806,10 @@ def met(agent1, agent2):
     return exists
 
 ### ### ### ### ###
-MAXAGE=30
+MAXAGE=50
 def stepAgents(maleID,womanId, it = 0 ):
     # move agent
-    if it % (maxFps/10) == 0:
+    if it % (maxFps/4) == 0:
         shuffle(foods)
         shuffle(zombies)
         shuffle(humans)
@@ -837,8 +838,8 @@ def stepAgents(maleID,womanId, it = 0 ):
             elif h.hunger==-1:
                 h.die()
                 humans.remove(h)
-
-            elif h.dead==False:
+            
+            if h.dead==False:
                 h.reproduire(humans, babyBoyId, babyGirlId , met)
                 h.combat(zombies,humans,foods, met)
                 
@@ -928,7 +929,6 @@ loadAllImages()
 displayWelcomeMessage()
 
 initWorld()
-render(it=0)
 initAgents()
 
 #player = BasicAgent(medicineId)
@@ -940,15 +940,6 @@ timeStampStart = timeStamp = datetime.datetime.now().timestamp()
 it = itStamp = 0
 
 userExit = False
-
-m = Male(manId)
-f = Female(womanId)
-for i in range(nbAgents):
-    zombies.append(Zombie(zombieId,-1,-1))
-    if random()<0.5:
-        humans.append(f)
-    else:
-        humans.append(m)
 
 stepWorld(it)
 
@@ -971,7 +962,7 @@ while userExit == False:
 
 
     if (len(zombies)==0):
-        perdu = True 
+        perdu = True
 
     for h in humans:
         #if h.getPosition() == player.getPosition():
@@ -993,7 +984,7 @@ while userExit == False:
         pygame.quit()
         sys.exit()
 
-    if it % 10 == 0:
+    """ if it % 10 == 0:
         m = Male(manId)
         f = Female(womanId)
         if random()<0.5:
@@ -1002,7 +993,7 @@ while userExit == False:
             humans.append(f)
         #ch = choice((m,f))
         #humans.append(ch)
-        zombies.append(Zombie(zombieId,-1,-1))
+        #zombies.append(Zombie(zombieId,-1,-1))"""
 
     # continuous stroke
     keys = pygame.key.get_pressed()

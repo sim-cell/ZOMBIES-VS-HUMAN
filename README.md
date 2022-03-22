@@ -23,14 +23,11 @@
     - for level in range... <br>
       goes through agents lists and implements them on the program
   
-  
-
   - food drops
+  - gun drops
 
 
 ## TO DO:
-!!!  Revoir render, probleme de display pour les humains
-  - gun drops (D)
   - reproduction (DONE)
   - couples becoming groups (K)
   - adding day and night (S)
