@@ -29,7 +29,7 @@
 
 
 ## TO DO:
-
+!!!  Revoir render, probleme de display pour les humains
   - gun drops (D)
   - reproduction (DONE)
   - couples becoming groups (K)
@@ -44,6 +44,7 @@
     - a transitioning period
     - immunity
   - working on a player (-)
+
 
 
 

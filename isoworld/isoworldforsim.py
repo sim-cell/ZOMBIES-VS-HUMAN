@@ -63,7 +63,7 @@ versionTag = "2018-12-24_15h06"
 #numbers of elements
 nbTrees = 30 #350
 nbBurningTrees = 0 #15
-nbAgents = 800
+nbAgents = 30
 
 ### ### ### ### ### ### ### ### ### ### ### ### ### ### ### ###
 ### ### ### ### ### ### ### ### ### ### ### ### ### ### ### ###
@@ -753,7 +753,7 @@ def initWorld():
         else:
             humans.append(m)
         #ch = choice((m,f))
-        #humans.append(ch)
+        #humans.append(ch)"""
 
 
 
@@ -928,6 +928,7 @@ loadAllImages()
 displayWelcomeMessage()
 
 initWorld()
+render(it=0)
 initAgents()
 
 #player = BasicAgent(medicineId)
@@ -940,7 +941,17 @@ it = itStamp = 0
 
 userExit = False
 
+m = Male(manId)
+f = Female(womanId)
+for i in range(nbAgents):
+    zombies.append(Zombie(zombieId,-1,-1))
+    if random()<0.5:
+        humans.append(f)
+    else:
+        humans.append(m)
+
 stepWorld(it)
+
 
 while userExit == False:
 
@@ -959,9 +970,9 @@ while userExit == False:
     perdu = False
 
 
-    """if (len(zombies)==0):
+    if (len(zombies)==0):
         perdu = True 
-"""
+
     for h in humans:
         #if h.getPosition() == player.getPosition():
         if h.getPosition() == (mx,my):
