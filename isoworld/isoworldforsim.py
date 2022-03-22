@@ -43,6 +43,7 @@ import time
 
 
 import pygame
+print(pygame.ver)
 from pygame.locals import *
 
 ###
