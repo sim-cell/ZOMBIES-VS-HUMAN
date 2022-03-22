@@ -62,7 +62,7 @@ versionTag = "2018-12-24_15h06"
 #numbers of elements
 nbTrees = 30 #350
 nbBurningTrees = 0 #15
-nbAgents = 30
+nbAgents = 800
 
 ### ### ### ### ### ### ### ### ### ### ### ### ### ### ### ###
 ### ### ### ### ### ### ### ### ### ### ### ### ### ### ### ###
@@ -153,7 +153,9 @@ def loadAllImages():
     agentType.append(loadImage('isoworld/assets/basic111x128/woman.png')) # woman
     agentType.append(loadImage('isoworld/assets/basic111x128/burger.png')) # burger
     agentType.append(loadImage('isoworld/assets/basic111x128/foods.png')) # foods
-    
+    agentType.append(loadImage('isoworld/assets/basic111x128/gun.png')) # gun
+    agentType.append(loadImage('isoworld/assets/basic111x128/babyBoy.png')) # babyBoy
+    agentType.append(loadImage('isoworld/assets/basic111x128/babyGirl.png')) # babyGirl
 
 def resetImages():
     global tileTotalWidth, tileTotalHeight, tileTotalWidthOriginal, tileTotalHeightOriginal, scaleMultiplier, heightMultiplier, tileVisibleHeight
@@ -202,6 +204,9 @@ winnerzombieId= 5
 womanId = 6
 burgerId = 7
 foodsId =8
+gunId = 9
+babyBoyId = 10
+babyGirlId = 11
 
 ###
 
@@ -355,6 +360,7 @@ class BasicAgent:
 
     def getPosition(self):
         return (self.x,self.y)
+
     def move(self):
         xNew = self.x
         yNew = self.y
@@ -397,7 +403,7 @@ class BasicAgent:
 
 
 class Human(BasicAgent):
-#,age,dead,hunger,gun
+#age,dead,hunger,gun
     def __init__(self,imageId, newx=-1, newy=-1):
         super().__init__(imageId, newx, newy)
         self.age=0
@@ -469,9 +475,9 @@ class Human(BasicAgent):
                 if self.getType()!=h.getType():#self.instanceOf(Male)&&h.instanceOf(Female) || self.instanceOf(Female)&&h.instanceOf(Male):
                     if random()<PROB_REPROD:
                         coords = self.getPosition()
-                        z=Male(sex, coords[0], coords[1])
-                        if sex_choice == imageIdF:
-                            z = Female(sex, coords[0], coords[1])
+                        z=Male(sex_choice, coords[0], coords[1])
+                        if sex_choice == ImageIdF:
+                            z = Female(sex_choice, coords[0], coords[1])
                         list_humans.append(z)
                     break
         return
@@ -489,11 +495,11 @@ class Human(BasicAgent):
           
 class Male(Human):
     def __init__(self,imageId, newx=-1, newy=-1):
-        super().__init__(imageId, newx=-1, newy=-1)
+        super().__init__(imageId, newx, newy)
         self.sex='M'
 class Female(Human):
     def __init__(self,imageId, newx=-1, newy=-1):
-        super().__init__(imageId, newx=-1, newy=-1)
+        super().__init__(imageId, newx, newy)
         self.sex='F'
 
  
@@ -554,26 +560,18 @@ class Zombie(BasicAgent):
         return
 
 
-
+#We can separate these probs for guns and for foods later but now i use only these ones
 PROBDROP=0.3
 PROBENERGY=0.5
 DROPDAY=9
 DECOMPDAY=15
-NBFOODS=10
-MAXFOOD= 20
+NBSAGENT=10
+MAXAGENT= 20
 
 
-class Food:
+class RandDropAgents:
 
     def __init__(self):
-        if random()<PROBENERGY :
-            self.energy=5
-            self.type = burgerId
-        else :
-            self.energy=2
-            self.type = foodsId
-        self.decomp=0
-        self.reset()
         return
 
     def reset(self):
@@ -584,22 +582,6 @@ class Food:
             self.y = randint(0,getWorldHeight()-1)
         setAgentAt(self.x,self.y,self.type)
         return
-    
-    
-
-    def randomDrop(it,foods):
-        if (it%DROPDAY==0 and len(foods)<MAXFOOD) :
-            for i in range(NBFOODS):
-                foods.append(Food())  #DISPLAY KALDI, decomp arttirmak, while it'na koy
-        return 
-
-    def decomposition(foods) :
-        for f in foods :
-            if f.decomp==DECOMPDAY :
-                foods.remove(f)
-            else :
-                f.decomp+=1
-        return
 
     def getPosition(self):
         return (self.x,self.y)
@@ -608,6 +590,48 @@ class Food:
         return self.type
 
 
+class Food(RandDropAgents):
+    def __init__(self) :
+        super().__init__()
+        if random()<PROBENERGY :
+            self.energy=5
+            self.type = burgerId
+        else :
+            self.energy=2
+            self.type = foodsId
+        self.decomp=0
+        self.reset()
+    
+    def decomposition(foods) :
+        for f in foods :
+            if f.decomp==DECOMPDAY :
+                foods.remove(f)
+            else :
+                f.decomp+=1
+        return
+    
+    def randomDrop(it,list):
+        if (it%DROPDAY==0 and len(list)<MAXAGENT) :
+            for i in range(NBSAGENT):
+                list.append(Food())  # decomp arttirmak, while it'na koy
+        return
+
+
+class Gun(RandDropAgents) :
+    def __init__(self) :
+        super().__init__()
+        self.type=gunId
+        self.reset()
+    
+    def randomDrop(it,list):
+        if (it%DROPDAY==0 and len(list)<MAXAGENT) :
+            for i in range(NBSAGENT):
+                list.append(Gun())  # decomp arttirmak, while it'na koy
+        return
+
+
+
+guns = []
 foods = []
 zombies = []
 humans = []
@@ -622,7 +646,7 @@ humans = []
 mx = 3
 my = 3
 MAXMOUNT = (int)(worldHeight/10)
-def randEnv():
+"""def randEnv():
     for ind in range(0,randint(0,MAXMOUNT+1)):
         wid=randint(0,10)
         len=randint(0,10)
@@ -643,7 +667,7 @@ def randEnv():
                 setHeightAt( x+x_offset, y+y_offset, heightMap[x][y] )
                 setObjectAt( x+x_offset, y+y_offset, 0)
     return
-
+"""
 
 
 def initWorld():
@@ -651,7 +675,7 @@ def initWorld():
 
     # add a pyramid-shape building
     #type of object
-    randEnv()
+    #randEnv()
     """building1TerrainMap = [
     [ 2, 2, 2, 2 ],
     [ 2, 3, 3, 2 ],
@@ -722,7 +746,7 @@ def initWorld():
     m = Male(manId)
     f = Female(womanId)
     for i in range(nbAgents):
-        zombies.append(Zombie(zombieId,-1,-1))
+        #zombies.append(Zombie(zombieId,-1,-1))
         if random()<0.5:
             humans.append(f)
         else:
@@ -788,6 +812,7 @@ def stepAgents(maleID,womanId, it = 0 ):
         shuffle(zombies)
         shuffle(humans)
         Food.randomDrop(it, foods)
+        Gun.randomDrop(it, guns)
         for z in zombies:
             if z.type!=2:
                 z.type=2   # shuffle agents in in-place (i.e. agents is modified)
@@ -813,9 +838,9 @@ def stepAgents(maleID,womanId, it = 0 ):
                 humans.remove(h)
 
             elif h.dead==False:
-
+                h.reproduire(humans, babyBoyId, babyGirlId , met)
                 h.combat(zombies,humans,foods, met)
-                h.reproduire(humans, manId, womanId, met)
+                
 
     return
 
@@ -865,7 +890,7 @@ def render( it = 0 ):
                 if getObjectAt( xTile , yTile , level)  > 0: # object on terrain?
                     screen.blit( objectType[ getObjectAt( xTile , yTile, level) ] , (xScreen, yScreen - heightMultiplier*(level+1) ))
             if (getAgentAt( xTile, yTile ) != 0) :
-                if ((getAgentAt( xTile, yTile ) == manId) or (getAgentAt( xTile, yTile ) == womanId)) :
+                if ((getAgentAt( xTile, yTile ) == manId) or (getAgentAt( xTile, yTile ) == womanId) or (getAgentAt( xTile, yTile ) == babyBoyId) or (getAgentAt( xTile, yTile ) == babyGirlId)) :
                     for h in humans:
                         if  h.dead==False and h.x==xTile and h.y==yTile : # agent on terrain?
                             screen.blit( agentType[ getAgentAt( xTile, yTile ) ] , (xScreen, yScreen - heightMultiplier ))
@@ -876,6 +901,11 @@ def render( it = 0 ):
                             screen.blit( agentType[ getAgentAt( xTile, yTile ) ] , (xScreen, yScreen - heightMultiplier ))
                 if ((getAgentAt( xTile, yTile ) == burgerId) or (getAgentAt( xTile, yTile ) == foodsId)) :
                     for f in foods:
+                        if f.x==xTile and f.y==yTile : # agent on terrain?
+                            screen.blit( agentType[ getAgentAt( xTile, yTile ) ] , (xScreen, yScreen - heightMultiplier ))
+
+                if (getAgentAt( xTile, yTile ) == gunId) :
+                    for f in guns:
                         if f.x==xTile and f.y==yTile : # agent on terrain?
                             screen.blit( agentType[ getAgentAt( xTile, yTile ) ] , (xScreen, yScreen - heightMultiplier ))
                 """else :
@@ -928,9 +958,9 @@ while userExit == False:
     perdu = False
 
 
-    if (len(zombies)==0):
+    """if (len(zombies)==0):
         perdu = True 
-
+"""
     for h in humans:
         #if h.getPosition() == player.getPosition():
         if h.getPosition() == (mx,my):
