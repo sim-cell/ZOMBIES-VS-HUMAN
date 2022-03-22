@@ -1,3 +1,4 @@
+
 #
 # World of Isotiles
 # Author: nicolas.bredeche(at)sorbonne-universite.fr
@@ -666,7 +667,6 @@ def initWorld():
     [ 1, 0, 0, 1 ]
     ]
     #place of building
-
     x_offset = mx
     y_offset = my
    
@@ -676,7 +676,6 @@ def initWorld():
             setTerrainAt( x+x_offset, y+y_offset, building1TerrainMap[x][y] )
             setHeightAt( x+x_offset, y+y_offset, building1HeightMap[x][y] )
             setObjectAt( x+x_offset, y+y_offset, 0) # add a virtual object: not displayed, but used to forbid agent(s) to come here.
-
     # add another pyramid-shape building with a tree on top
     building2TerrainMap = [
     [ 0, 2, 2, 2, 2, 2, 0 ],
