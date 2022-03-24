@@ -64,6 +64,7 @@ versionTag = "2018-12-24_15h06"
 nbTrees = 30 #350
 nbBurningTrees = 0 #15
 nbAgents = 30
+DAY = True
 
 ### ### ### ### ### ### ### ### ### ### ### ### ### ### ### ###
 ### ### ### ### ### ### ### ### ### ### ### ### ### ### ### ###
@@ -829,7 +830,14 @@ def stepAgents(maleID,womanId, it = 0 ):
 def render( it = 0 ):
     global xViewOffset, yViewOffset
 
-    pygame.draw.rect(screen, (0,0,0), (0, 0, screenWidth, screenHeight), 0) # overkill - can be optimized. (most sprites are already "naturally" overwritten)
+    blue=(135,206,235)
+    black=(0,0,0)
+
+    if DAY:
+        pygame.draw.rect(screen, blue, (0, 0, screenWidth, screenHeight), 0) # overkill - can be optimized. (most sprites are already "naturally" overwritten)
+  
+    else:
+        pygame.draw.rect(screen, black, (0, 0, screenWidth, screenHeight), 0) 
     #pygame.display.update()
 
     for y in range(getViewHeight()):
@@ -949,7 +957,7 @@ while userExit == False:
         print ("")
         pygame.quit()
         sys.exit()
-
+    """
     if it % 10 == 0:
         m = Male(manId)
         f = Female(womanId)
@@ -959,7 +967,12 @@ while userExit == False:
             humans.append(f)
         #ch = choice((m,f))
         #humans.append(ch)
-        zombies.append(Zombie(zombieId,-1,-1))
+        zombies.append(Zombie(zombieId,-1,-1))"""
+
+    if it % 60 == 0:
+        DAY=False
+    if it % 120 == 0:
+        DAY=True
 
     # continuous stroke
     keys = pygame.key.get_pressed()

@@ -871,7 +871,7 @@ def render( it = 0 ):
         pygame.draw.rect(screen, blue, (0, 0, screenWidth, screenHeight), 0) # overkill - can be optimized. (most sprites are already "naturally" overwritten)
   
     else:
-        pygame.draw.rect(screen, black, (0, 0, screenWidth, screenHeight), 0) # overkill - can be optimized. (most sprites are already "naturally" overwritten)
+        pygame.draw.rect(screen, black, (0, 0, screenWidth, screenHeight), 0) 
     #pygame.display.update()
 
 

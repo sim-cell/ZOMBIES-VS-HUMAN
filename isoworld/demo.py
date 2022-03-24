@@ -114,13 +114,7 @@ pygame.init()
 fpsClock = pygame.time.Clock()
 screen = pygame.display.set_mode((screenWidth, screenHeight), DOUBLEBUF)
 pygame.display.set_caption('Zombieland')
-blue = [135,206,235]
-black = [0,0,0]
-if DAY :
-    screen.fill(blue)
-else :
-    screen.fill(black)
-pygame.display.update()
+
 
 ### ### ### ### ### ### ### ### ### ### ### ### ### ### ### ###
 ### ### ### ### ### ### ### ### ### ### ### ### ### ### ### ###
@@ -840,8 +834,15 @@ def stepAgents(maleID,womanId, it = 0 ):
 
 def render( it = 0 ):
     global xViewOffset, yViewOffset
+    blue=(135,206,235)
+    black=(0,0,0)
 
-    pygame.draw.rect(screen, (0,0,0), (0, 0, screenWidth, screenHeight), 0) # overkill - can be optimized. (most sprites are already "naturally" overwritten)
+    if DAY:
+        pygame.draw.rect(screen, blue, (0, 0, screenWidth, screenHeight), 0) # overkill - can be optimized. (most sprites are already "naturally" overwritten)
+  
+    else:
+        pygame.draw.rect(screen, black, (0, 0, screenWidth, screenHeight), 0) 
+
     #pygame.display.update()
 
     for y in range(getViewHeight()):
@@ -961,7 +962,7 @@ while userExit == False:
         print ("")
         pygame.quit()
         sys.exit()
-
+    """
     if it % 10 == 0:
         m = Male(manId)
         f = Female(womanId)
@@ -971,7 +972,12 @@ while userExit == False:
             humans.append(f)
         #ch = choice((m,f))
         #humans.append(ch)
-        zombies.append(Zombie(zombieId,-1,-1))
+        zombies.append(Zombie(zombieId,-1,-1))"""
+    #day and night
+    if it % 60 == 0:
+        DAY=False
+    if it % 120 == 0:
+        DAY=True
 
     # continuous stroke
     keys = pygame.key.get_pressed()
