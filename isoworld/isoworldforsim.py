@@ -1000,9 +1000,9 @@ while userExit == False:
         sys.exit()
 
     #day and night
-    if it % 12 == 0:
+    if it % 60 == 0:
         DAY=False
-    if it % 24 == 0:
+    if it % 120 == 0:
         DAY=True
     """ if it % 10 == 0:
         m = Male(manId)
