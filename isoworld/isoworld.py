@@ -652,7 +652,7 @@ def initWorld():
 
     # add a pyramid-shape building
     #type of object
-    randEnv()
+    #randEnv()
     """building1TerrainMap = [
     [ 2, 2, 2, 2 ],
     [ 2, 3, 3, 2 ],
