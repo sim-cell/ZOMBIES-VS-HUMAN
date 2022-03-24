@@ -148,7 +148,7 @@ def loadAllImages():
     agentType.append(None) # default -- never drawn
     agentType.append(loadImage('isoworld/assets/basic111x128/vaccine.png')) # medicine
     agentType.append(loadImage('isoworld/assets/basic111x128/zomb.png')) # zombie
-    agentType.append(loadImage('isoworld/assets/basic111x128/man.png')) # man
+    agentType.append(loadImage('isoworld/assets/basic111x128/mann.png')) # man
     agentType.append(loadImage('isoworld/assets/basic111x128/combat.png')) #human wins
     agentType.append(loadImage('isoworld/assets/basic111x128/bite.png')) #zombie wins
     agentType.append(loadImage('isoworld/assets/basic111x128/woman.png')) # woman
