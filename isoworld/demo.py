@@ -893,8 +893,6 @@ def render( it = 0 ):
                 """else :
                      screen.blit( agentType[ getAgentAt( xTile, yTile ) ] , (xScreen, yScreen - heightMultiplier ))"""
 
-        if not DAY:
-            display_surface.blit(filter,(50,50),)
 
     return
 
