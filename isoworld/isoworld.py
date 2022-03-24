@@ -827,6 +827,8 @@ def stepAgents(maleID,womanId, it = 0 ):
 ###
 ###
 
+filter=pygame.image.load("isoworld/assets/night.png")
+
 def render( it = 0 ):
     global xViewOffset, yViewOffset
 
@@ -837,7 +839,11 @@ def render( it = 0 ):
         pygame.draw.rect(screen, blue, (0, 0, screenWidth, screenHeight), 0) # overkill - can be optimized. (most sprites are already "naturally" overwritten)
   
     else:
-        pygame.draw.rect(screen, black, (0, 0, screenWidth, screenHeight), 0) 
+        pygame.draw.rect(screen, black, (0, 0, screenWidth, screenHeight), 0)
+        filter = pygame.surface.Surface(screenWidth, screenHeight)
+        filter.fill(pygame.color.Color('Grey'))
+        screen.blit(filter,(0,0))
+
     #pygame.display.update()
 
     for y in range(getViewHeight()):

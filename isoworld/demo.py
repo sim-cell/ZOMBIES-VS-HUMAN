@@ -115,7 +115,6 @@ fpsClock = pygame.time.Clock()
 screen = pygame.display.set_mode((screenWidth, screenHeight), DOUBLEBUF)
 pygame.display.set_caption('Zombieland')
 
-
 ### ### ### ### ### ### ### ### ### ### ### ### ### ### ### ###
 ### ### ### ### ### ### ### ### ### ### ### ### ### ### ### ###
 ### ### ### ### ### ### ### ### ### ### ### ### ### ### ### ###
@@ -160,7 +159,6 @@ def loadAllImages():
     agentType.append(loadImage('isoworld/assets/basic111x128/babyBoy.png')) # babyBoy
     agentType.append(loadImage('isoworld/assets/basic111x128/babyGirl.png')) # babyGirl
 
-    
 
 def resetImages():
     global tileTotalWidth, tileTotalHeight, tileTotalWidthOriginal, tileTotalHeightOriginal, scaleMultiplier, heightMultiplier, tileVisibleHeight
@@ -832,17 +830,19 @@ def stepAgents(maleID,womanId, it = 0 ):
 ###
 ###
 
+filter=pygame.image.load("isoworld/assets/f10.png")
+
 def render( it = 0 ):
     global xViewOffset, yViewOffset
+    display_surface = pygame.display.set_mode((screenWidth, screenHeight ))
     blue=(135,206,235)
     black=(0,0,0)
-
     if DAY:
         pygame.draw.rect(screen, blue, (0, 0, screenWidth, screenHeight), 0) # overkill - can be optimized. (most sprites are already "naturally" overwritten)
   
     else:
-        pygame.draw.rect(screen, black, (0, 0, screenWidth, screenHeight), 0) 
-
+        pygame.draw.rect(screen, black, (0, 0, screenWidth, screenHeight), 0)
+        display_surface.blit(filter,(0,0))
     #pygame.display.update()
 
     for y in range(getViewHeight()):
@@ -892,7 +892,10 @@ def render( it = 0 ):
                             screen.blit( agentType[ getAgentAt( xTile, yTile ) ] , (xScreen, yScreen - heightMultiplier ))
                 """else :
                      screen.blit( agentType[ getAgentAt( xTile, yTile ) ] , (xScreen, yScreen - heightMultiplier ))"""
-    
+
+        if not DAY:
+            display_surface.blit(filter,(50,50),)
+
     return
 
 ### ### ### ### ### ### ### ### ### ### ### ### ### ### ### ###
@@ -967,13 +970,13 @@ while userExit == False:
         m = Male(manId)
         f = Female(womanId)
         if random()<0.5:
-            humans.append(m)s
+            humans.append(m)
         else:
             humans.append(f)
         #ch = choice((m,f))
         #humans.append(ch)
         zombies.append(Zombie(zombieId,-1,-1))"""
-    #day and night
+
     if it % 60 == 0:
         DAY=False
     if it % 120 == 0:
