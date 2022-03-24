@@ -892,7 +892,7 @@ def render( it = 0 ):
                             screen.blit( agentType[ getAgentAt( xTile, yTile ) ] , (xScreen, yScreen - heightMultiplier ))
                 """else :
                      screen.blit( agentType[ getAgentAt( xTile, yTile ) ] , (xScreen, yScreen - heightMultiplier ))"""
-
+    
     return
 
 ### ### ### ### ### ### ### ### ### ### ### ### ### ### ### ###
@@ -967,7 +967,7 @@ while userExit == False:
         m = Male(manId)
         f = Female(womanId)
         if random()<0.5:
-            humans.append(m)
+            humans.append(m)s
         else:
             humans.append(f)
         #ch = choice((m,f))
