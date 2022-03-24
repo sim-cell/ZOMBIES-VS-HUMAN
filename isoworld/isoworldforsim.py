@@ -805,7 +805,7 @@ def initWorld():
         setObjectAt( c[0], c[1], fenceNWId)"""
 
     #adding house2
-    for c in [(11,0),(13,0),(15,0),(17,0)]:
+    """for c in [(11,0),(13,0),(15,0),(17,0)]:
         for level in range(0,6):
             setObjectAt(c[0],c[1],blockId,level)
     
@@ -824,7 +824,12 @@ def initWorld():
 
     for c in [(10,0),(10,1),(11,1),(12,1),(13,1),(15,1),(16,1),(17,1),(18,1),(18,0)] :
         setObjectAt(c[0],c[1],floorGrId,0)
-        #setHeightAt( c[0], c[1], 0)
+        #setHeightAt( c[0], c[1], 0)"""
+    
+    for x in range(11,18):
+        for y in range(1,4) :
+            setObjectAt(c[0],c[1],blockId,level)
+
 
 
     #adding trees
