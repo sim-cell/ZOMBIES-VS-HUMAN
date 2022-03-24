@@ -61,10 +61,13 @@ versionTag = "2018-12-24_15h06"
 # all values are for initialisation. May change during runtime.
 
 #numbers of elements
-nbTrees = 30 #350
+nbTrees = 10 #350
 nbBurningTrees = 0 #15
 nbAgents = 30
-DAY = True
+nbDetails = 15
+
+
+DAY=True
 
 ### ### ### ### ### ### ### ### ### ### ### ### ### ### ### ###
 ### ### ### ### ### ### ### ### ### ### ### ### ### ### ### ###
@@ -143,15 +146,36 @@ def loadAllImages():
     objectType = []
     agentType = []
 
-    tileType.append(loadImage('isoworld/assets/basic111x128/plat.png')) # grasss
+    tileType.append(loadImage('isoworld/assets/ext/isometric-blocks/PNG/Voxel tiles/voxelTile_05.png')) # grasss
     tileType.append(loadImage('isoworld/assets/ext/isometric-blocks/PNG/Platformer tiles/platformerTile_33.png')) # brick
     tileType.append(loadImage('isoworld/assets/ext/isometric-blocks/PNG/Abstract tiles/abstractTile_12.png')) # blue grass (?)
     tileType.append(loadImage('isoworld/assets/ext/isometric-blocks/PNG/Abstract tiles/abstractTile_09.png')) # grey brock
+    tileType.append(loadImage('isoworld/assets/ext/isometric-blocks/PNG/Platformer tiles/platformerTile_28.png'))  #for road 
+    tileType.append(loadImage('isoworld/assets/ext/isometric-blocks/PNG/Abstract tiles/abstractTile_26.png')) #for water
+    tileType.append(loadImage('isoworld/assets/ext/isometric-blocks/PNG/Voxel tiles/VoxelTile_16.png')) #for sides of lake ---> to choise 
+    tileType.append(loadImage('isoworld/assets/ext/isometric-blocks/PNG/Platformer tiles/platformerTile_22.png')) #for sides of lake
+    tileType.append(loadImage('isoworld/assets/ext/isometric-blocks/PNG/Abstract tiles/abstractTile_31.png')) # ground
+
+    
 
     objectType.append(None) # default -- never drawn
-    objectType.append(loadImage('isoworld/assets/basic111x128/tree_small_NW_ret.png')) # normal tree
-    objectType.append(loadImage('isoworld/assets/basic111x128/blockHuge_N_ret.png')) # construction block
+    objectType.append(loadImage('isoworld/assets/ext/kenney_natureKit/Isometric/tree_plateau_NE.png')) # normal tree
+    objectType.append(loadImage('isoworld/assets/ext/isometric-blocks/PNG/Voxel tiles/VoxelTile_27.png')) # block
     objectType.append(loadImage('isoworld/assets/basic111x128/tree_small_NW_ret_red.png')) # burning tree
+    objectType.append(loadImage('isoworld/assets/ext/kenney_natureKit/Isometric/grass_dense_NE.png')) #grass detail
+    objectType.append(loadImage('isoworld/assets/ext/kenney_natureKit/Isometric/flower_red1_SE.png')) # flower rouge
+    objectType.append(loadImage('isoworld/assets/ext/kenney_natureKit/Isometric/canoe_NW.png')) #canoe
+    objectType.append(loadImage('isoworld/assets/ext/kenney_natureKit/Isometric/plant_bushDetailed_SW.png')) #plant detail
+    #details for house
+    objectType.append(loadImage('isoworld/assets/ext/isometric-blocks/PNG/Voxel tiles/VoxelTile_14.png')) #door
+    objectType.append(loadImage('isoworld/assets/ext/isometric-blocks/PNG/Platformer tiles/platformerTile_23.png')) #window
+    objectType.append(loadImage('isoworld/assets/ext/kenney_prototypepack/Isometric/floorGrass_S.png')) #floorGrass
+    objectType.append(loadImage('isoworld/assets/ext/kenney_prototypepack/Isometric/stepsSmall_W.png')) #steps
+    objectType.append(loadImage('isoworld/assets/ext/kenney_natureKit/Isometric/fence_strong_NW.png')) #fenceNW
+    objectType.append(loadImage('isoworld/assets/ext/kenney_natureKit/Isometric/fence_strong_SE.png')) #fenceSE
+    objectType.append(loadImage('isoworld/assets/ext/kenney_natureKit/Isometric/fence_strong_NE.png')) #fenceNE
+
+
     #agent images
     agentType.append(None) # default -- never drawn
     agentType.append(loadImage('isoworld/assets/basic111x128/vaccine.png')) # medicine
@@ -196,11 +220,25 @@ objectType = []
 agentType = []
 #ID
 noObjectId = noAgentId = 0
+
 #objects
 grassId = 0
 treeId = 1
 blockId = 2
 burningTreeId = 3
+grassDetId = 4
+flowerRId = 5
+canoeId = 6
+plantDetId = 7
+doorId = 8
+windowId = 9
+floorGrId = 10
+stepsId = 11
+fenceNWId = 12
+fenceSEId = 13
+fenceNEId = 14
+
+
 #agents
 medicineId = 1
 zombieId = 2
@@ -682,15 +720,110 @@ MAXMOUNT = (int)(worldHeight/10)
 
 
 def initWorld():
-    global nbTrees, nbBurningTrees, zombies, humans, agents
+    global nbTrees, nbBurningTrees, zombies, humans, nbDetails 
 
     # add a pyramid-shape building
     #type of object
     #randEnv()
-    """building1TerrainMap = [
+
+    #adding lake 
+    lakeTerrainMap =[
+    [ 0, 0, 0, 0, 0, 0, 0, 0, 0 ],
+    [ 0, 5, 5, 5, 5, 5, 5, 5, 0 ],
+    [ 0, 5, 5, 5, 5, 5, 5, 5, 0 ],
+    [ 0, 5, 5, 7, 5, 5, 5, 5, 0 ],
+    [ 0, 7, 7, 7, 5, 5, 5, 5, 0 ],
+    [ 0, 5, 5, 7, 5, 5, 5, 5, 0 ],
+    [ 0, 5, 5, 5, 5, 5, 5, 5, 0 ],
+    [ 0, 5, 5, 5, 5, 5, 5, 5, 0 ],
+    [ 0, 0, 0, 0, 0, 0, 0, 0, 0 ],
+    ]
+
+    lakeHeightMap = [
+    [ 0, 0, 0, 0, 0, 0, 0, 0, 0 ],
+    [ 0, -1, -1, -1, -1, -1, -1, -1, 0 ],
+    [ 0, -1, -1, -1, -1, -1, -1, -1, 0 ],
+    [ 0, -1, -1, 0, -1, -1, -1, -1, 0 ],
+    [ 0, 0, 0, 0, -1, -1, -1, -1, 0 ],
+    [ 0, -1, -1, 0, -1, -1, -1, -1, 0 ],
+    [ 0, -1, -1, -1, -1, -1, -1, -1, 0 ],
+    [ 0, -1, -1, -1, -1, -1, -1, -1, 0 ],
+    [ 0, 0, 0, 0, 0, 0, 0, 0, 0 ]
+    ]
+
+    x_offset = 6
+    y_offset = 20
+   
+    #putting the lake 
+    for x in range( len( lakeTerrainMap )):
+        for y in range( len( lakeTerrainMap[0] )):
+            setTerrainAt( x+x_offset, y+y_offset, lakeTerrainMap[x][y] )
+            setHeightAt( x+x_offset, y+y_offset, lakeHeightMap[x][y] )
+            setObjectAt( x+x_offset, y+y_offset, 0)
+    setObjectAt( 6+x_offset, 3+y_offset, canoeId)
+
+    #adding details : flower, plant or grass
+    for i in range(nbDetails):
+        x = randint(0,getWorldWidth()-1)
+        y = randint(0,getWorldHeight()-1)
+        options=[grassDetId, plantDetId]
+        det=choice(options)
+        while getTerrainAt(x,y) != 0 or getObjectAt(x,y) != 0:
+            x = randint(0,getWorldWidth()-1)
+            y = randint(0,getWorldHeight()-1)
+        setObjectAt(x,y,det)
+    
+    #adding a house
+    for c in [(0,15),(0,17),(0,19),(0,21)]:
+        for level in range(0,6):
+            setObjectAt(c[0],c[1],blockId,level)
+
+    for c in [(0,16),(0,20)]:
+        for level in range(0,6):
+            if level == 3 :
+                setObjectAt(c[0],c[1],windowId,level)
+                continue
+            setObjectAt(c[0],c[1],blockId,level)
+
+    for c in [(0,18)]:
+        for level in range(2,6):
+            setObjectAt(c[0],c[1],blockId,level)
+    setObjectAt(0,18,doorId,0)
+    setObjectAt(0,18,doorId,1)
+
+    for c in [(2,15),(2,16),(2,17),(2,19),(2,20),(2,21)] :
+        setTerrainAt( c[0], c[1], 8 )
+        setHeightAt( c[0], c[1], 0)
+        setObjectAt( c[0], c[1], flowerRId)
+    """ #ajout de fences ????maybeeee 
+    for c in [(3,15),(3,17)]:
+        setObjectAt( c[0], c[1], fenceSEId)
+    for c in [(3,19),(3,21)] :
+        setObjectAt( c[0], c[1], fenceNEId)
+    for c in [(0,14),(2,14),(2,22),(0,22)] :
+        setObjectAt( c[0], c[1], fenceNWId)"""
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+    """eski codelar :
+    
+    building1TerrainMap = [
     [ 2, 2, 2, 2 ],
-    [ 2, 3, 3, 2 ],
-    [ 2, 3, 3, 2 ],
+    [ 2, 4, 4, 2 ],
+    [ 2, 4, 4, 2 ],
     [ 2, 2, 2, 2 ]
     ]
     #height of building
@@ -698,7 +831,7 @@ def initWorld():
     [ 1, 1, 1, 1 ],
     [ 1, 0, 0, 1 ],
     [ 1, 0, 0, 1 ],
-    [ 1, 0, 0, 1 ]
+    [ 1, 1, 1, 1 ]
     ]
     #place of building
 
@@ -711,7 +844,7 @@ def initWorld():
             setTerrainAt( x+x_offset, y+y_offset, building1TerrainMap[x][y] )
             setHeightAt( x+x_offset, y+y_offset, building1HeightMap[x][y] )
             setObjectAt( x+x_offset, y+y_offset, 0) # add a virtual object: not displayed, but used to forbid agent(s) to come here.
-
+    
     # add another pyramid-shape building with a tree on top
     building2TerrainMap = [
     [ 0, 2, 2, 2, 2, 2, 0 ],
@@ -742,7 +875,8 @@ def initWorld():
             setTerrainAt( x+x_offset, y+y_offset, building2TerrainMap[y][x] )
             setHeightAt( x+x_offset, y+y_offset, building2HeightMap[y][x] )
             setObjectAt( x+x_offset, y+y_offset, -1 ) # add a virtual object: not displayed, but used to forbid agent(s) to come here.
-    setObjectAt( x_offset+3, y_offset+4, treeId )"""
+    setObjectAt( x_offset+3, y_offset+4, treeId ) 
+
     #orange thing collumn
     for c in [(20,2),(30,2),(30,12),(20,12)]:
         for level in range(0,objectMapLevels):
@@ -753,6 +887,7 @@ def initWorld():
         setObjectAt(21+i,12,blockId,objectMapLevels-1)
         setObjectAt(20,3+i,blockId,objectMapLevels-1)
         setObjectAt(30,3+i,blockId,objectMapLevels-1)
+    
     #adding agents
 
     for i in range(nbAgents):
@@ -762,10 +897,7 @@ def initWorld():
         else:
             humans.append(Female(womanId))
         #ch = choice((m,f))
-        #humans.append(ch)"""
-
-
-
+        #humans.append(ch)
 
     #adding trees
     for i in range(nbTrees):
@@ -783,7 +915,7 @@ def initWorld():
             x = randint(0,getWorldWidth()-1)
             y = randint(0,getWorldHeight()-1)
         setObjectAt(x,y,burningTreeId)
-
+    """
     return
 
 ### ### ### ### ###
@@ -970,13 +1102,13 @@ while userExit == False:
 
     render(it)
     
-    stepAgents(manId, womanId, it)
+    #stepAgents(manId, womanId, it)
     stepWorld(it)
 
     perdu = False
 
 
-    if (len(zombies)==0):
+    """if (len(zombies)==0):
         perdu = True
 
     for h in humans:
@@ -984,7 +1116,7 @@ while userExit == False:
         if h.getPosition() == (mx,my):
             perdu = True
             #playsound('isoworld/sounds/VOXScrm_Wilhelm scream (ID 0477)_BSB.wav')
-            break
+            break"""
 
     if perdu == True:
         print ("")
