@@ -61,7 +61,7 @@ versionTag = "2018-12-24_15h06"
 # all values are for initialisation. May change during runtime.
 
 #numbers of elements
-nbTrees = 10 #350
+nbTrees = 60 #350
 nbBurningTrees = 0 #15
 nbAgents = 30
 nbDetails = 15
@@ -146,26 +146,28 @@ def loadAllImages():
     objectType = []
     agentType = []
 
-    tileType.append(loadImage('assets/ext/isometric-blocks/PNG/Voxel tiles/voxelTile_05.png')) # grasss
-    tileType.append(loadImage('assets/ext/isometric-blocks/PNG/Platformer tiles/platformerTile_33.png')) # brick
-    tileType.append(loadImage('assets/ext/isometric-blocks/PNG/Abstract tiles/abstractTile_12.png')) # blue grass (?)
-    tileType.append(loadImage('assets/ext/isometric-blocks/PNG/Abstract tiles/abstractTile_09.png')) # grey brock
-    tileType.append(loadImage('assets/ext/isometric-blocks/PNG/Platformer tiles/platformerTile_28.png'))  #for road 
-    tileType.append(loadImage('assets/ext/isometric-blocks/PNG/Abstract tiles/abstractTile_26.png')) #for water
-    tileType.append(loadImage('assets/ext/isometric-blocks/PNG/Voxel tiles/VoxelTile_16.png')) #for sides of lake ---> to choise 
-    tileType.append(loadImage('assets/ext/isometric-blocks/PNG/Platformer tiles/platformerTile_22.png')) #for sides of lake
-    tileType.append(loadImage('assets/ext/isometric-blocks/PNG/Abstract tiles/abstractTile_31.png')) # ground
+    tileType.append(loadImage('isoworld/assets/ext/isometric-blocks/PNG/Voxel tiles/voxelTile_05.png')) # grasss
+    tileType.append(loadImage('isoworld/assets/ext/isometric-blocks/PNG/Platformer tiles/platformerTile_30.png')) # brick
+    tileType.append(loadImage('isoworld/assets/ext/isometric-blocks/PNG/Abstract tiles/abstractTile_12.png')) # blue grass (?)
+    tileType.append(loadImage('isoworld/assets/ext/isometric-blocks/PNG/Abstract tiles/abstractTile_09.png')) # grey brock
+    tileType.append(loadImage('isoworld/assets/ext/isometric-blocks/PNG/Platformer tiles/platformerTile_28.png'))  #for road 
+    tileType.append(loadImage('isoworld/assets/ext/isometric-blocks/PNG/Abstract tiles/abstractTile_26.png')) #for water
+    tileType.append(loadImage('isoworld/assets/ext/isometric-blocks/PNG/Voxel tiles/VoxelTile_16.png')) #for sides of lake ---> to choise 
+    tileType.append(loadImage('isoworld/assets/ext/isometric-blocks/PNG/Platformer tiles/platformerTile_22.png')) #
+    tileType.append(loadImage('isoworld/assets/ext/isometric-blocks/PNG/Abstract tiles/abstractTile_31.png')) # ground
+    tileType.append(loadImage('isoworld/assets/ext/kenney_prototypepack/Isometric/floorGrass_S.png')) #floorGrass
 
     
 
     objectType.append(None) # default -- never drawn
-    objectType.append(loadImage('isoworld/assets/ext/kenney_natureKit/Isometric/tree.png')) # normal tree
+    objectType.append(loadImage('isoworld/assets/ext/kenney_natureKit/Isometric/tree_pineSmall_round1_NW.png')) # normal tree
     objectType.append(loadImage('isoworld/assets/ext/isometric-blocks/PNG/Voxel tiles/VoxelTile_27.png')) # block
     objectType.append(loadImage('isoworld/assets/basic111x128/tree_small_NW_ret_red.png')) # burning tree
     objectType.append(loadImage('isoworld/assets/ext/kenney_natureKit/Isometric/grass_dense_NE.png')) #grass detail
     objectType.append(loadImage('isoworld/assets/ext/kenney_natureKit/Isometric/flower_red1_SE.png')) # flower rouge
     objectType.append(loadImage('isoworld/assets/ext/kenney_natureKit/Isometric/canoe_NW.png')) #canoe
     objectType.append(loadImage('isoworld/assets/ext/kenney_natureKit/Isometric/plant_bushDetailed_SW.png')) #plant detail
+
     #details for house
     objectType.append(loadImage('isoworld/assets/ext/isometric-blocks/PNG/Voxel tiles/VoxelTile_14.png')) #door
     objectType.append(loadImage('isoworld/assets/ext/isometric-blocks/PNG/Platformer tiles/platformerTile_23.png')) #window
@@ -174,6 +176,7 @@ def loadAllImages():
     objectType.append(loadImage('isoworld/assets/ext/kenney_natureKit/Isometric/fence_strong_NW.png')) #fenceNW
     objectType.append(loadImage('isoworld/assets/ext/kenney_natureKit/Isometric/fence_strong_SE.png')) #fenceSE
     objectType.append(loadImage('isoworld/assets/ext/kenney_natureKit/Isometric/fence_strong_NE.png')) #fenceNE
+    objectType.append(loadImage('isoworld/assets/ext/isometric-blocks/PNG/Abstract tiles/abstractTile_23.png'))
 
 
     #agent images
@@ -757,41 +760,39 @@ def initWorld():
     #putting the lake 
     for x in range( len( lakeTerrainMap )):
         for y in range( len( lakeTerrainMap[0] )):
-            setTerrainAt( x+x_offset, y+y_offset, lakeTerrainMap[x][y] )
-            setHeightAt( x+x_offset, y+y_offset, lakeHeightMap[x][y] )
+            setTerrainAt( x+x_offset, y+y_offset, lakeTerrainMap[x][y])
+            setHeightAt( x+x_offset, y+y_offset, lakeHeightMap[x][y])
             setObjectAt( x+x_offset, y+y_offset, 0)
     setObjectAt( 6+x_offset, 3+y_offset, canoeId)
 
     #adding details : flower, plant or grass
     for i in range(nbDetails):
         x = randint(0,getWorldWidth()-1)
-        y = randint(0,getWorldHeight()-1)
-        options=[grassDetId, plantDetId]
-        det=choice(options)
+        y = randint(0,22)
         while getTerrainAt(x,y) != 0 or getObjectAt(x,y) != 0:
             x = randint(0,getWorldWidth()-1)
-            y = randint(0,getWorldHeight()-1)
-        setObjectAt(x,y,det)
+            y = randint(0,22)
+        setObjectAt(x,y,grassDetId)
     
-    #adding a house
-    for c in [(0,15),(0,17),(0,19),(0,21)]:
+    #adding house1
+    for c in [(0,13),(0,15),(0,17),(0,19)]:
         for level in range(0,6):
             setObjectAt(c[0],c[1],blockId,level)
 
-    for c in [(0,16),(0,20)]:
+    for c in [(0,14),(0,18)]:
         for level in range(0,6):
             if level == 3 :
                 setObjectAt(c[0],c[1],windowId,level)
                 continue
             setObjectAt(c[0],c[1],blockId,level)
 
-    for c in [(0,18)]:
+    for c in [(0,16)]:
         for level in range(2,6):
             setObjectAt(c[0],c[1],blockId,level)
-    setObjectAt(0,18,doorId,0)
-    setObjectAt(0,18,doorId,1)
+    setObjectAt(0,16,doorId,0)
+    setObjectAt(0,16,doorId,1)
 
-    for c in [(2,15),(2,16),(2,17),(2,19),(2,20),(2,21)] :
+    for c in [(2,13),(2,14),(2,15),(2,17),(2,18),(2,19)] :
         setTerrainAt( c[0], c[1], 8 )
         setHeightAt( c[0], c[1], 0)
         setObjectAt( c[0], c[1], flowerRId)
@@ -803,25 +804,89 @@ def initWorld():
     for c in [(0,14),(2,14),(2,22),(0,22)] :
         setObjectAt( c[0], c[1], fenceNWId)"""
 
+    #adding house2
+    for c in [(11,0),(13,0),(15,0),(17,0)]:
+        for level in range(0,6):
+            setObjectAt(c[0],c[1],blockId,level)
+    
+    for c in [(12,0),(16,0)]:
+        for level in range(0,6):
+            if level == 3 :
+                setObjectAt(c[0],c[1],windowId,level)
+                continue
+            setObjectAt(c[0],c[1],blockId,level)
+
+    for c in [(14,0)]:
+        for level in range(2,6):
+            setObjectAt(c[0],c[1],blockId,level)
+    setObjectAt(14,0,doorId,0)
+    setObjectAt(14,0,doorId,1)
+
+    for c in [(10,0),(10,1),(11,1),(12,1),(13,1),(15,1),(16,1),(17,1),(18,1),(18,0)] :
+        setObjectAt(c[0],c[1],floorGrId,0)
+        #setHeightAt( c[0], c[1], 0)
 
 
     #adding trees
     for i in range(nbTrees):
         x = randint(0,getWorldWidth()-1)
-        y = randint(25,getWorldHeight()-1)
+        y = randint(22,getWorldHeight()-1)
         while getTerrainAt(x,y) != 0 or getObjectAt(x,y) != 0:
             x = randint(0,getWorldWidth()-1)
-            y = randint(0,getWorldHeight()-1)
+            y = randint(22,getWorldHeight()-1)
         setObjectAt(x,y,treeId)
+    
+    #adding a road
 
+    for y in range(0,getWorldHeight()):
+        setTerrainAt((getWorldWidth()-1)-5, y, 4)
+        setTerrainAt((getWorldWidth()-1)-6 , y, 4)
+        setObjectAt((getWorldWidth()-1)-5 , y, 0)
+        setObjectAt((getWorldWidth()-1)-6 , y, 0)
+    
+    for x in range(1,(getWorldWidth()-1)-6):
+        setTerrainAt(x, 16, 4)
+        setObjectAt(x,16, 0)
 
+    for y in range(1,16):
+        setTerrainAt(14,y, 4)
+        setObjectAt(14,y, 0)
+    
 
+     # adding pyramid-shape building
+    building2TerrainMap = [
+    [ 0, 1, 1, 1, 0 ],
+    [ 1, 1, 1, 1, 1 ],
+    [ 1, 1, 1, 1, 1 ],
+    [ 1, 1, 1, 1, 1 ],
+    [ 0, 1, 1, 1, 0 ]
+    ]
+    building2HeightMap = [
+    [ 0, 1, 1, 1, 0 ],
+    [ 1, 1, 2, 1, 1 ],
+    [ 1, 2, 3, 2, 1 ],
+    [ 1, 1, 2, 1, 1 ],
+    [ 0, 1, 1, 1, 0 ]
+    ]
+    x_offset = (getWorldWidth()-1)-14
+    y_offset = (getWorldHeight()-1)-5
 
+    for x in range( len( building2TerrainMap[0]) ):
+        for y in range( len( building2TerrainMap) ):
+            setTerrainAt( x+x_offset, y+y_offset, building2TerrainMap[y][x] )
+            setHeightAt( x+x_offset, y+y_offset, building2HeightMap[y][x] )
+            setObjectAt( x+x_offset, y+y_offset, -1 ) # add a virtual object: not displayed, but used to forbid agent(s) to come here. 
 
-
-
-
-
+    #collumn
+    for c in [(1,1),(8,1),(8,9),(1,9)]:
+        for level in range(0,objectMapLevels):
+            setObjectAt(c[0],c[1],15,level)
+            #koprusu
+    for i in range(7): 
+        setObjectAt(2+i,1,15,objectMapLevels-1)
+        setObjectAt(2+i,9,15,objectMapLevels-1)
+        setObjectAt(1,2+i,15,objectMapLevels-1)
+        setObjectAt(8,2+i,15,objectMapLevels-1)
 
 
 
@@ -852,50 +917,17 @@ def initWorld():
             setHeightAt( x+x_offset, y+y_offset, building1HeightMap[x][y] )
             setObjectAt( x+x_offset, y+y_offset, 0) # add a virtual object: not displayed, but used to forbid agent(s) to come here.
     
-    # add another pyramid-shape building with a tree on top
-    building2TerrainMap = [
-    [ 0, 2, 2, 2, 2, 2, 0 ],
-    [ 2, 2, 2, 2, 2, 2, 2 ],
-    [ 2, 2, 2, 2, 2, 2, 2 ],
-    [ 2, 2, 2, 2, 2, 2, 2 ],
-    [ 2, 2, 2, 2, 2, 2, 2 ],
-    [ 2, 2, 2, 2, 2, 2, 2 ],
-    [ 2, 2, 2, 2, 2, 2, 2 ],
-    [ 2, 2, 2, 2, 2, 2, 2 ],
-    [ 0, 2, 2, 2, 2, 2, 0 ]
-    ]
-    building2HeightMap = [
-    [ 0, 1, 1, 1, 1, 1, 0 ],
-    [ 1, 1, 1, 1, 1, 1, 1 ],
-    [ 1, 2, 2, 2, 2, 2, 1 ],
-    [ 1, 2, 3, 3, 3, 2, 1 ],
-    [ 1, 2, 3, 4, 3, 2, 1 ],
-    [ 1, 2, 3, 3, 3, 2, 1 ],
-    [ 1, 2, 2, 2, 2, 2, 1 ],
-    [ 1, 1, 1, 1, 1, 1, 1 ],
-    [ 0, 1, 1, 1, 1, 1, 0 ]
-    ]
-    x_offset = 4
-    y_offset = 13
-    for x in range( len( building2TerrainMap[0] ) ):
-        for y in range( len( building2TerrainMap ) ):
-            setTerrainAt( x+x_offset, y+y_offset, building2TerrainMap[y][x] )
-            setHeightAt( x+x_offset, y+y_offset, building2HeightMap[y][x] )
-            setObjectAt( x+x_offset, y+y_offset, -1 ) # add a virtual object: not displayed, but used to forbid agent(s) to come here.
-    setObjectAt( x_offset+3, y_offset+4, treeId ) 
-
-    #orange thing collumn
-    for c in [(20,2),(30,2),(30,12),(20,12)]:
-        for level in range(0,objectMapLevels):
-            setObjectAt(c[0],c[1],blockId,level)
-            #koprusu
-    for i in range(9): 
-        setObjectAt(21+i,2,blockId,objectMapLevels-1)
-        setObjectAt(21+i,12,blockId,objectMapLevels-1)
-        setObjectAt(20,3+i,blockId,objectMapLevels-1)
-        setObjectAt(30,3+i,blockId,objectMapLevels-1)
-    
-    #adding agents
+    #adding burning trees
+    for i in range(nbBurningTrees):
+        x = randint(0,getWorldWidth()-1)
+        y = randint(0,getWorldHeight()-1)
+        while getTerrainAt(x,y) != 0 or getObjectAt(x,y) != 0:
+            x = randint(0,getWorldWidth()-1)
+            y = randint(0,getWorldHeight()-1)
+        setObjectAt(x,y,burningTreeId)
+    """
+   
+    """#adding agents
 
     for i in range(nbAgents):
         zombies.append(Zombie(zombieId,-1,-1))
@@ -906,15 +938,6 @@ def initWorld():
         #ch = choice((m,f))
         #humans.append(ch)
 
-    
-    #adding burning trees
-    for i in range(nbBurningTrees):
-        x = randint(0,getWorldWidth()-1)
-        y = randint(0,getWorldHeight()-1)
-        while getTerrainAt(x,y) != 0 or getObjectAt(x,y) != 0:
-            x = randint(0,getWorldWidth()-1)
-            y = randint(0,getWorldHeight()-1)
-        setObjectAt(x,y,burningTreeId)
     """
     return
 
