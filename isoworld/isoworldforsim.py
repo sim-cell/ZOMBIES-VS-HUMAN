@@ -146,20 +146,20 @@ def loadAllImages():
     objectType = []
     agentType = []
 
-    tileType.append(loadImage('isoworld/assets/ext/isometric-blocks/PNG/Voxel tiles/voxelTile_05.png')) # grasss
-    tileType.append(loadImage('isoworld/assets/ext/isometric-blocks/PNG/Platformer tiles/platformerTile_33.png')) # brick
-    tileType.append(loadImage('isoworld/assets/ext/isometric-blocks/PNG/Abstract tiles/abstractTile_12.png')) # blue grass (?)
-    tileType.append(loadImage('isoworld/assets/ext/isometric-blocks/PNG/Abstract tiles/abstractTile_09.png')) # grey brock
-    tileType.append(loadImage('isoworld/assets/ext/isometric-blocks/PNG/Platformer tiles/platformerTile_28.png'))  #for road 
-    tileType.append(loadImage('isoworld/assets/ext/isometric-blocks/PNG/Abstract tiles/abstractTile_26.png')) #for water
-    tileType.append(loadImage('isoworld/assets/ext/isometric-blocks/PNG/Voxel tiles/VoxelTile_16.png')) #for sides of lake ---> to choise 
-    tileType.append(loadImage('isoworld/assets/ext/isometric-blocks/PNG/Platformer tiles/platformerTile_22.png')) #for sides of lake
-    tileType.append(loadImage('isoworld/assets/ext/isometric-blocks/PNG/Abstract tiles/abstractTile_31.png')) # ground
+    tileType.append(loadImage('assets/ext/isometric-blocks/PNG/Voxel tiles/voxelTile_05.png')) # grasss
+    tileType.append(loadImage('assets/ext/isometric-blocks/PNG/Platformer tiles/platformerTile_33.png')) # brick
+    tileType.append(loadImage('assets/ext/isometric-blocks/PNG/Abstract tiles/abstractTile_12.png')) # blue grass (?)
+    tileType.append(loadImage('assets/ext/isometric-blocks/PNG/Abstract tiles/abstractTile_09.png')) # grey brock
+    tileType.append(loadImage('assets/ext/isometric-blocks/PNG/Platformer tiles/platformerTile_28.png'))  #for road 
+    tileType.append(loadImage('assets/ext/isometric-blocks/PNG/Abstract tiles/abstractTile_26.png')) #for water
+    tileType.append(loadImage('assets/ext/isometric-blocks/PNG/Voxel tiles/VoxelTile_16.png')) #for sides of lake ---> to choise 
+    tileType.append(loadImage('assets/ext/isometric-blocks/PNG/Platformer tiles/platformerTile_22.png')) #for sides of lake
+    tileType.append(loadImage('assets/ext/isometric-blocks/PNG/Abstract tiles/abstractTile_31.png')) # ground
 
     
 
     objectType.append(None) # default -- never drawn
-    objectType.append(loadImage('isoworld/assets/ext/kenney_natureKit/Isometric/tree_plateau_NE.png')) # normal tree
+    objectType.append(loadImage('isoworld/assets/ext/kenney_natureKit/Isometric/tree.png')) # normal tree
     objectType.append(loadImage('isoworld/assets/ext/isometric-blocks/PNG/Voxel tiles/VoxelTile_27.png')) # block
     objectType.append(loadImage('isoworld/assets/basic111x128/tree_small_NW_ret_red.png')) # burning tree
     objectType.append(loadImage('isoworld/assets/ext/kenney_natureKit/Isometric/grass_dense_NE.png')) #grass detail
@@ -805,7 +805,14 @@ def initWorld():
 
 
 
-
+    #adding trees
+    for i in range(nbTrees):
+        x = randint(0,getWorldWidth()-1)
+        y = randint(25,getWorldHeight()-1)
+        while getTerrainAt(x,y) != 0 or getObjectAt(x,y) != 0:
+            x = randint(0,getWorldWidth()-1)
+            y = randint(0,getWorldHeight()-1)
+        setObjectAt(x,y,treeId)
 
 
 
@@ -899,14 +906,7 @@ def initWorld():
         #ch = choice((m,f))
         #humans.append(ch)
 
-    #adding trees
-    for i in range(nbTrees):
-        x = randint(0,getWorldWidth()-1)
-        y = randint(0,getWorldHeight()-1)
-        while getTerrainAt(x,y) != 0 or getObjectAt(x,y) != 0:
-            x = randint(0,getWorldWidth()-1)
-            y = randint(0,getWorldHeight()-1)
-        setObjectAt(x,y,treeId)
+    
     #adding burning trees
     for i in range(nbBurningTrees):
         x = randint(0,getWorldWidth()-1)
