@@ -623,7 +623,7 @@ humans = []
 mx = 3
 my = 3
 MAXMOUNT = (int)(worldHeight/10)
-def randEnv():
+"""def randEnv():
     for ind in range(0,randint(0,MAXMOUNT+1)):
         wid=randint(0,10)
         len=randint(0,10)
@@ -643,7 +643,7 @@ def randEnv():
                 setTerrainAt( x+x_offset, y+y_offset, terrainMap[x][y] )
                 setHeightAt( x+x_offset, y+y_offset, heightMap[x][y] )
                 setObjectAt( x+x_offset, y+y_offset, 0)
-    return
+    return"""
 
 
 
