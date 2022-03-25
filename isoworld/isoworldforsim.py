@@ -61,12 +61,10 @@ versionTag = "2018-12-24_15h06"
 # all values are for initialisation. May change during runtime.
 
 #numbers of elements
-nbTrees = 60 #350
+nbTrees = 40 #350
 nbBurningTrees = 0 #15
-nbAgents = 30
-nbDetails = 15
-
-
+nbAgents = 10
+nbDetails = 18
 DAY=True
 
 ### ### ### ### ### ### ### ### ### ### ### ### ### ### ### ###
@@ -146,7 +144,7 @@ def loadAllImages():
     objectType = []
     agentType = []
 
-    tileType.append(loadImage('isoworld/assets/ext/isometric-blocks/PNG/Voxel tiles/voxelTile_05.png')) # grasss
+    tileType.append(loadImage('isoworld/assets/ext/isometric-blocks/PNG/Abstract tiles/abstractTile_27.png')) # grasss
     tileType.append(loadImage('isoworld/assets/ext/isometric-blocks/PNG/Platformer tiles/platformerTile_30.png')) # brick
     tileType.append(loadImage('isoworld/assets/ext/isometric-blocks/PNG/Abstract tiles/abstractTile_12.png')) # blue grass (?)
     tileType.append(loadImage('isoworld/assets/ext/isometric-blocks/PNG/Abstract tiles/abstractTile_09.png')) # grey brock
@@ -160,11 +158,18 @@ def loadAllImages():
     
 
     objectType.append(None) # default -- never drawn
-    objectType.append(loadImage('isoworld/assets/ext/kenney_natureKit/Isometric/tree_pineSmall_round1_NW.png')) # normal tree
+    treeBig=loadImage('isoworld/assets/basic111x128/tree.png') # normal tree
+    treeBig = pygame.transform.scale(treeBig, (23, 70))
+    #treeBig = pygame.transform.rotozoom(treeBig, 0, 1.2)
+    objectType.append(treeBig)
     objectType.append(loadImage('isoworld/assets/ext/isometric-blocks/PNG/Voxel tiles/VoxelTile_27.png')) # block
     objectType.append(loadImage('isoworld/assets/basic111x128/tree_small_NW_ret_red.png')) # burning tree
-    objectType.append(loadImage('isoworld/assets/ext/kenney_natureKit/Isometric/grass_dense_NE.png')) #grass detail
-    objectType.append(loadImage('isoworld/assets/ext/kenney_natureKit/Isometric/flower_red1_SE.png')) # flower rouge
+    grassSmall=loadImage('isoworld/assets/basic111x128/grass.png') #grass detail
+    grassSmall = pygame.transform.scale(grassSmall, (30, 25))
+    objectType.append(grassSmall)
+    flowerSmall=loadImage('isoworld/assets/ext/kenney_natureKit/Isometric/flower_red1_SE.png') # flower red
+    flowerSmall = pygame.transform.scale(flowerSmall, (15, 20))
+    objectType.append(flowerSmall)
     objectType.append(loadImage('isoworld/assets/ext/kenney_natureKit/Isometric/canoe_NW.png')) #canoe
     objectType.append(loadImage('isoworld/assets/ext/kenney_natureKit/Isometric/plant_bushDetailed_SW.png')) #plant detail
 
@@ -187,9 +192,11 @@ def loadAllImages():
     agentType.append(loadImage('isoworld/assets/basic111x128/combat.png')) #human wins
     agentType.append(loadImage('isoworld/assets/basic111x128/bite.png')) #zombie wins
     agentType.append(loadImage('isoworld/assets/basic111x128/woman.png')) # woman
-    agentType.append(loadImage('isoworld/assets/basic111x128/burger.png')) # burger
-    agentType.append(loadImage('isoworld/assets/basic111x128/foods.png')) # foods
-    agentType.append(loadImage('isoworld/assets/basic111x128/gun.png')) # gun
+    #agentType.append(loadImage('isoworld/assets/basic111x128/burger.png')) # burger
+    agentType.append(loadImage('isoworld/assets/basic111x128/food.png')) # foods
+    gunSmall=loadImage('isoworld/assets/basic111x128/gun.png') # gun
+    gunSmall = pygame.transform.scale(gunSmall, (23, 15))
+    agentType.append(gunSmall)
     agentType.append(loadImage('isoworld/assets/basic111x128/babyBoy.png')) # babyBoy
     agentType.append(loadImage('isoworld/assets/basic111x128/babyGirl.png')) # babyGirl
 
@@ -252,11 +259,11 @@ manId = 3
 winnerhumanId = 4
 winnerzombieId= 5
 womanId = 6
-burgerId = 7
-foodsId =8
-gunId = 9
-babyBoyId = 10
-babyGirlId = 11
+#burgerId = 7
+foodsId = 7
+gunId = 8
+babyBoyId = 9
+babyGirlId = 10
 
 ###
 
@@ -625,12 +632,6 @@ class RandDropAgents:
         return
 
     def reset(self):
-        self.x = randint(0,getWorldWidth()-1)
-        self.y = randint(0,getWorldWidth()-1)
-        while getTerrainAt(self.x,self.y) != 0 or getObjectAt(self.x,self.y) != 0 or getAgentAt(self.x,self.y) != 0:
-            self.x = randint(0,getWorldWidth()-1)
-            self.y = randint(0,getWorldHeight()-1)
-        setAgentAt(self.x,self.y,self.type)
         return
 
     def getPosition(self):
@@ -643,14 +644,23 @@ class RandDropAgents:
 class Food(RandDropAgents):
     def __init__(self) :
         super().__init__()
-        if random()<PROBENERGY :
+        """if random()<PROBENERGY :
             self.energy=5
             self.type = burgerId
-        else :
-            self.energy=2
-            self.type = foodsId
+        else :"""
+        self.energy=2
+        self.type = foodsId
         self.decomp=0
         self.reset()
+
+    def reset(self) :
+        self.x = randint(0,getWorldWidth()-1)
+        self.y = randint(0,getWorldWidth()-1)
+        while getTerrainAt(self.x,self.y) != 0 or getObjectAt(self.x,self.y) != 0 or getAgentAt(self.x,self.y) != 0:
+            self.x = randint(0,getWorldWidth()-1)
+            self.y = randint(0,getWorldHeight()-1)
+        setAgentAt(self.x,self.y,self.type)
+        return 
     
     def decomposition(foods) :
         for f in foods :
@@ -662,9 +672,10 @@ class Food(RandDropAgents):
     
     def randomDrop(it,list):
         if (it != 0):
-            if (it%DROPDAY==0 and len(list)<MAXAGENT) :
-                for i in range(NBSAGENT):
-                    list.append(Food())  # decomp arttirmak, while it'na koy
+            if random() < PROBDROP:
+                if (it%DROPDAY==0 and len(list)<MAXAGENT) :
+                    for i in range(NBSAGENT):
+                        list.append(Food())  # decomp arttirmak, while it'na koy
         return
 
 
@@ -674,11 +685,20 @@ class Gun(RandDropAgents) :
         self.type=gunId
         self.reset()
     
+    def reset (self):
+        self.x = randint(0,getWorldWidth()-7)
+        self.y = randint(0,16)
+        while getTerrainAt(self.x,self.y) != 0 or getObjectAt(self.x,self.y) != 0 or getAgentAt(self.x,self.y) != 0:
+            self.x = randint(0,getWorldWidth()-7)
+            self.y = randint(0,16)
+        setAgentAt(self.x,self.y,self.type)
+    
     def randomDrop(it,list):
         if (it != 0):
-            if (it%DROPDAY==0 and len(list)<MAXAGENT) :
-                for i in range(NBSAGENT):
-                    list.append(Gun())  # decomp arttirmak, while it'na koy
+            if random() < 0.02:
+                if (it%DROPDAY==0 and len(list)<MAXAGENT) :
+                    for i in range(NBSAGENT):
+                        list.append(Gun())  # decomp arttirmak, while it'na koy
         return
 
 
@@ -765,98 +785,135 @@ def initWorld():
             setObjectAt( x+x_offset, y+y_offset, 0)
     setObjectAt( 6+x_offset, 3+y_offset, canoeId)
 
+    #-----------------------------------------------------------------------------------
+
     #adding details : flower, plant or grass
     for i in range(nbDetails):
-        x = randint(0,getWorldWidth()-1)
-        y = randint(0,22)
+        x = randint(0,getWorldWidth()-6)
+        y = randint(0,20)
         while getTerrainAt(x,y) != 0 or getObjectAt(x,y) != 0:
             x = randint(0,getWorldWidth()-1)
-            y = randint(0,22)
+            y = randint(0,20)
         setObjectAt(x,y,grassDetId)
-    
-    #adding house1
-    for c in [(0,13),(0,15),(0,17),(0,19)]:
-        for level in range(0,6):
-            setObjectAt(c[0],c[1],blockId,level)
 
-    for c in [(0,14),(0,18)]:
-        for level in range(0,6):
-            if level == 3 :
+    #----------------------------------------------------------------------------------- 
+
+    #adding house1
+    for x in range(1,4):
+        for y in range(13,20) :
+            for level in range(0,objectMapLevels):
+                setObjectAt(x,y,blockId,level)
+    
+    for c in [(4,13),(4,15),(4,17),(4,19)]:
+        for level in range(0,objectMapLevels):
+            setObjectAt(c[0],c[1],blockId,level)
+    
+    #adding windows
+    for c in [(4,14),(4,18)]:
+        for level in range(0,objectMapLevels):
+            if level == 4 :
                 setObjectAt(c[0],c[1],windowId,level)
                 continue
             setObjectAt(c[0],c[1],blockId,level)
 
-    for c in [(0,16)]:
-        for level in range(2,6):
+    #adding the door
+    for c in [(4,16)]:
+        for level in range(3,objectMapLevels):
             setObjectAt(c[0],c[1],blockId,level)
-    setObjectAt(0,16,doorId,0)
-    setObjectAt(0,16,doorId,1)
+    setObjectAt(4,16,doorId,0)
+    setObjectAt(4,16,doorId,1)
+    setObjectAt(4,16,doorId,2)
 
-    for c in [(2,13),(2,14),(2,15),(2,17),(2,18),(2,19)] :
+    for c in [(6,13),(6,14),(6,15),(6,17),(6,18),(6,19)] :
         setTerrainAt( c[0], c[1], 8 )
-        setHeightAt( c[0], c[1], 0)
         setObjectAt( c[0], c[1], flowerRId)
-    """ #ajout de fences ????maybeeee 
-    for c in [(3,15),(3,17)]:
+
+    """#ajout de fences ????maybeeee 
+    for c in [(7,15),(7,17)]:
         setObjectAt( c[0], c[1], fenceSEId)
-    for c in [(3,19),(3,21)] :
+    for c in [(7,19),(7,21)] :
         setObjectAt( c[0], c[1], fenceNEId)
     for c in [(0,14),(2,14),(2,22),(0,22)] :
         setObjectAt( c[0], c[1], fenceNWId)"""
 
+    #-----------------------------------------------------------------------------------
+
     #adding house2
-    """for c in [(11,0),(13,0),(15,0),(17,0)]:
-        for level in range(0,6):
+    for x in range(13,20):
+        for y in range(1,4) :
+            for level in range(0,objectMapLevels):
+                setObjectAt(x,y,blockId,level)
+    
+    for c in [(13,4),(15,4),(17,4),(19,4)]:
+        for level in range(0,objectMapLevels):
             setObjectAt(c[0],c[1],blockId,level)
     
-    for c in [(12,0),(16,0)]:
-        for level in range(0,6):
-            if level == 3 :
+    #adding windows
+    for c in [(14,4),(18,4)]:
+        for level in range(0,objectMapLevels):
+            if level == 4 :
                 setObjectAt(c[0],c[1],windowId,level)
                 continue
             setObjectAt(c[0],c[1],blockId,level)
 
-    for c in [(14,0)]:
-        for level in range(2,6):
+    #adding the door
+    for c in [(16,4)]:
+        for level in range(3,objectMapLevels):
             setObjectAt(c[0],c[1],blockId,level)
-    setObjectAt(14,0,doorId,0)
-    setObjectAt(14,0,doorId,1)
+    setObjectAt(16,4,doorId,0)
+    setObjectAt(16,4,doorId,1)
+    setObjectAt(16,4,doorId,2)
 
-    for c in [(10,0),(10,1),(11,1),(12,1),(13,1),(15,1),(16,1),(17,1),(18,1),(18,0)] :
+    #adding floor grass around the house
+    for c in [(12,5),(13,5),(14,5),(15,5),(17,5),(18,5),(19,5),(20,5)] :
         setObjectAt(c[0],c[1],floorGrId,0)
-        #setHeightAt( c[0], c[1], 0)"""
-    
-    for x in range(11,18):
-        for y in range(1,4) :
-            setObjectAt(c[0],c[1],blockId,level)
+        if (c[0]==12 or c[0]==20) :
+            for y in range (1,5):
+                setObjectAt(c[0],y,floorGrId,0)
 
-
+    #-----------------------------------------------------------------------------------
 
     #adding trees
     for i in range(nbTrees):
-        x = randint(0,getWorldWidth()-1)
+        x = randint(0,getWorldWidth()-7)
         y = randint(22,getWorldHeight()-1)
-        while getTerrainAt(x,y) != 0 or getObjectAt(x,y) != 0:
-            x = randint(0,getWorldWidth()-1)
+        while getTerrainAt(x,y) != 0 or getObjectAt(x,y) != 0 or getHeightAt(x,y) == 1:
+            x = randint(0,getWorldWidth()-7)
             y = randint(22,getWorldHeight()-1)
-        setObjectAt(x,y,treeId)
+        setObjectAt(x,y,treeId,2)
+        setObjectAt(x,y, -1,0)        
     
-    #adding a road
+    for i in range(nbTrees-10):
+        x = randint(getWorldWidth()-5,getWorldWidth()-1)
+        y = randint(0,getWorldHeight()-1)
+        while getTerrainAt(x,y) != 0 or getObjectAt(x,y) != 0:
+            x = randint(getWorldWidth()-5,getWorldWidth()-1)
+            y = randint(0,getWorldHeight()-1)
+        setObjectAt(x,y,treeId,2)
+        setObjectAt(x,y,-1, 0)
+    
 
-    for y in range(0,getWorldHeight()):
-        setTerrainAt((getWorldWidth()-1)-5, y, 4)
-        setTerrainAt((getWorldWidth()-1)-6 , y, 4)
-        setObjectAt((getWorldWidth()-1)-5 , y, 0)
-        setObjectAt((getWorldWidth()-1)-6 , y, 0)
     
-    for x in range(1,(getWorldWidth()-1)-6):
+    #-----------------------------------------------------------------------------------
+
+    #adding a road
+    for y in range(0,getWorldHeight()):
+        setTerrainAt(getWorldWidth()-6, y, 4)
+        setTerrainAt(getWorldWidth()-7 , y, 4)
+        setObjectAt(getWorldWidth()-6 , y, 0)
+        setObjectAt(getWorldWidth()-7 , y, 0)
+        setObjectAt(getWorldWidth()-6 , y, -1, 2)
+        setObjectAt(getWorldWidth()-7 , y, -1, 2)# add a virtual object: not displayed, but used to forbid agent(s) to come here. 
+    
+    for x in range(5,getWorldWidth()-7):
         setTerrainAt(x, 16, 4)
         setObjectAt(x,16, 0)
 
-    for y in range(1,16):
-        setTerrainAt(14,y, 4)
-        setObjectAt(14,y, 0)
-    
+    for y in range(5,16):
+        setTerrainAt(16,y, 4)
+        setObjectAt(16,y, 0)
+
+    #-----------------------------------------------------------------------------------
 
      # adding pyramid-shape building
     building2TerrainMap = [
@@ -873,25 +930,28 @@ def initWorld():
     [ 1, 1, 2, 1, 1 ],
     [ 0, 1, 1, 1, 0 ]
     ]
-    x_offset = (getWorldWidth()-1)-14
-    y_offset = (getWorldHeight()-1)-5
+    x_offset = getWorldWidth()-15
+    y_offset = getWorldHeight()-6
 
     for x in range( len( building2TerrainMap[0]) ):
         for y in range( len( building2TerrainMap) ):
             setTerrainAt( x+x_offset, y+y_offset, building2TerrainMap[y][x] )
             setHeightAt( x+x_offset, y+y_offset, building2HeightMap[y][x] )
-            setObjectAt( x+x_offset, y+y_offset, -1 ) # add a virtual object: not displayed, but used to forbid agent(s) to come here. 
+            setObjectAt( x+x_offset, y+y_offset, -1, 0 )
+            setObjectAt( x+x_offset, y+y_offset, -1, 2) # add a virtual object: not displayed, but used to forbid agent(s) to come here. 
+
+    #-----------------------------------------------------------------------------------
 
     #collumn
-    for c in [(1,1),(8,1),(8,9),(1,9)]:
+    for c in [(2,2),(8,2),(8,8),(2,8)]:
         for level in range(0,objectMapLevels):
             setObjectAt(c[0],c[1],15,level)
             #koprusu
-    for i in range(7): 
-        setObjectAt(2+i,1,15,objectMapLevels-1)
-        setObjectAt(2+i,9,15,objectMapLevels-1)
-        setObjectAt(1,2+i,15,objectMapLevels-1)
-        setObjectAt(8,2+i,15,objectMapLevels-1)
+    for i in range(5): 
+        setObjectAt(3+i,2,15,objectMapLevels-1)
+        setObjectAt(3+i,8,15,objectMapLevels-1)
+        setObjectAt(2,3+i,15,objectMapLevels-1)
+        setObjectAt(8,3+i,15,objectMapLevels-1)
 
 
 
@@ -932,7 +992,7 @@ def initWorld():
         setObjectAt(x,y,burningTreeId)
     """
    
-    """#adding agents
+    #adding agents
 
     for i in range(nbAgents):
         zombies.append(Zombie(zombieId,-1,-1))
@@ -943,7 +1003,7 @@ def initWorld():
         #ch = choice((m,f))
         #humans.append(ch)
 
-    """
+    
     return
 
 ### ### ### ### ###
@@ -1076,7 +1136,7 @@ def render( it = 0 ):
                     for z in zombies:
                         if z.dead==False and z.x==xTile and z.y==yTile : # agent on terrain?
                             screen.blit( agentType[ getAgentAt( xTile, yTile ) ] , (xScreen, yScreen - heightMultiplier ))
-                if ((getAgentAt( xTile, yTile ) == burgerId) or (getAgentAt( xTile, yTile ) == foodsId)) :
+                if ((getAgentAt( xTile, yTile ) == foodsId)) :
                     for f in foods:
                         if f.x==xTile and f.y==yTile : # agent on terrain?
                             screen.blit( agentType[ getAgentAt( xTile, yTile ) ] , (xScreen, yScreen - heightMultiplier ))
@@ -1130,7 +1190,7 @@ while userExit == False:
 
     render(it)
     
-    #stepAgents(manId, womanId, it)
+    stepAgents(manId, womanId, it)
     stepWorld(it)
 
     perdu = False
