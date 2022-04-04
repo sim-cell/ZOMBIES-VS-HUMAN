@@ -1141,6 +1141,11 @@ def render( it = 0 ):
                     for f in foods:
                         if f.x==xTile and f.y==yTile : # agent on terrain?
                             screen.blit( agentType[ getAgentAt( xTile, yTile ) ] , (xScreen, yScreen - heightMultiplier ))
+
+                if (getAgentAt( xTile, yTile ) == gunId) :
+                    for f in guns:
+                        if f.x==xTile and f.y==yTile : # agent on terrain?
+                            screen.blit( agentType[ getAgentAt( xTile, yTile ) ] , (xScreen, yScreen - heightMultiplier ))
                 """else :
                      screen.blit( agentType[ getAgentAt( xTile, yTile ) ] , (xScreen, yScreen - heightMultiplier ))"""
 
