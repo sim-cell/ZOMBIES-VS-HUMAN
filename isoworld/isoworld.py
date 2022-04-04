@@ -135,6 +135,12 @@ def loadAllImages():
     tileType = []
     objectType = []
     agentType = []
+    #!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!
+
+    """DISCLAIMER : IF YOU ADD AN IMAGE PLEASE ADD A NIGHT VERSION OF IT TOO 
+    (right after the day one so that it is in the i+1 nd case) THXXX -S"""
+
+    #!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!
 
     tileType.append(loadImage('assets/basic111x128/plat.png')) # grasss
     tileType.append(loadImage('assets/ext/isometric-blocks/PNG/Platformer tiles/platformerTile_33.png')) # brick
@@ -827,7 +833,7 @@ def stepAgents(maleID,womanId, it = 0 ):
 ###
 ###
 
-filter=pygame.image.load("isoworld/assets/night.png")
+
 
 def render( it = 0 ):
     global xViewOffset, yViewOffset
