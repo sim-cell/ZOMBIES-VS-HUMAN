@@ -39,7 +39,7 @@ from random import *
 #import random
 import math
 import time
-#from playsound import playsound
+from playsound import playsound
   
 
 
@@ -76,16 +76,16 @@ DAY=True
 ### ### ### ### ### ### ### ### ### ### ### ### ### ### ### ###
 
 # display screen dimensions
-screenWidth =  930 # 1400
-screenHeight = 640 #900
+screenWidth =  930 # 1400 #
+screenHeight =  640 #900 #
 
 # world dimensions (ie. nb of cells in total)
-worldWidth = 64  #32#
-worldHeight = 64 #32#
+worldWidth =  32# 120 #32#
+worldHeight = 32  # 120 #32#
 
 # set surface of displayed tiles (ie. nb of cells that are rendered) -- must be superior to worldWidth and worldHeight
-viewWidth = 32 #32
-viewHeight = 32 #32
+viewWidth = 40 #32
+viewHeight = 40 #32
 
 scaleMultiplier = 0.25 # re-scaling of loaded images = zoom
 
@@ -375,7 +375,7 @@ def setAgentAt(x,y,type):
 ###
 ###
 PSHOOT=0.5
-PROB_REPROD = 0.03
+PROB_REPROD = 0.8
 MAXHUNGER=20
 
 class BasicAgent:
@@ -510,11 +510,13 @@ class Human(BasicAgent):
                     self.age+=1
                     self.hunger-=1
                     self.move3()
+                    print ("one zombie down")
                 else:
                     Tx=self.x
                     Ty=self.y
                     humans.remove(self)
                     zombies.append(Zombie(winnerzombieId,Tx,Ty))
+                    print ("new zombie rawr")
                     return
         self.age+=1
         self.hunger-=1
@@ -532,8 +534,10 @@ class Human(BasicAgent):
                         coords = self.getPosition()
                         if sex_choice == ImageIdF:
                             list_humans.append(Female(sex_choice, coords[0], coords[1]))
+                            print ("female born")
                         else :
                             list_humans.append(Male(sex_choice, coords[0], coords[1]))
+                            print ("male born")
                     break
         return
 
@@ -574,42 +578,54 @@ class Zombie(BasicAgent):
                 if self.direction==0:
                     if getAgentAt((self.x+1+worldWidth)%worldWidth,(self.y+worldHeight)%worldHeight) == agentId :
                         self.move2(1,0)
+                        print("chase")
                         return
                     elif getAgentAt((self.x+1+worldWidth)%worldWidth,(self.y+1+worldHeight)%worldHeight) == agentId :
                         self.move2(1,1)
+                        print("chase")
                         return
                     elif getAgentAt((self.x+1+worldWidth)%worldWidth,(self.y-1+worldHeight)%worldHeight) == agentId :
                         self.move2(1,-1)
+                        print("chase")
                         return
                 elif self.direction==2:
                     if getAgentAt((self.x-1+worldWidth)%worldWidth,(self.y+worldHeight)%worldHeight) == agentId :
                         self.move2(-1,0)
+                        print("chase")
                         return
                     elif getAgentAt((self.x-1+worldWidth)%worldWidth,(self.y+1+worldHeight)%worldHeight) == agentId :
                         self.move2(-1,1)
+                        print("chase")
                         return
                     elif getAgentAt((self.x-1+worldWidth)%worldWidth,(self.y-1+worldHeight)%worldHeight) == agentId :
                         self.move2(-1,-1)
+                        print("chase")
                         return
                 elif self.direction==1:
                     if getAgentAt((self.x+worldWidth)%worldWidth,(self.y+1+worldHeight)%worldHeight) == agentId :
                         self.move2(0,1)
+                        print("chase")
                         return
                     elif getAgentAt((self.x+1+worldWidth)%worldWidth,(self.y+1+worldHeight)%worldHeight) == agentId :
                         self.move2(1,1)
+                        print("chase")
                         return
                     elif getAgentAt((self.x-1+worldWidth)%worldWidth,(self.y+1+worldHeight)%worldHeight) == agentId :
                         self.move2(1,1)
+                        print("chase")
                         return
                 elif self.direction==3:
                     if getAgentAt((self.x+worldWidth)%worldWidth,(self.y-1+worldHeight)%worldHeight) == agentId :
                         self.move2(0,-1)
+                        print("chase")
                         return
                     elif getAgentAt((self.x+1+worldWidth)%worldWidth,(self.y-1+worldHeight)%worldHeight) == agentId :
                         self.move2(1,-1)
+                        print("chase")
                         return
                     elif getAgentAt((self.x-1+worldWidth)%worldWidth,(self.y-1+worldHeight)%worldHeight) == agentId :
                         self.move2(-1,-1)
+                        print("chase")
                         return
         self.move()
         return
@@ -825,6 +841,7 @@ def initWorld():
         setObjectAt( c[0], c[1], flowerRId)
 
     """#ajout de fences ????maybeeee 
+    
     for c in [(7,15),(7,17)]:
         setObjectAt( c[0], c[1], fenceSEId)
     for c in [(7,19),(7,21)] :
@@ -868,7 +885,7 @@ def initWorld():
                 setObjectAt(c[0],y,floorGrId,0)
 
     #-----------------------------------------------------------------------------------
-
+        
     #adding trees
     for i in range(nbTrees):
         x = randint(0,getWorldWidth()-7)
@@ -951,7 +968,7 @@ def initWorld():
 
 
 
-    """eski codelar :
+    """old codes :
     
     building1TerrainMap = [
     [ 2, 2, 2, 2 ],
@@ -991,7 +1008,8 @@ def initWorld():
     #adding agents
 
     for i in range(nbAgents):
-        zombies.append(Zombie(zombieId,-1,-1))
+        if random()<0.8:
+            zombies.append(Zombie(zombieId,-1,-1))
         if random()<0.5:
             humans.append(Male(manId))
         else:
@@ -1009,7 +1027,7 @@ def initAgents():
 ### ### ### ### ###
 
 def stepWorld( it = 0 ):
-    if it % (maxFps/180) == 0: #tour speed
+    if it % (maxFps/60) == 0: #tour speed
         for x in range(worldWidth):
             for y in range(worldHeight):
                 #burning the trees
@@ -1077,10 +1095,14 @@ def stepAgents(maleID,womanId, it = 0 ):
 ###
 ###
 
+
 filter=pygame.image.load("isoworld/assets/night.png")
+#dimensions of filter is screenwidth and height
 
 def render( it = 0 ):
     global xViewOffset, yViewOffset
+    humancount=0
+    zombiecount=0
 
     blue=(135,206,235)
     black=(0,0,0)
@@ -1131,11 +1153,13 @@ def render( it = 0 ):
                 if ((getAgentAt( xTile, yTile ) == manId) or (getAgentAt( xTile, yTile ) == womanId)) :
                     for h in humans:
                         if  h.dead==False and h.x==xTile and h.y==yTile : # agent on terrain?
+                            humancount+=1
                             screen.blit( agentType[ getAgentAt( xTile, yTile ) ] , (xScreen, yScreen - heightMultiplier ))
                 
                 if (getAgentAt( xTile, yTile ) == zombieId) :
                     for z in zombies:
                         if z.dead==False and z.x==xTile and z.y==yTile : # agent on terrain?
+                            zombiecount+=1
                             screen.blit( agentType[ getAgentAt( xTile, yTile ) ] , (xScreen, yScreen - heightMultiplier ))
                 if ((getAgentAt( xTile, yTile ) == foodsId)) :
                     for f in foods:
@@ -1148,6 +1172,9 @@ def render( it = 0 ):
                             screen.blit( agentType[ getAgentAt( xTile, yTile ) ] , (xScreen, yScreen - heightMultiplier ))
                 """else :
                      screen.blit( agentType[ getAgentAt( xTile, yTile ) ] , (xScreen, yScreen - heightMultiplier ))"""
+    if it%10==0:
+        print (humancount," humans left")
+        print (zombiecount," zombies left")
 
     return
 
@@ -1186,6 +1213,7 @@ while userExit == False:
         timeStamp = datetime.datetime.now().timestamp()
         itStamp = it
 
+    
     #screen.blit(pygame.font.render(str(currentFps), True, (255,255,255)), (screenWidth-100, screenHeight-50))
 
     render(it)
@@ -1198,6 +1226,20 @@ while userExit == False:
 
     if (len(zombies)==0):
         perdu = True 
+
+    if (len(humans)==0):
+        print ("")
+        print ("#### #### #### #### ####")
+        print ("####                ####")
+        print ("####     ZOMBIES WIN !    ####")
+        print ("####                ####")
+        print ("#### #### #### #### ####")
+        print ("")
+        print (">>> Score:",it,"--> OOPS! ")
+        print ("")
+        playsound('isoworld/sounds/VOXScrm_Wilhelm scream (ID 0477)_BSB.wav')
+        pygame.quit()
+        sys.exit()
 
     for h in humans:
         #if h.getPosition() == player.getPosition():
