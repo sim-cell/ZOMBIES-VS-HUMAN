@@ -12,7 +12,7 @@ When adding agents, pls do not create a new variable and instead just add them t
   If humans see a zombie close to them they run away, if a zombie sees a human in front of them (depends on their random  direction) they run towards them. PROBABILITY TO MOVE for humans is lower so that zombies can catch up. When a zombie and a human are on the same coords : explained in combat function in DONE list. If two opposite sexes of humans REPRODUCE a baby is born (might add the aging factors) and human couples tend to move together.
 
   ## PROBLEM SOLVING
-  - readding 
+  - readding the cure
   - objects vs humans
   - gun and food probabilities
   - basic agents - food gun display problem
@@ -23,18 +23,18 @@ When adding agents, pls do not create a new variable and instead just add them t
 
 ## TO DO:
   - randomising the environment
-  - couples becoming groups (K)
-  - adding day and night (S)
-  - adding images for zombies and humans (S)
-  - visual changements concerning agents and objects (S)
+  - couples becoming groups (K) --------------
+  - adding day and night (S) !!!!!
+  - adding images for zombies and humans (S) !!!!!   - visual changements concerning agents and objects (S)
+
   - adding environmental changes
     - random mountains (S)
-    - environmental changes (D)
+    - environmental changes (D) 
   - environment x agents x objects 
     - climbing a mountain etc (S-D)
   - changing the transitioning process from human to zombie (-)
     - a transitioning period
-    - immunity
+    - immunity 
   - working on a player (-)
 
 

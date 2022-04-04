@@ -516,6 +516,7 @@ class Human(BasicAgent):
                     Ty=self.y
                     humans.remove(self)
                     zombies.append(Zombie(winnerzombieId,Tx,Ty))
+                    playsound('isoworld/sounds/VOXScrm_Wilhelm scream (ID 0477)_BSB.wav')
                     print ("new zombie rawr")
                     return
         self.age+=1
