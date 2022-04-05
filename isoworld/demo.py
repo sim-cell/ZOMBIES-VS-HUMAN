@@ -1088,7 +1088,6 @@ def stepAgents(maleID,womanId, it = 0 ):
 
     return
 
-
 ### ### ### ### ### ### ### ### ### ### ### ### ### ### ### ###
 ### ### ### ### ### ### ### ### ### ### ### ### ### ### ### ###
 ### ### ### ### ### ### ### ### ### ### ### ### ### ### ### ###
@@ -1097,8 +1096,14 @@ def stepAgents(maleID,womanId, it = 0 ):
 ###
 
 
-filter=pygame.image.load("isoworld/assets/night.png")
+#filter=pygame.image.load("isoworld/assets/night.png")
 #dimensions of filter is screenwidth and height
+filter = pygame.Surface((screenWidth,screenHeight))
+filter.fill((0,0,0))
+filter.set_alpha(255)
+filter.fill((0,0,0))
+
+
 
 def render( it = 0 ):
     global xViewOffset, yViewOffset
@@ -1113,9 +1118,10 @@ def render( it = 0 ):
   
     else:
         pygame.draw.rect(screen, black, (0, 0, screenWidth, screenHeight), 0)
-       # filter = pygame.surface.Surface(screenWidth, screenHeight)
-        filter.fill(pygame.color.Color('Grey'))
-        screen.blit(filter,(0,0))
+        #filter = pygame.surface.Surface(screenWidth, screenHeight)
+        #pygame.Surface((screenWidth, screenHeight), pygame.SRCALPHA)
+        #filter.fill(pygame.color.Color('Grey'))
+        screen.blits(filter,(0,0))
 
     #pygame.display.update()
 

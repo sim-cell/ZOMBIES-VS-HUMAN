@@ -63,3 +63,6 @@ When adding agents, pls do not create a new variable and instead just add them t
   - gun drops
   - reproduction (DONE)
 
+## lighting 
+https://www.youtube.com/watch?v=oicpNiye6c0
+https://www.youtube.com/watch?v=NGFk44fY0O4
