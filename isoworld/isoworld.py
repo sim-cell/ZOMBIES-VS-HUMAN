@@ -479,7 +479,10 @@ class Human(BasicAgent):
 
 
     def move3(self):
-        if random()<0.5:
+        PROB=0.6 #less than zombies to be able to get caught
+        if not DAY:
+            PROB=0.3 #during night they can't see
+        if random()<PROB:
             if getAgentAt((self.x+1+worldWidth)%worldWidth, (self.y+worldHeight)%worldHeight ) == zombieId: #x+1 y
                 self.move2(-1,0)
             elif getAgentAt((self.x-1+worldWidth)%worldWidth, (self.y+worldHeight)%worldHeight ) == zombieId: #x-1 y

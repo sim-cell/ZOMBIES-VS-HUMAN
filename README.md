@@ -19,9 +19,11 @@ When adding agents, pls do not create a new variable and instead just add them t
   - night and day
   - slow down the iteration 
   - change probabilities -> zombies can't win right now
+  - fps drop
 
 
 ## TO DO:
+  - restart with backlogs (add at least 20 days worth of work)
   - randomising the environment
   - couples becoming groups (K) --------------
   - adding day and night (S) !!!!!
@@ -32,7 +34,7 @@ When adding agents, pls do not create a new variable and instead just add them t
     - environmental changes (D) 
   - environment x agents x objects 
     - climbing a mountain etc (S-D)
-  - changing the transitioning process from human to zombie (-)
+  - changing the transitioning process from human to zombie (-) !!!!!!!!!!!!!!!1
     - a transitioning period
     - immunity 
   - working on a player (-)

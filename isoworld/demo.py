@@ -80,12 +80,12 @@ screenWidth =  930 # 1400 #
 screenHeight =  640 #900 #
 
 # world dimensions (ie. nb of cells in total)
-worldWidth =  32# 120 #32#
+worldWidth = 32# 120 #32#
 worldHeight = 32  # 120 #32#
 
 # set surface of displayed tiles (ie. nb of cells that are rendered) -- must be superior to worldWidth and worldHeight
-viewWidth = 40 #32
-viewHeight = 40 #32
+viewWidth = 32
+viewHeight = 32
 
 scaleMultiplier = 0.25 # re-scaling of loaded images = zoom
 
@@ -97,7 +97,7 @@ yViewOffset = 0
 
 addNoise = False
 
-maxFps = 30 # set up maximum number of frames-per-second
+maxFps = 15 # set up maximum number of frames-per-second
 
 verbose = False # display message in console on/off
 verboseFps = True # display FPS every once in a while
@@ -479,7 +479,11 @@ class Human(BasicAgent):
 
 
     def move3(self):
-        if random()<0.5:
+        PROB=0.6 #less than zombies to be able to get caught
+        if not DAY:
+            PROB=0.3 #during night they can't see
+
+        if random()<PROB:
             if getAgentAt((self.x+1+worldWidth)%worldWidth, (self.y+worldHeight)%worldHeight ) == zombieId: #x+1 y
                 self.move2(-1,0)
             elif getAgentAt((self.x-1+worldWidth)%worldWidth, (self.y+worldHeight)%worldHeight ) == zombieId: #x-1 y
@@ -795,7 +799,9 @@ def initWorld():
         for y in range( len( lakeTerrainMap[0] )):
             setTerrainAt( x+x_offset, y+y_offset, lakeTerrainMap[x][y])
             setHeightAt( x+x_offset, y+y_offset, lakeHeightMap[x][y])
-            setObjectAt( x+x_offset, y+y_offset, 0)
+            #setObjectAt( x+x_offset, y+y_offset, 0)
+            # setObjectAt(x,y, -1,0)
+            setObjectAt( x+x_offset, y+y_offset, -1, 0 ) 
     setObjectAt( 6+x_offset, 3+y_offset, canoeId)
 
     #-----------------------------------------------------------------------------------
@@ -810,12 +816,13 @@ def initWorld():
         setObjectAt(x,y,grassDetId)
 
     #----------------------------------------------------------------------------------- 
-
+    
     #adding house1
     for x in range(1,4):
         for y in range(13,20) :
             for level in range(0,objectMapLevels):
                 setObjectAt(x,y,blockId,level)
+                setObjectAt( x, y, -1, 0 ) 
     
     for c in [(4,13),(4,15),(4,17),(4,19)]:
         for level in range(0,objectMapLevels):
@@ -1028,7 +1035,7 @@ def initAgents():
 ### ### ### ### ###
 
 def stepWorld( it = 0 ):
-    if it % (maxFps/60) == 0: #tour speed
+    if it % (maxFps/30) == 0: #tour speed
         for x in range(worldWidth):
             for y in range(worldHeight):
                 #burning the trees
@@ -1121,7 +1128,7 @@ def render( it = 0 ):
         #filter = pygame.surface.Surface(screenWidth, screenHeight)
         #pygame.Surface((screenWidth, screenHeight), pygame.SRCALPHA)
         #filter.fill(pygame.color.Color('Grey'))
-        screen.blits(filter,(0,0))
+        #screen.blits(filter,(0,0))
 
     #pygame.display.update()
 
@@ -1179,9 +1186,9 @@ def render( it = 0 ):
                             screen.blit( agentType[ getAgentAt( xTile, yTile ) ] , (xScreen, yScreen - heightMultiplier ))
                 """else :
                      screen.blit( agentType[ getAgentAt( xTile, yTile ) ] , (xScreen, yScreen - heightMultiplier ))"""
-    if it%10==0:
-        print (humancount," humans left")
-        print (zombiecount," zombies left")
+    #if it%10==0:
+        #print (humancount," humans left")
+        #print (zombiecount," zombies left")
 
     return
 
@@ -1204,7 +1211,7 @@ initAgents()
 #player = BasicAgent(medicineId)
 setAgentAt( mx+1, my+1, medicineId )
 
-print ("initWorld:",datetime.datetime.now().timestamp()-timestamp,"second(s)")
+#print ("initWorld:",datetime.datetime.now().timestamp()-timestamp,"second(s)")
 timeStampStart = timeStamp = datetime.datetime.now().timestamp()
 
 it = itStamp = 0
