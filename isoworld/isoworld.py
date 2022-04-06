@@ -1405,7 +1405,7 @@ while userExit == False:
 
     render(it)
     
-    stepAgents(manId, womanId, it)
+    stepAgents(it)
     stepWorld(it)
 
     perdu = False
