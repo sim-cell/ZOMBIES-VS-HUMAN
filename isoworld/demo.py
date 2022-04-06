@@ -84,8 +84,8 @@ worldWidth = 32# 120 #32#
 worldHeight = 32  # 120 #32#
 
 # set surface of displayed tiles (ie. nb of cells that are rendered) -- must be superior to worldWidth and worldHeight
-viewWidth = 32
-viewHeight = 32
+viewWidth = 32 #32
+viewHeight = 32 #32
 
 scaleMultiplier = 0.25 # re-scaling of loaded images = zoom
 
@@ -520,7 +520,7 @@ class Human(BasicAgent):
                     Ty=self.y
                     humans.remove(self)
                     zombies.append(Zombie(winnerzombieId,Tx,Ty))
-                    playsound('isoworld/sounds/VOXScrm_Wilhelm scream (ID 0477)_BSB.wav')
+                    #playsound('isoworld/sounds/VOXScrm_Wilhelm scream (ID 0477)_BSB.wav')
                     print ("new zombie rawr")
                     return
         self.age+=1
@@ -1257,7 +1257,7 @@ while userExit == False:
         print ("")
         print (">>> Score:",it,"--> OOPS! ")
         print ("")
-        playsound('isoworld/sounds/VOXScrm_Wilhelm scream (ID 0477)_BSB.wav')
+        #playsound('isoworld/sounds/VOXScrm_Wilhelm scream (ID 0477)_BSB.wav')
         pygame.quit()
         sys.exit()
 
