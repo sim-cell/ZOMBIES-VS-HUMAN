@@ -97,7 +97,7 @@ yViewOffset = 0
 
 addNoise = False
 
-maxFps = 15 # set up maximum number of frames-per-second
+maxFps = 30 # set up maximum number of frames-per-second
 
 verbose = False # display message in console on/off
 verboseFps = True # display FPS every once in a while
@@ -1103,12 +1103,17 @@ def stepAgents(maleID,womanId, it = 0 ):
 ###
 
 
-#filter=pygame.image.load("isoworld/assets/night.png")
+night=pygame.image.load("isoworld/assets/stars.png").convert()
+day=pygame.image.load("isoworld/assets/day.png")
+
+IMAGE = pygame.image.load('an_image.png').convert()
+IMAGE2 = pygame.image.load('an_image_with_transparency.png')
+
 #dimensions of filter is screenwidth and height
-filter = pygame.Surface((screenWidth,screenHeight))
+"""filter = pygame.Surface((screenWidth,screenHeight))
 filter.fill((0,0,0))
 filter.set_alpha(255)
-filter.fill((0,0,0))
+filter.fill((0,0,0))"""
 
 
 
@@ -1121,14 +1126,15 @@ def render( it = 0 ):
     black=(0,0,0)
 
     if DAY:
-        pygame.draw.rect(screen, blue, (0, 0, screenWidth, screenHeight), 0) # overkill - can be optimized. (most sprites are already "naturally" overwritten)
+        screen.blit(day,(0,0))
+        #pygame.draw.rect(screen, blue, (0, 0, screenWidth, screenHeight), 0) # overkill - can be optimized. (most sprites are already "naturally" overwritten)
   
     else:
-        pygame.draw.rect(screen, black, (0, 0, screenWidth, screenHeight), 0)
+        #pygame.draw.rect(filter, black, (0, 0, screenWidth, screenHeight), 0)
         #filter = pygame.surface.Surface(screenWidth, screenHeight)
         #pygame.Surface((screenWidth, screenHeight), pygame.SRCALPHA)
         #filter.fill(pygame.color.Color('Grey'))
-        #screen.blits(filter,(0,0))
+        screen.blit(night,(0,0))
 
     #pygame.display.update()
 

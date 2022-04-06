@@ -482,7 +482,7 @@ class Human(BasicAgent):
         PROB=0.6 #less than zombies to be able to get caught
         if not DAY:
             PROB=0.3 #during night they can't see
-        if random()<PROB:
+        if random()<PROB_REPROD:
             if getAgentAt((self.x+1+worldWidth)%worldWidth, (self.y+worldHeight)%worldHeight ) == zombieId: #x+1 y
                 self.move2(-1,0)
             elif getAgentAt((self.x-1+worldWidth)%worldWidth, (self.y+worldHeight)%worldHeight ) == zombieId: #x-1 y
@@ -1094,8 +1094,8 @@ def render( it = 0 ):
     else:
         pygame.draw.rect(screen, black, (0, 0, screenWidth, screenHeight), 0)
        # filter = pygame.surface.Surface(screenWidth, screenHeight)
-        filter.fill(pygame.color.Color('Grey'))
-        screen.blit(filter,(0,0))
+       #filter.fill(pygame.color.Color('Grey'))
+        #screen.blit(filter,(0,0))
 
     #pygame.display.update()
 
