@@ -39,7 +39,7 @@ from random import *
 #import random
 import math
 import time
-#from playsound import playsound
+from playsound import playsound
   
 
 
@@ -66,7 +66,7 @@ nbBurningTrees = 0 #15
 nbAgents = 10
 nbDetails = 18
 DAY=True
-WEATHER=0 #0=sunny 1=cloudy 
+WEATHER=1 #0=sunny 1=cloudy 
 
 ### ### ### ### ### ### ### ### ### ### ### ### ### ### ### ###
 ### ### ### ### ### ### ### ### ### ### ### ### ### ### ### ###
@@ -768,7 +768,10 @@ def cloudspawn():
             w=((x+cx)+worldWidth)%worldWidth
             for y in range(0,yy):
                 l=((y+cy)+worldHeight)%worldHeight
-                setObjectAt(w,l,cloudId,objectMapLevels-1)
+                if random()<0.3:
+                    setObjectAt(w,l,chargedCloudId,objectMapLevels-1)
+                else :
+                    setObjectAt(w,l,cloudId,objectMapLevels-1)
                 clouds.append(1)
 
 
@@ -1251,15 +1254,25 @@ def initAgents():
 
 def stepWorld( it = 0 ):
     if it % (maxFps/180) == 0: #tour speed
-        for x in range(worldWidth):
-            for y in range(worldHeight):
-                #burning the trees
-                if getObjectAt(x,y) == treeId:
-                    for neighbours in ((-1,0),(+1,0),(0,-1),(0,+1)):
-                        if getObjectAt((x+neighbours[0]+worldWidth)%worldWidth,(y+neighbours[1]+worldHeight)%worldHeight) == burningTreeId:
-                            setObjectAt(x,y,burningTreeId)
-                        elif getAgentAt((x+neighbours[0]+worldWidth)%worldWidth,(y+neighbours[1]+worldHeight)%worldHeight) == zombieId:
-                            setObjectAt(x,y,burningTreeId)
+        if WEATHER==1: #stormy
+            for x in range(worldWidth):
+                for y in range(worldHeight):
+
+                    if getObjectAt(x,y,objectMapLevels-1) == chargedCloudId:
+                        for neighbours in ((-1,0),(+1,0),(0,-1),(0,+1)):
+                            if getObjectAt((x+neighbours[0]+worldWidth)%worldWidth,(y+neighbours[1]+worldHeight)%worldHeight) == chargedCloudId:
+                                playsound('isoworld/sounds/thunder.wav')
+
+
+    #burning the trees
+    """
+    if getObjectAt(x,y) == treeId:
+        for neighbours in ((-1,0),(+1,0),(0,-1),(0,+1)):
+            if getObjectAt((x+neighbours[0]+worldWidth)%worldWidth,(y+neighbours[1]+worldHeight)%worldHeight) == burningTreeId:
+                setObjectAt(x,y,burningTreeId)
+            elif getAgentAt((x+neighbours[0]+worldWidth)%worldWidth,(y+neighbours[1]+worldHeight)%worldHeight) == zombieId:
+                setObjectAt(x,y,burningTreeId)"""
+                
     return
 ### ### ### ### ###
 
