@@ -1128,9 +1128,6 @@ def render( it = 0 ):
 
     else:
         #pygame.draw.rect(filter, black, (0, 0, screenWidth, screenHeight), 0)
-        #filter = pygame.surface.Surface(screenWidth, screenHeight)
-        #pygame.Surface((screenWidth, screenHeight), pygame.SRCALPHA)
-        #filter.fill(pygame.color.Color('Grey'))
         screen.blit(night,(0,0))
 
     #pygame.display.update()
