@@ -759,9 +759,11 @@ def cloudspawn():
     cx=randint(0,worldWidth)
     cy=randint(0,worldHeight)
 
-    while len(clouds)<(worldHeight*worldWidth)//4:
+    while len(clouds)<(worldHeight*worldWidth)//2:
         xx=randint(2,maxx)
         yy=randint(2,maxy)
+        cx=randint(0,worldWidth)
+        cy=randint(0,worldHeight)
         for x in range(0,xx):
             w=((x+cx)+worldWidth)%worldWidth
             for y in range(0,yy):
