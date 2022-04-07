@@ -698,13 +698,13 @@ class Cure(RandDropAgents):
         self.decomp=0
         self.reset()
 
-"""    def randomDrop(it,list):
+    def randomDrop(it,list):
         if (it != 0):
             if random() < PROBDROPCURE:
                 if it%DROPDAYCURE == 0 :
                     for i in range(0,MAXCURE):
                         list.append(Cure())
-        return  """
+        return
 
 
 class Food(RandDropAgents):
@@ -750,24 +750,6 @@ class Gun(RandDropAgents) :
                             break
                         list.append(Gun())
         return
-
-"""    def __init__(self) :
-        super().__init__()
-        self.type=gunId
-        self.reset()
-        self.probDrop=PROBDROPGUN
-        self.dropDay=DROPDAYGUN
-        self.maxRange=MAXGUN
-
-    def randomDrop(it,list):
-        if (it != 0):
-            if random() < self.probDrop:
-                if it%self.dropDay == 0 :
-                    for i in range(0,randint(5, 10)):
-                        if len(list)== maxRange :
-                            break
-                        list.append(self.init())
-        return"""
 
 guns = []
 foods = []
@@ -1057,46 +1039,6 @@ def randEnv():
         setObjectAt(x,y,grassDetId)
     return
 
-def fixEnv():
-
-    lakeHeightMap = [
-    [ 0, 0, 0, 0, 0, 0, 0, 0, 0 ],
-    [ 0, -1, -1, -1, -1, -1, -1, -1, 0 ],
-    [ 0, -1, -1, -1, -1, -1, -1, -1, 0 ],
-    [ 0, -1, -1, 0, -1, -1, -1, -1, 0 ],
-    [ 0, 0, 0, 0, -1, -1, -1, -1, 0 ],
-    [ 0, -1, -1, 0, -1, -1, -1, -1, 0 ],
-    [ 0, -1, -1, -1, -1, -1, -1, -1, 0 ],
-    [ 0, -1, -1, -1, -1, -1, -1, -1, 0 ],
-    [ 0, 0, 0, 0, 0, 0, 0, 0, 0 ]
-    ]
-    xforroad=0
-    yforroad=0
-    #putting the lake
-    for w in range( len( lakeTerrainMap )):
-        for l in range( len( lakeTerrainMap[0] )):
-            xx=((x+w)+worldWidth)%worldWidth
-            yy=((y+l)+worldHeight)%worldHeight
-            if (w==len(lakeTerrainMap )//2 and l==0) :
-                setTerrainAt(xx,yy,4)
-                occupied.append((xx,yy))
-                xforroad=xx
-                yforroad=((yy-1)+worldHeight)%worldHeight
-                continue
-            occupied.append((xx,yy))
-            setTerrainAt( xx, yy, lakeTerrainMap[w][l])
-            setHeightAt( xx, yy, lakeHeightMap[w][l])
-            """if you do this the agents can climb the objects
-            setObjectAt( xx, yy, 0, -1)
-            setObjectAt( xx, yy, 0, 0) """
-            if (lakeHeightMap[w][l] == -1) :
-                #this one prohibit agents from coming
-                setObjectAt( xx, yy, -1, 0)
-
-    createRoad(xforroad,yforroad,'x')
-    #putting the canoe
-    setObjectAt( ((x+6)+worldWidth)%worldWidth,((y+3)+worldHeight)%worldHeight, canoeId)
-    return
 
 def createHouse(x,y):
     lev=objectMapLevels-3
@@ -1442,13 +1384,17 @@ def fixEnv():
 
 
 def initWorld():
-    global nbTrees, nbBurningTrees, zombies, humans, nbDetails
-    # add a pyramid-shape building
-    #type of objectss
+    global nbTrees, nbBurningTrees, zombies, humans, nbDetails 
+
     cloudspawn()
-    randEnv()
-    addingTrees()
-    #fixEnv()
+    if getWorldWidth() >= 100 :
+        fixEnv()
+        randEnv()
+        addingTrees()
+    else :
+        randEnv()
+        addingTrees()
+ 
     #adding agents
     for i in range(nbAgents):
         zombies.append(Zombie(zombieId,-1,-1))
