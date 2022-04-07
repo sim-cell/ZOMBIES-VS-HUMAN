@@ -66,6 +66,7 @@ nbBurningTrees = 0 #15
 nbAgents = 10
 nbDetails = 18
 DAY=True
+WEATHER=0 #0=sunny 1=cloudy 
 
 ### ### ### ### ### ### ### ### ### ### ### ### ### ### ### ###
 ### ### ### ### ### ### ### ### ### ### ### ### ### ### ### ###
@@ -89,7 +90,7 @@ viewHeight = 32 #32
 
 scaleMultiplier = 0.25 # re-scaling of loaded images = zoom
 
-objectMapLevels = 8 # number of levels for the objectMap. This determines how many objects you can pile upon one another.
+objectMapLevels = 10 # number of levels for the objectMap. This determines how many objects you can pile upon one another.
 
 # set scope of displayed tiles
 xViewOffset = 0
@@ -131,12 +132,18 @@ pygame.display.set_caption('Zombieland')
 ###
 ### ### ### ### ### ### ### ### ### ### ### ### ### ### ### ###
 
+#creating clouds (the dimensions are different so do not use loadImage)
+cloud = pygame.image.load('assets/cloud30.png').convert_alpha()
+cloud = pygame.transform.scale(cloud, (int(25), int(25)))
+
 def loadImage(filename):
     global tileTotalWidthOriginal,tileTotalHeightOriginal,scaleMultiplier
     image = pygame.image.load(filename).convert_alpha()
     image = pygame.transform.scale(image, (int(tileTotalWidthOriginal*scaleMultiplier), int(tileTotalHeightOriginal*scaleMultiplier)))
     return image
 #downloading all images
+
+
 def loadAllImages():
     global tileType, objectType, agentType
 
@@ -188,6 +195,10 @@ def loadAllImages():
     objectType.append(loadImage('assets/ext/kenney_natureKit/Isometric/fence_strong_SE.png')) #fenceSE
     objectType.append(loadImage('assets/ext/kenney_natureKit/Isometric/fence_strong_NE.png')) #fenceNE
     objectType.append(loadImage('assets/ext/isometric-blocks/PNG/Abstract tiles/abstractTile_23.png'))
+
+    #clouds
+    objectType.append(cloud) #normal cloud
+    objectType.append(cloud) #charged cloud 
 
 
     #agent images
@@ -253,6 +264,8 @@ stepsId = 11
 fenceNWId = 12
 fenceSEId = 13
 fenceNEId = 14
+cloudId = 16
+chargedCloudId = 17
 
 
 #agents
@@ -735,6 +748,29 @@ humans = []
 ###
 
 #create random environment
+
+clouds = []
+def cloudspawn():
+    #creating the cloud matrix
+    #interaction points are the corners and if they are touching every x iteration we hear lightning (maybe their color change)
+
+    maxx=worldWidth/4
+    maxy=worldHeight/4
+    cx=randint(0,worldWidth)
+    cy=randint(0,worldHeight)
+
+    while len(clouds)<(worldHeight*worldWidth)//4:
+        xx=randint(2,maxx)
+        yy=randint(2,maxy)
+        for x in range(0,xx):
+            w=((x+cx)+worldWidth)%worldWidth
+            for y in range(0,yy):
+                l=((y+cy)+worldHeight)%worldHeight
+                setObjectAt(w,l,cloudId,objectMapLevels-1)
+                clouds.append(1)
+
+
+
 occupied=[]  #occupied surface by objects
 PROBTURN = 0.03    #randomly turn of road
 
@@ -842,6 +878,7 @@ def createlake(x,y) :
     return
 
 def createHouse(x,y):
+    lev=objectMapLevels-3
 
     #forbidden area around the house
     xforbidden=((x-1)+worldWidth)%worldWidth
@@ -862,7 +899,7 @@ def createHouse(x,y):
         w=((x+i)+worldWidth)%worldWidth
         for j in range(0,7):
             l=((y+j)+worldHeight)%worldHeight
-            for level in range(0,objectMapLevels):
+            for level in range(0,lev):
                 setObjectAt(w,l,blockId,level)
                 #print(w,l)
             occupied.append((w,l))  
@@ -874,7 +911,7 @@ def createHouse(x,y):
     for c in [(faceX,y),(faceX,faceY1),(faceX,faceY2),(faceX,faceY3)]:
         occupied.append((c[0],c[1]))
         setObjectAt(c[0],c[1],-1,0)
-        for level in range(0,objectMapLevels):
+        for level in range(0,lev):
             setObjectAt(c[0],c[1],blockId,level)
     faceY4= ((y+1)+worldHeight)%worldHeight
     faceY5= ((y+5)+worldHeight)%worldHeight
@@ -882,7 +919,7 @@ def createHouse(x,y):
     for c in [(faceX,faceY4),(faceX,faceY5)]:
         occupied.append((c[0],c[1]))
         setObjectAt(c[0],c[1],-1,0)
-        for level in range(0,objectMapLevels):
+        for level in range(0,lev):
             if level == 4 :
                 setObjectAt(c[0],c[1],windowId,level)
                 continue
@@ -892,7 +929,7 @@ def createHouse(x,y):
     #adding the door
     for c in [(faceX,faceY6)]:
         occupied.append((c[0],c[1]))
-        for level in range(3,objectMapLevels):
+        for level in range(3,lev):
             setObjectAt(c[0],c[1],blockId,level)
 
     setObjectAt(faceX,faceY6,doorId,0)
@@ -1186,6 +1223,7 @@ def initWorld():
 
     # add a pyramid-shape building
     #type of objectss
+    cloudspawn()
     randEnv()
     addingTrees()
     #fixEnv()
@@ -1281,28 +1319,44 @@ def stepAgents(it = 0 ):
 ###
 ###
 
-#filter=pygame.image.load("assets/night.png")
-#night=pygame.image.load("isoworld/assets/stars.png").convert()
-#day=pygame.image.load("isoworld/assets/day.png")
+#background variables (images and colours)
+night=pygame.image.load("assets/starsbig.png").convert_alpha()
+#nıght=pygame.transform.scale(night, (1200, 1200))
+day=pygame.image.load("assets/daybig.png").convert_alpha()
 
+def draw_rect_alpha(surface, color, rect):
+    shape_surf = pygame.Surface(pygame.Rect(rect).size, pygame.SRCALPHA)
+    pygame.draw.rect(shape_surf, color, shape_surf.get_rect())
+    surface.blit(shape_surf, rect)
+
+filter=pygame.image.load("assets/daybig.png").convert_alpha()
+
+############TRANSPARENT FILTER EXPERIMENTATION AREA ################
 #IMAGE = pygame.image.load('an_image.png').convert()
-#IMAGE2 = pygame.image.load('an_image_with_transparency.png')
+#IMAGE2 = pygame.image.load('assets/f10.png').convert()
+#IMAGE2.set_colorkey((0, 0, 0))
+#image = pygame.Surface([640,480], pygame.SRCALPHA, 32)
+#image = image.convert_alpha()
+
+blue=(135,206,235)
+black=(0,0,0)
+surface = pygame.Surface((screenWidth, screenHeight), pygame.SRCALPHA)
+
 
 def render( it = 0 ):
     global xViewOffset, yViewOffset
-
-    blue=(135,206,235)
-    black=(0,0,0)
-    
+    pygame.display.update()
     if DAY:
-        #screen.blit(day,(0,0))
-        pygame.draw.rect(screen, blue, (0, 0, screenWidth, screenHeight), 0) # overkill - can be optimized. (most sprites are already "naturally" overwritten)
-  
+        screen.blit(day,(0,0))
+        #pygame.draw.rect(screen, blue, (0, 0, screenWidth, screenHeight), 0) # overkill - can be optimized. (most sprites are already "naturally" overwritten)
+
     else:
-        pygame.draw.rect(screen, black, (0, 0, screenWidth, screenHeight), 0)
-       # filter = pygame.surface.Surface(screenWidth, screenHeight)
-       #filter.fill(pygame.color.Color('Grey'))
+        screen.blit(night,(0,0))
         #screen.blit(filter,(0,0))
+        #screen.fill((255, 255, 255))
+        #draw_rect_alpha(screen,(0,0,0),(55, 90, 140, 140))
+        #pygame.draw.rect(screen, black, (0, 0, screenWidth, screenHeight), 0)
+       # filter = pygame.surface.Surface(screenWidth, screenHeight)
         #filter.fill(pygame.color.Color('Grey'))
         #screen.blit(night,(0,0))
 
