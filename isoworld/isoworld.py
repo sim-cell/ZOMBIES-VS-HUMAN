@@ -752,6 +752,7 @@ guns = []
 foods = []
 zombies = []
 humans = []
+cure = []
 
 
 ### ### ### ### ### ### ### ### ### ### ### ### ### ### ### ###
@@ -1394,6 +1395,9 @@ def initWorld():
         #ch = choice((m,f))
         #humans.append(ch)
 
+    for i in range(MAXCURE):
+        cure.append(Cure())
+
     return
 
 ### ### ### ### ###
@@ -1580,6 +1584,10 @@ def render( it = 0, list_agents=iconsH_list):
 
                 if (getAgentAt( xTile, yTile ) == gunId) :
                     for f in guns:
+                        if f.x==xTile and f.y==yTile : # agent on terrain?
+                            screen.blit( agentType[ getAgentAt( xTile, yTile ) ] , (xScreen, yScreen - heightMultiplier ))
+                if (getAgentAt( xTile, yTile ) == medicineId) :
+                    for f in cure:
                         if f.x==xTile and f.y==yTile : # agent on terrain?
                             screen.blit( agentType[ getAgentAt( xTile, yTile ) ] , (xScreen, yScreen - heightMultiplier ))
                 """else :
