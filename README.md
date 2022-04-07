@@ -13,8 +13,6 @@ When adding agents, pls do not create a new variable and instead just add them t
 
   ## PROBLEM SOLVING
   - readding the cure
-  - objects vs humans
-  - gun and food probabilities
   - basic agents - food gun display problem
   - night and day
   - slow down the iteration 
@@ -23,18 +21,10 @@ When adding agents, pls do not create a new variable and instead just add them t
 
 
 ## TO DO:
-  - restart with backlogs (add at least 20 days worth of work)
-  - randomising the environment
   - couples becoming groups (K) --------------
   - adding day and night (S) !!!!!
   - adding images for zombies and humans (S) !!!!!   - visual changements concerning agents and objects (S)
-
-  - adding environmental changes
-    - random mountains (S)
-    - environmental changes (D) 
-  - environment x agents x objects 
-    - climbing a mountain etc (S-D)
-  - changing the transitioning process from human to zombie (-) !!!!!!!!!!!!!!!1
+  - changing the transitioning process from human to zombie (-)
     - a transitioning period
     - immunity 
   - working on a player (-)
@@ -64,6 +54,9 @@ When adding agents, pls do not create a new variable and instead just add them t
   - food drops
   - gun drops
   - reproduction (DONE)
+  - gun and food probabilities
+  - objects vs humans
+  - randomising the environment
 
 ## lighting 
 https://www.youtube.com/watch?v=oicpNiye6c0
