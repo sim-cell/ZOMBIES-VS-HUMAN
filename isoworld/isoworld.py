@@ -580,6 +580,23 @@ class Human(BasicAgent):
         if not food:
             self.hunger-=1
 
+    def takeCure(self, cure, manId, womanId):
+        if self.infected >0:
+            for i in cure:
+                if self.x ==i.x and self.y==i.y :
+                    self.infected = 0
+                    if self.sex =='M':
+                        self.type = manId
+                        print("Female ", id(self), " cured")
+                    else:
+                        self.type = womanId
+                        print("Male ", id(self), " cured")
+
+                cure.remove(i)
+                break
+        return
+
+
 
 class Male(Human):
     def __init__(self,imageId, newx=-1, newy=-1):
@@ -1494,6 +1511,7 @@ def stepAgents(maleID,womanId, it = 0 ):
             else:
                 if h.infected != 0:
                     h.infected +=1
+                    h.takeCure(cure, manId, womanId)
                 else:
                     h.combat(zombies,humans,foods, met)
                     h.reproduire(humans, manId, womanId, met)
