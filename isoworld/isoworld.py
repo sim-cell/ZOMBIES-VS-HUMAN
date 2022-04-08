@@ -1655,28 +1655,45 @@ while userExit == False:
     stepAgents(manId, womanId, it)
     stepWorld(it)
 
-    perdu = False
+    winner = None
 
 
     if (len(zombies)==0):
-        perdu = True
+        winner = 'H'
+    if (len(humans)==0):
+        winner = 'Z'
 
-    for h in humans:
-        #if h.getPosition() == player.getPosition():
-        if h.getPosition() == (mx,my):
-            perdu = True
+
+# --->>> humans win when they find the Cure
+
+#    for h in humans:
+#        #if h.getPosition() == player.getPosition():
+#        if h.getPosition() == (mx,my):
+#            perdu = True
             #playsound('isoworld/sounds/VOXScrm_Wilhelm scream (ID 0477)_BSB.wav')
-            break
+#            break
 
-    if perdu == True:
+    if winner == 'Z':
         print ("")
         print ("#### #### #### #### ####")
         print ("####                ####")
-        print ("####     HUMANS WIN !    ####")
+        print ("####  ZOMBIES WIN!  ####")
         print ("####                ####")
         print ("#### #### #### #### ####")
         print ("")
-        print (">>> Score:",it,"--> BRAVO! ")
+        print (">>> Score:",it)
+        print ("")
+        pygame.quit()
+        sys.exit()
+    if winner == 'H':
+        print ("")
+        print ("#### #### #### #### ####")
+        print ("####                ####")
+        print ("####  HUMANS WIN !  ####")
+        print ("####                ####")
+        print ("#### #### #### #### ####")
+        print ("")
+        print (">>> Score:",it)
         print ("")
         pygame.quit()
         sys.exit()
