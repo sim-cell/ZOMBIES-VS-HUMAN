@@ -486,10 +486,11 @@ class Human(BasicAgent):
         self.age=0
         self.sex=None
         self.hunger=MAXHUNGER
-        if random()<0.5:
-            self.gun=randint(1,10)
-        else:
-            self.gun=0
+        #if random()<0.5:
+        #    self.gun=randint(1,10)
+        #else:
+        #    self.gun=0
+        self.gun = randint(1,10)
 
         self.infected = 0
         return
@@ -531,10 +532,14 @@ class Human(BasicAgent):
 
 
 
-    def combat(self,zombies,humans,foods,met):
+    def combat(self,zombies,humans,met):
+        success = False
+        if self.gun > 0:
+            success = self.shoot()
         for z in zombies:
             if (met(self,z)):
-                if self.shoot()==True:
+                #if self.shoot()==True:
+                if success:
                     zombies.remove(z)
                     self.type=4
                 else:
@@ -548,6 +553,7 @@ class Human(BasicAgent):
                     else:
                         self.type = womanInfId
                         print("infected F")
+                break
                    # print("will remove a Z now")
                     #zombies.append(Zombie(winnerzombieId,Tx,Ty))
                    # print("Z removed")
@@ -576,9 +582,17 @@ class Human(BasicAgent):
             if self.x== f.x and self.y==f.y :
                 self.hunger+=f.energy
                 foods.remove(f)
+                print("Food taken")
                 food=True
         if not food:
             self.hunger-=1
+    def takeGun(self, guns) :
+        for g in guns:
+            if self.x== g.x and self.y==g.y :
+                self.gun+=1
+                guns.remove(g)
+                print("Gun taken")
+
 
     def takeCure(self, cure, manId, womanId):
         if self.infected >0:
@@ -1513,7 +1527,9 @@ def stepAgents(maleID,womanId, it = 0 ):
                     h.infected +=1
                     h.takeCure(cure, manId, womanId)
                 else:
-                    h.combat(zombies,humans,foods, met)
+                    h.eat(foods)
+                    h.takeGun(guns)
+                    h.combat(zombies,humans, met)
                     h.reproduire(humans, manId, womanId, met)
                 h.age+=1
                 h.hunger-=1
