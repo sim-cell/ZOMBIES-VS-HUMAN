@@ -71,10 +71,9 @@ WEATHER=True #True=sunny False=storm
 
 #probs for humans and zombies
 MAXAGE=30
-
-PSHOOT=0.8
+PSHOOT=1
 PROB_REPROD = 0.05
-MAXHUNGER=20
+MAXHUNGER=30
 
 
 #probs for foods
@@ -95,7 +94,7 @@ MAXGUN= 20
 PROBDROPCURE=1.0
 DROPDAYCURE=1
 NBCURE=0
-MAXCURE=10
+MAXCURE=20
 
 #probs of environment
 PROBTURN = 0.03    #randomly turn of road
@@ -550,8 +549,8 @@ class Human(BasicAgent):
         self.age=0
         self.sex=None
         self.hunger=MAXHUNGER
-        if random()<0.8:
-            self.gun=randint(1,10)
+        if random()<=1:
+            self.gun=randint(5,10)
         else:
             self.gun=0
         self.infected = 0
@@ -620,15 +619,14 @@ class Human(BasicAgent):
         success = self.shoot()
         for z in zombies:
             if (met(self,z)):
-                #if self.shoot()==True:
                 if success:
                     zombies.remove(z)
-                    print("zombie got shot")
+                    print("zombie got shot by ",id(self))
                     self.type=winnerhumanId
                 else:
                     Tx=self.x
                     Ty=self.y
-                    print("Human", id(self), "was infected")
+                    print("Human", id(self), "was infected and had gun :",self.gun)
                     self.infected += 1
                     if self.sex=='M':
                         self.type = manInfId
@@ -693,6 +691,8 @@ class Human(BasicAgent):
                 #cure.remove(i)
                 break
         return
+
+
 
 
 class Male(Human):
@@ -762,6 +762,22 @@ class Zombie(BasicAgent):
         return
 
 
+def met(agent1, agent2):
+    exists=False
+    if agent1.x==agent2.x and agent1.y==agent2.y:
+        exists=True
+    return exists
+
+def check_transition(h, zombies):
+
+    if h.infected == 15:
+        h.die()
+
+        Tx=h.x
+        Ty=h.y
+        zombies.append(Zombie(zombieId,Tx,Ty))
+    return
+
 
 class RandDropAgents:
 
@@ -791,7 +807,6 @@ class Cure(RandDropAgents):
         self.reset()
 
     def randomDrop(list, it):
-
         for i in range(0,MAXCURE):
             list.append(Cure())
         
@@ -1385,29 +1400,14 @@ def stepWorld( it = 0):
 
                 
     return
-### ### ### ### ###
 
-def met(agent1, agent2):
-    exists=False
-    if agent1.x==agent2.x and agent1.y==agent2.y:
-        exists=True
-    return exists
-
-def check_transition(h, zombies):
-
-    if h.infected == 15:
-        h.die()
-
-        Tx=h.x
-        Ty=h.y
-        zombies.append(Zombie(zombieId,Tx,Ty))
-    return
 
 ### ### ### ### ###
 
 def stepAgents(it = 0 ):
     # move agent
     if it % (maxFps/16) == 0:
+        print("stepped agents")
         shuffle(foods)
         shuffle(zombies)
         shuffle(humans)
@@ -1425,7 +1425,7 @@ def stepAgents(it = 0 ):
                 z.move3()
                 z.direction=randint(0,3)
         for h in humans:
-            if not (h.type==winnerhumanId): #if s/he won the combat
+            if (h.type==winnerhumanId): #if s/he won the combat
                 if h.sex=='M':
                     h.type=manId 
                 else:
@@ -1433,6 +1433,7 @@ def stepAgents(it = 0 ):
 
             if h.age>MAXAGE or h.hunger==-1:
                 h.die()
+                
             check_transition(h, zombies)
 
             if h.dead:
