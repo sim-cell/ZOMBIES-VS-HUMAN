@@ -39,7 +39,7 @@ from random import *
 #import random
 import math
 import time
-from playsound import playsound
+#from playsound import playsound
   
 
 
@@ -63,10 +63,9 @@ versionTag = "2018-12-24_15h06"
 #numbers of elements
 nbTrees = 40 #350
 nbBurningTrees = 0 #15
-nbAgents = 20
+nbAgents = 10
 nbDetails = 18
 DAY=True
-WEATHER=1 #0=sunny 1=cloudy 
 
 ### ### ### ### ### ### ### ### ### ### ### ### ### ### ### ###
 ### ### ### ### ### ### ### ### ### ### ### ### ### ### ### ###
@@ -77,8 +76,8 @@ WEATHER=1 #0=sunny 1=cloudy
 ### ### ### ### ### ### ### ### ### ### ### ### ### ### ### ###
 
 # display screen dimensions
-screenWidth =  930 # 1400
-screenHeight = 640 #900
+screenWidth = 1400 # 930 # 
+screenHeight =900 # 640 #
 
 # world dimensions (ie. nb of cells in total)
 worldWidth = 32#64
@@ -90,21 +89,25 @@ viewHeight = 32 #32
 
 scaleMultiplier = 0.25 # re-scaling of loaded images = zoom
 
-objectMapLevels = 8 # number of levels for the objectMap. This determines how many objects you caddNoise = True
+objectMapLevels = 8 # number of levels for the objectMap. This determines how many objects you can pile upon one another.
 
 # set scope of displayed tiles
 xViewOffset = 0
 yViewOffset = 0
-addNoise = False
 
+
+addNoise = False
 
 maxFps = 30 # set up maximum number of frames-per-second
 
 verbose = False # display message in console on/off
 verboseFps = True # display FPS every once in a while
 
+
+   
 MAXENVOBJ = randint(2,worldWidth //10)
 MAXSURFACE = (worldWidth * worldHeight*30)//100
+
 
 ### ### ### ### ### ### ### ### ### ### ### ### ### ### ### ###
 ### ### ### ### ### ### ### ### ### ### ### ### ### ### ### ###
@@ -128,10 +131,6 @@ pygame.display.set_caption('Zombieland')
 ###
 ### ### ### ### ### ### ### ### ### ### ### ### ### ### ### ###
 
-#creating clouds (the dimensions are different so do not use loadImage)
-cloud = pygame.image.load('assets/cloud30.png').convert_alpha()
-cloud = pygame.transform.scale(cloud, (int(25), int(25)))
-
 def loadImage(filename):
     global tileTotalWidthOriginal,tileTotalHeightOriginal,scaleMultiplier
     image = pygame.image.load(filename).convert_alpha()
@@ -146,7 +145,7 @@ def loadAllImages():
     agentType = []
     #!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!
 
-    """DISCLAIMER : IF YOU ADD AN IMAGE PLEASE ADD A NIGHT VERSION OF IT TOO
+    """DISCLAIMER : IF YOU ADD AN IMAGE PLEASE ADD A NIGHT VERSION OF IT TOO 
     (right after the day one so that it is in the i+1 nd case) THXXX -S"""
 
     #!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!
@@ -155,14 +154,14 @@ def loadAllImages():
     tileType.append(loadImage('assets/ext/isometric-blocks/PNG/Platformer tiles/platformerTile_30.png')) # brick
     tileType.append(loadImage('assets/ext/isometric-blocks/PNG/Abstract tiles/abstractTile_12.png')) # blue grass (?)
     tileType.append(loadImage('assets/ext/isometric-blocks/PNG/Abstract tiles/abstractTile_09.png')) # grey brock
-    tileType.append(loadImage('assets/ext/isometric-blocks/PNG/Platformer tiles/platformerTile_28.png'))  #for road
+    tileType.append(loadImage('assets/ext/isometric-blocks/PNG/Platformer tiles/platformerTile_28.png'))  #for road 
     tileType.append(loadImage('assets/ext/isometric-blocks/PNG/Abstract tiles/abstractTile_26.png')) #for water
-    tileType.append(loadImage('assets/ext/isometric-blocks/PNG/Voxel tiles/VoxelTile_16.png')) #for sides of lake ---> to choise
+    tileType.append(loadImage('assets/ext/isometric-blocks/PNG/Voxel tiles/VoxelTile_16.png')) #for sides of lake ---> to choise 
     tileType.append(loadImage('assets/ext/isometric-blocks/PNG/Platformer tiles/platformerTile_22.png')) #
     tileType.append(loadImage('assets/ext/isometric-blocks/PNG/Abstract tiles/abstractTile_31.png')) # ground
     tileType.append(loadImage('assets/ext/kenney_prototypepack/Isometric/floorGrass_S.png')) #floorGrass
 
-
+    
 
     objectType.append(None) # default -- never drawn
     treeBig=loadImage('assets/basic111x128/tree.png') # normal tree
@@ -190,14 +189,10 @@ def loadAllImages():
     objectType.append(loadImage('assets/ext/kenney_natureKit/Isometric/fence_strong_NE.png')) #fenceNE
     objectType.append(loadImage('assets/ext/isometric-blocks/PNG/Abstract tiles/abstractTile_23.png'))
 
-    #clouds
-    objectType.append(cloud) #normal cloud
-    objectType.append(cloud) #charged cloud
-
 
     #agent images
     agentType.append(None) # default -- never drawn
-    agentType.append(loadImage('assets/basic111x128/vaccine.png')) # cure
+    agentType.append(loadImage('assets/basic111x128/vaccine.png')) # medicine
     agentType.append(loadImage('assets/basic111x128/zomb.png')) # zombie
     agentType.append(loadImage('assets/basic111x128/man2.png')) # man
     agentType.append(loadImage('assets/basic111x128/combat.png')) #human wins
@@ -210,16 +205,14 @@ def loadAllImages():
     agentType.append(gunSmall)
     agentType.append(loadImage('assets/basic111x128/babyBoy.png')) # babyBoy
     agentType.append(loadImage('assets/basic111x128/babyGirl.png')) # babyGirl
-    agentType.append(loadImage('assets/basic111x128/man2Z.png')) # man
-    agentType.append(loadImage('assets/basic111x128/womanZ.png')) # woman
-
+    
 
 def resetImages():
     global tileTotalWidth, tileTotalHeight, tileTotalWidthOriginal, tileTotalHeightOriginal, scaleMultiplier, heightMultiplier, tileVisibleHeight
-    tileTotalWidth    = tileTotalWidthOriginal * scaleMultiplier  # width of tile image, as stored in memory
-    tileTotalHeight   = tileTotalHeightOriginal * scaleMultiplier # height of tile image, as stored in memory
+    tileTotalWidth = tileTotalWidthOriginal * scaleMultiplier  # width of tile image, as stored in memory
+    tileTotalHeight = tileTotalHeightOriginal * scaleMultiplier # height of tile image, as stored in memory
     tileVisibleHeight = tileVisibleHeightOriginal * scaleMultiplier # height "visible" part of the image, as stored in memory
-    heightMultiplier  = tileTotalHeight/2 # should be less than (or equal to) tileTotalHeight
+    heightMultiplier = tileTotalHeight/2 # should be less than (or equal to) tileTotalHeight
     loadAllImages()
     return
 
@@ -233,8 +226,8 @@ def resetImages():
 
 # spritesheet-specific -- as stored on the disk ==> !!! here, assume 128x111 with 64 pixels upper-surface !!!
 # Values will be updated *after* image loading and *before* display starts
-tileTotalWidthOriginal    = 111  # width of tile image
-tileTotalHeightOriginal   = 128 # height of tile image
+tileTotalWidthOriginal = 111  # width of tile image
+tileTotalHeightOriginal = 128 # height of tile image
 tileVisibleHeightOriginal = 64 # height "visible" part of the image, i.e. top part without subterranean part
 
 ###
@@ -246,7 +239,7 @@ agentType = []
 noObjectId = noAgentId = 0
 #objects
 grassId = 0
-treeId  = 1
+treeId = 1
 blockId = 2
 burningTreeId = 3
 grassDetId = 4
@@ -270,23 +263,13 @@ zombieId = 2
 #humanId = 3
 manId = 3
 winnerhumanId = 4
-babyBoyId = 9
-babyGirlId = 10
-manInfId = 11
-womanInfId = 12
-womanId = 6
-
 winnerzombieId= 5
+womanId = 6
 #burgerId = 7
 foodsId = 7
 gunId = 8
-
-cloudId = 16
-chargedCloudId = 17
-
-
-iconsH_list = [manId, winnerhumanId, womanId, babyGirlId, babyBoyId, womanInfId, manInfId]
-
+babyBoyId = 9
+babyGirlId = 10
 
 ###
 
@@ -380,6 +363,7 @@ def getObjectAt(x,y,level=0):
 
 def setObjectAt(x,y,type,level=0): # negative values are possible: invisible but tangible objects (ie. no display, collision)
     if level < objectMapLevels:
+        #print("settingobject",x,y)
         objectMap[level][y][x] = type
     else:
         print ("[ERROR] setObjectMap(.) -- Cannot set object. Level does not exist.")
@@ -422,7 +406,7 @@ class BasicAgent:
             self.y = randint(0,getWorldHeight()-1)
         setAgentAt(self.x,self.y,self.type)
         return
-
+    
     def setHumanAt(self,x,y):
         self.x = x
         self.y = y
@@ -432,7 +416,7 @@ class BasicAgent:
         setAgentAt(self.x,self.y,self.type)
         return
 
-    def die(self):
+    def die(self): 
         self.dead=True
 
     def getType(self):
@@ -457,7 +441,7 @@ class BasicAgent:
             self.x = xNew
             self.y = yNew
             setAgentAt(self.x,self.y,self.type)
-
+        
         if verbose == True:
             print ("agent of type ",str(self.type),"located at (",self.x,",",self.y,")")
         return
@@ -480,6 +464,7 @@ class BasicAgent:
     def move3():
         return
 
+
 class Human(BasicAgent):
 #,age,dead,hunger,gun
     def __init__(self,imageId, newx=-1, newy=-1):
@@ -491,8 +476,6 @@ class Human(BasicAgent):
             self.gun=randint(1,10)
         else:
             self.gun=0
-
-        self.infected = 0
         return
 
     def shoot(self):
@@ -500,14 +483,14 @@ class Human(BasicAgent):
             if self.gun>0 :
                 self.gun-=1
                 return True
-        return False
+        return False 
 
 
     def move3(self):
         PROB=0.6 #less than zombies to be able to get caught
         if not DAY:
             PROB=0.3 #during night they can't see
-        if random()<PROB:
+        if random()<PROB_REPROD:
             if getAgentAt((self.x+1+worldWidth)%worldWidth, (self.y+worldHeight)%worldHeight ) == zombieId: #x+1 y
                 self.move2(-1,0)
             elif getAgentAt((self.x-1+worldWidth)%worldWidth, (self.y+worldHeight)%worldHeight ) == zombieId: #x-1 y
@@ -529,30 +512,24 @@ class Human(BasicAgent):
         return
 
 
-
-
-
-    def combat(self,zombies,humans,foods,met):
+    def combat(self,zombies,humans,met):
         for z in zombies:
             if (met(self,z)):
                 if self.shoot()==True:
                     zombies.remove(z)
                     self.type=4
+                    self.age+=1
+                    self.hunger-=1
+                    self.move3()
                 else:
                     Tx=self.x
                     Ty=self.y
-                    print("Human", id(self), "was infected")
-                    self.infected += 1
-                    if self.sex=='M':
-                        self.type = manInfId
-                        print("infected M")
-                    else:
-                        self.type = womanInfId
-                        print("infected F")
-                   # print("will remove a Z now")
-                    #zombies.append(Zombie(winnerzombieId,Tx,Ty))
-                   # print("Z removed")
-
+                    humans.remove(self)
+                    zombies.append(Zombie(winnerzombieId,Tx,Ty))
+                    return
+        self.age+=1
+        self.hunger-=1
+        self.move3()
         return
 
    # def reproduire(self, list_humans, imageIdF, imageIdM, met):
@@ -578,10 +555,16 @@ class Human(BasicAgent):
                 self.hunger+=f.energy
                 foods.remove(f)
                 food=True
-        if not food:
+        if not food :
             self.hunger-=1
+    
+    def arming(self, guns) :
+        for g in guns :
+            if self.x== g.x and self.y==g.y :
+                self.gun+=1
+                guns.remove(g)
 
-
+          
 class Male(Human):
     def __init__(self,imageId, newx=-1, newy=-1):
         super().__init__(imageId, newx=-1, newy=-1)
@@ -591,14 +574,14 @@ class Female(Human):
         super().__init__(imageId, newx=-1, newy=-1)
         self.sex='F'
 
-
+ 
 
 class Zombie(BasicAgent):
 
     def __init__(self,imageId,newx,newy):
         super().__init__(imageId, newx, newy)
         self.decomp=0
-        self.direction=randint(0,3)
+        self.direction=randint(0,3) 
         return
 
 
@@ -648,6 +631,7 @@ class Zombie(BasicAgent):
         self.move()
         return
 
+
 #probs for foods
 PROBDROPFOOD=0.3
 DROPDAYFOOD=9
@@ -655,18 +639,11 @@ DECOMPDAYFOOD=15
 NBFOOD=0
 MAXFOOD= 20
 
-
 #probs for gun
 PROBDROPGUN=0.2
 DROPDAYGUN=9
 NBGUN=0
 MAXGUN= 20
-
-#probs for Cure
-PROBDROPCURE=1.0
-DROPDAYCURE=1
-NBCURE=0
-MAXCURE=5
 
 
 class RandDropAgents:
@@ -674,35 +651,14 @@ class RandDropAgents:
     def __init__(self):
         return
 
-    def reset (self):
-        self.x = randint(0,getWorldWidth()-1)
-        self.y = randint(0,getWorldHeight()-1)
-        while getTerrainAt(self.x,self.y) != 0 or getObjectAt(self.x,self.y) != 0 or getAgentAt(self.x,self.y) != 0:
-            self.x = randint(0,getWorldWidth()-1)
-            self.y = randint(0,getWorldHeight()-1)
-        setAgentAt(self.x,self.y,self.type)
+    def reset(self):
+        return
 
     def getPosition(self):
         return (self.x,self.y)
 
     def getType(self):
         return self.type
-
-class Cure(RandDropAgents):
-    def __init__(self) :
-        super().__init__()
-        self.energy=0
-        self.type = medicineId
-        self.decomp=0
-        self.reset()
-
-    def randomDrop(it,list):
-        if (it != 0):
-            if random() < PROBDROPCURE:
-                if it%DROPDAYCURE == 0 :
-                    for i in range(0,MAXCURE):
-                        list.append(Cure())
-        return
 
 
 class Food(RandDropAgents):
@@ -713,7 +669,15 @@ class Food(RandDropAgents):
         self.decomp=0
         self.reset()
 
-
+    def reset(self) :
+        self.x = randint(0,getWorldWidth()-1)
+        self.y = randint(0,getWorldWidth()-1)
+        while getTerrainAt(self.x,self.y) != 0 or getObjectAt(self.x,self.y) != 0 or getAgentAt(self.x,self.y) != 0:
+            self.x = randint(0,getWorldWidth()-1)
+            self.y = randint(0,getWorldHeight()-1)
+        setAgentAt(self.x,self.y,self.type)
+        return 
+    
     def decomposition(foods) :
         for f in foods :
             if f.decomp==DECOMPDAYFOOD :
@@ -721,7 +685,7 @@ class Food(RandDropAgents):
             else :
                 f.decomp+=1
         return
-
+    
     def randomDrop(it,list):
         if (it != 0):
             if random() < PROBDROPFOOD:
@@ -738,7 +702,15 @@ class Gun(RandDropAgents) :
         super().__init__()
         self.type=gunId
         self.reset()
-
+    
+    def reset (self):
+        self.x = randint(0,getWorldWidth()-1)
+        self.y = randint(0,getWorldHeight()-1)
+        while getTerrainAt(self.x,self.y) != 0 or getObjectAt(self.x,self.y) != 0 or getAgentAt(self.x,self.y) != 0:
+            self.x = randint(0,getWorldWidth()-1)
+            self.y = randint(0,getWorldHeight()-1)
+        setAgentAt(self.x,self.y,self.type)
+    
     def randomDrop(it,list):
         if (it != 0):
             if random() < PROBDROPGUN:
@@ -753,7 +725,6 @@ guns = []
 foods = []
 zombies = []
 humans = []
-cure = []
 
 
 ### ### ### ### ### ### ### ### ### ### ### ### ### ### ### ###
@@ -762,61 +733,8 @@ cure = []
 ### Initialise world
 ###
 ###
-mx = 3
-my = 3
-MAXMOUNT = (int)(worldHeight/10)
-"""def randEnv():
-    for ind in range(0,randint(0,MAXMOUNT+1)):
-        wid=randint(0,10)
-        len=randint(0,10)
-        terrainMap=[[]]
-        for i in range(wid) :
-
-            terrainMap[i] = [3 for j in range(len)]
-
-        heightMap=[[]]
-        for w in range(wid):
-            for l in range(len):
-                heightMap[w][l]=randint(1,3)
-        x_offset = randint(0,32)
-        y_offset = randint(0,32)
-        for x in range(wid):
-            for y in range(len):
-                setTerrainAt( x+x_offset, y+y_offset, terrainMap[x][y] )
-                setHeightAt( x+x_offset, y+y_offset, heightMap[x][y] )
-                setObjectAt( x+x_offset, y+y_offset, 0)
-    return"""
-
 
 #create random environment
-
-clouds = []
-def cloudspawn():
-    #creating the cloud matrix
-    #interaction points are the corners and if they are touching every x iteration we hear lightning (maybe their color change)
-
-    maxx=worldWidth/4
-    maxy=worldHeight/4
-    cx=randint(0,worldWidth)
-    cy=randint(0,worldHeight)
-
-    while len(clouds)<(worldHeight*worldWidth)//2:
-        xx=randint(2,maxx)
-        yy=randint(2,maxy)
-        cx=randint(0,worldWidth)
-        cy=randint(0,worldHeight)
-        for x in range(0,xx):
-            w=((x+cx)+worldWidth)%worldWidth
-            for y in range(0,yy):
-                l=((y+cy)+worldHeight)%worldHeight
-                if random()<0.3:
-                    setObjectAt(w,l,chargedCloudId,objectMapLevels-1)
-                else :
-                    setObjectAt(w,l,cloudId,objectMapLevels-1)
-                clouds.append(1)
-
-
-
 occupied=[]  #occupied surface by objects
 PROBTURN = 0.03    #randomly turn of road
 
@@ -831,14 +749,12 @@ def createRoad(x,y,dir='x'):
                 if getObjectAt(x2,ychoix) != 0 or getTerrainAt(x2,ychoix) != 0 :
                     #try the other side :
                     if ychoix == y1 :
-
-                        ychoix= y2
+                        ychoix= y2  
                     else :
                         ychoix = y1
                     if getObjectAt(x2,ychoix) != 0 or getTerrainAt(x2,ychoix) != 0 :
-                            break  #surrounded with the objects, finish the road
-                return createRoad(((x2-1+worldWidth)%worldWidth),ychoix,dir)
-
+                            break  #surrounded with the objects, finish the road  
+                return createRoad(((x2-1+worldWidth)%worldWidth),ychoix,dir) 
             else :
                 setTerrainAt(x2,y,4)#add a road
     if dir== 'y' :
@@ -851,7 +767,7 @@ def createRoad(x,y,dir='x'):
                 if getObjectAt(xchoix,y2) != 0 or getTerrainAt(xchoix,y2) != 0 :
                     #to try the other side :
                     if xchoix == x1 :
-                        xchoix= x2
+                        xchoix= x2  
                     else :
                         xchoix = x1
                     if getObjectAt(xchoix,y2) != 0 or getTerrainAt(xchoix,y2) != 0 :
@@ -869,10 +785,9 @@ def addingTrees():
             x = randint(0,getWorldWidth()-1)
             y = randint(0,getWorldHeight()-1)
         setObjectAt(x,y,treeId,2)
-
-        setObjectAt(x,y, -1,0)
-    return
-
+        setObjectAt(x,y, -1,0)  
+    return      
+    
 
 def createlake(x,y) :
     lakeTerrainMap =[
@@ -900,9 +815,9 @@ def createlake(x,y) :
     ]
     xforroad=0
     yforroad=0
-    #putting the lake
+    #putting the lake 
     for w in range( len( lakeTerrainMap )):
-        for l in range( len( lakeTerrainMap[0] )):
+        for l in range( len( lakeTerrainMap[0] )): 
             xx=((x+w)+worldWidth)%worldWidth
             yy=((y+l)+worldHeight)%worldHeight
             if (w==len(lakeTerrainMap )//2 and l==0) :
@@ -914,13 +829,13 @@ def createlake(x,y) :
             occupied.append((xx,yy))
             setTerrainAt( xx, yy, lakeTerrainMap[w][l])
             setHeightAt( xx, yy, lakeHeightMap[w][l])
-            """if you do this the agents can climb the objects
+            """if you do this the agents can climb the objects 
             setObjectAt( xx, yy, 0, -1)
             setObjectAt( xx, yy, 0, 0) """
             if (lakeHeightMap[w][l] == -1) :
-                #this one prohibit agents from coming
+                #this one prohibit agents from coming 
                 setObjectAt( xx, yy, -1, 0)
-
+                 
     createRoad(xforroad,yforroad,'x')
     #putting the canoe
     setObjectAt( ((x+6)+worldWidth)%worldWidth,((y+3)+worldHeight)%worldHeight, canoeId)
@@ -950,8 +865,8 @@ def createHouse(x,y):
             for level in range(0,objectMapLevels):
                 setObjectAt(w,l,blockId,level)
                 #print(w,l)
-            occupied.append((w,l))
-
+            occupied.append((w,l))  
+ 
     faceX=((x+4)+worldWidth)%worldWidth
     faceY1= ((y+2)+worldHeight)%worldHeight
     faceY2= ((y+4)+worldHeight)%worldHeight
@@ -997,7 +912,7 @@ def createHouse(x,y):
 def randEnv():
     nbobj=randint(2,MAXENVOBJ)
     i=nbobj
-    while i>0 and len(occupied)<MAXSURFACE :
+    while i>0 and len(occupied)<MAXSURFACE : 
         type = 0
         if random()<0.3:
             type=1 #if 0 then house if 1 then lake
@@ -1019,7 +934,7 @@ def randEnv():
                     elif ((x==a) and ((y+nb+worldHeight)%worldHeight)==b) :
                         nottrouve=False
                         print("trouve x,y+")
-                        break
+                        break 
                     elif (((x+nb+worldWidth)%worldWidth)==a and y==b) :
                         nottrouve=False
                         print("trouve x+,y")
@@ -1039,8 +954,8 @@ def randEnv():
                     elif (((x+nb+worldWidth)%worldWidth)==a and ((y+nb/2+worldHeight)%worldHeight)==b) :
                         nottrouve=False
                         print("trouve x+,y/ mil")
-                        break
-                else :
+                        break             
+                else : 
                     break
             if (not  nottrouve) :
                 x = randint(0,getWorldWidth()-1)
@@ -1062,78 +977,12 @@ def randEnv():
         while getTerrainAt(x,y) != 0 or getObjectAt(x,y) != 0:
             x = randint(0,getWorldWidth()-1)
             y = randint(0,20)
-        setObjectAt(x,y,grassDetId)
+        setObjectAt(x,y,grassDetId)  
     return
 
+def fixEnv():
 
-def createHouse(x,y):
-    lev=objectMapLevels-3
-
-    #forbidden area around the house
-    xforbidden=((x-1)+worldWidth)%worldWidth
-    yborbidden1=((y-1)+worldHeight)%worldHeight
-    yborbidden2=((y+7)+worldHeight)%worldHeight
-    for i in range(0,7):
-        w=((xforbidden+i)+worldWidth)%worldWidth
-        setObjectAt(w,yborbidden1,-1,0)
-        setObjectAt(w,yborbidden2,-1,0)
-        occupied.append((w,yborbidden1))
-        occupied.append((w,yborbidden2))
-    for j in range(0,7):
-            l=((y+j)+worldHeight)%worldHeight
-            setObjectAt(xforbidden,l,-1,0)
-
-    #putting the house
-    for i in range(0,4):
-        w=((x+i)+worldWidth)%worldWidth
-        for j in range(0,7):
-            l=((y+j)+worldHeight)%worldHeight
-            for level in range(0,lev):
-                setObjectAt(w,l,blockId,level)
-                #print(w,l)
-            occupied.append((w,l))
-
-    faceX=((x+4)+worldWidth)%worldWidth
-    faceY1= ((y+2)+worldHeight)%worldHeight
-    faceY2= ((y+4)+worldHeight)%worldHeight
-    faceY3= ((y+6)+worldHeight)%worldHeight
-    for c in [(faceX,y),(faceX,faceY1),(faceX,faceY2),(faceX,faceY3)]:
-        occupied.append((c[0],c[1]))
-        setObjectAt(c[0],c[1],-1,0)
-        for level in range(0,lev):
-            setObjectAt(c[0],c[1],blockId,level)
-    faceY4= ((y+1)+worldHeight)%worldHeight
-    faceY5= ((y+5)+worldHeight)%worldHeight
-    #adding windows
-    for c in [(faceX,faceY4),(faceX,faceY5)]:
-        occupied.append((c[0],c[1]))
-        setObjectAt(c[0],c[1],-1,0)
-        for level in range(0,lev):
-            if level == 4 :
-                setObjectAt(c[0],c[1],windowId,level)
-                continue
-            setObjectAt(c[0],c[1],blockId,level)
-
-    faceY6= ((y+3)+worldHeight)%worldHeight
-    #adding the door
-    for c in [(faceX,faceY6)]:
-        occupied.append((c[0],c[1]))
-        for level in range(3,lev):
-            setObjectAt(c[0],c[1],blockId,level)
-
-    setObjectAt(faceX,faceY6,doorId,0)
-    setObjectAt(faceX,faceY6,doorId,1)
-    setObjectAt(faceX,faceY6,doorId,2)
-
-
-def initWorld():
-    global nbTrees, nbBurningTrees, zombies, humans, nbDetails
-
-    # add a pyramid-shape building
-    #type of object
-    #randEnv()
-
-    #adding lake
+    #adding lake 
     lakeTerrainMap =[
     [ 0, 0, 0, 0, 0, 0, 0, 0, 0 ],
     [ 0, 5, 5, 5, 5, 5, 5, 5, 0 ],
@@ -1160,13 +1009,19 @@ def initWorld():
 
     x_offset = 6
     y_offset = 20
-
-    #putting the lake
+   
+    #putting the lake 
     for x in range( len( lakeTerrainMap )):
         for y in range( len( lakeTerrainMap[0] )):
             setTerrainAt( x+x_offset, y+y_offset, lakeTerrainMap[x][y])
             setHeightAt( x+x_offset, y+y_offset, lakeHeightMap[x][y])
-            setObjectAt( x+x_offset, y+y_offset, 0)
+            #if you do this the agents can climb the objects 
+            setObjectAt( x+x_offset, y+y_offset, 0, -1)
+            setObjectAt( x+x_offset, y+y_offset, 0, 0) 
+            if (lakeHeightMap[x][y] == -1) :
+                #this one prohibit agents from coming 
+                setObjectAt( x+x_offset, y+y_offset, -1, 0) 
+
     setObjectAt( 6+x_offset, 3+y_offset, canoeId)
 
     #-----------------------------------------------------------------------------------
@@ -1180,21 +1035,24 @@ def initWorld():
             y = randint(0,20)
         setObjectAt(x,y,grassDetId)
 
-    #-----------------------------------------------------------------------------------
-
+    #----------------------------------------------------------------------------------- 
     #adding house1
     for x in range(1,4):
         for y in range(13,20) :
-            for level in range(0,objectMapLevels):
+            setObjectAt(x,y,-1,0)
+            for level in range(1,objectMapLevels):
                 setObjectAt(x,y,blockId,level)
 
+    
     for c in [(4,13),(4,15),(4,17),(4,19)]:
-        for level in range(0,objectMapLevels):
+        setObjectAt(c[0],c[1],-1,0)
+        for level in range(1,objectMapLevels):
             setObjectAt(c[0],c[1],blockId,level)
 
     #adding windows
     for c in [(4,14),(4,18)]:
-        for level in range(0,objectMapLevels):
+        setObjectAt(c[0],c[1],-1,0)
+        for level in range(1,objectMapLevels):
             if level == 4 :
                 setObjectAt(c[0],c[1],windowId,level)
                 continue
@@ -1204,37 +1062,33 @@ def initWorld():
     for c in [(4,16)]:
         for level in range(3,objectMapLevels):
             setObjectAt(c[0],c[1],blockId,level)
-    setObjectAt(4,16,doorId,0)
+    #they can go through the door
     setObjectAt(4,16,doorId,1)
     setObjectAt(4,16,doorId,2)
+    setObjectAt(4,16,doorId,3)
 
     for c in [(6,13),(6,14),(6,15),(6,17),(6,18),(6,19)] :
         setTerrainAt( c[0], c[1], 8 )
-        setObjectAt( c[0], c[1], flowerRId)
-
-    """#ajout de fences ????maybeeee
-    for c in [(7,15),(7,17)]:
-        setObjectAt( c[0], c[1], fenceSEId)
-    for c in [(7,19),(7,21)] :
-        setObjectAt( c[0], c[1], fenceNEId)
-    for c in [(0,14),(2,14),(2,22),(0,22)] :
-        setObjectAt( c[0], c[1], fenceNWId)"""
+        setObjectAt( c[0], c[1], flowerRId,0)
 
     #-----------------------------------------------------------------------------------
 
     #adding house2
     for x in range(13,20):
         for y in range(1,4) :
-            for level in range(0,objectMapLevels):
+            setObjectAt(x,y,-1,0)
+            for level in range(1,objectMapLevels):
                 setObjectAt(x,y,blockId,level)
-
+    
     for c in [(13,4),(15,4),(17,4),(19,4)]:
-        for level in range(0,objectMapLevels):
+        setObjectAt(c[0],c[1],-1,0)
+        for level in range(1,objectMapLevels):
             setObjectAt(c[0],c[1],blockId,level)
-
+    
     #adding windows
     for c in [(14,4),(18,4)]:
-        for level in range(0,objectMapLevels):
+        setObjectAt(c[0],c[1],-1,0)
+        for level in range(1,objectMapLevels):
             if level == 4 :
                 setObjectAt(c[0],c[1],windowId,level)
                 continue
@@ -1244,9 +1098,9 @@ def initWorld():
     for c in [(16,4)]:
         for level in range(3,objectMapLevels):
             setObjectAt(c[0],c[1],blockId,level)
-    setObjectAt(16,4,doorId,0)
     setObjectAt(16,4,doorId,1)
     setObjectAt(16,4,doorId,2)
+    setObjectAt(16,4,doorId,3)
 
     #adding floor grass around the house
     for c in [(12,5),(13,5),(14,5),(15,5),(17,5),(18,5),(19,5),(20,5)] :
@@ -1265,8 +1119,8 @@ def initWorld():
             x = randint(0,getWorldWidth()-7)
             y = randint(22,getWorldHeight()-1)
         setObjectAt(x,y,treeId,2)
-        setObjectAt(x,y, -1,0)
-
+        setObjectAt(x,y, -1,0)        
+    
     for i in range(nbTrees-10):
         x = randint(getWorldWidth()-5,getWorldWidth()-1)
         y = randint(0,getWorldHeight()-1)
@@ -1275,9 +1129,9 @@ def initWorld():
             y = randint(0,getWorldHeight()-1)
         setObjectAt(x,y,treeId,2)
         setObjectAt(x,y,-1, 0)
+    
 
-
-
+    
     #-----------------------------------------------------------------------------------
 
     #adding a road
@@ -1287,13 +1141,13 @@ def initWorld():
         setObjectAt(getWorldWidth()-6 , y, 0)
         setObjectAt(getWorldWidth()-7 , y, 0)
         setObjectAt(getWorldWidth()-6 , y, -1, 2)
-        setObjectAt(getWorldWidth()-7 , y, -1, 2)# add a virtual object: not displayed, but used to forbid agent(s) to come here.
-
-    for x in range(5,getWorldWidth()-7):
+        setObjectAt(getWorldWidth()-7 , y, -1, 2)# add a virtual object: not displayed, but used to forbid agent(s) to come here. 
+    
+    for x in range(4,getWorldWidth()-7):
         setTerrainAt(x, 16, 4)
         setObjectAt(x,16, 0)
 
-    for y in range(5,16):
+    for y in range(4,16):
         setTerrainAt(16,y, 4)
         setObjectAt(16,y, 0)
 
@@ -1321,75 +1175,22 @@ def initWorld():
         for y in range( len( building2TerrainMap) ):
             setTerrainAt( x+x_offset, y+y_offset, building2TerrainMap[y][x] )
             setHeightAt( x+x_offset, y+y_offset, building2HeightMap[y][x] )
-            setObjectAt( x+x_offset, y+y_offset, -1, 0 )
-            setObjectAt( x+x_offset, y+y_offset, -1, 2) # add a virtual object: not displayed, but used to forbid agent(s) to come here.
+            setObjectAt( x+x_offset, y+y_offset, 0)
+            setObjectAt( x+x_offset, y+y_offset, -1, 2) # add a virtual object: not displayed, but used to forbid objects to come here.
 
-    #-----------------------------------------------------------------------------------
+    return        
 
-    #collumn
-    for c in [(2,2),(8,2),(8,8),(2,8)]:
-        for level in range(0,objectMapLevels):
-            setObjectAt(c[0],c[1],15,level)
-            #koprusu
-    for i in range(5):
-        setObjectAt(3+i,2,15,objectMapLevels-1)
-        setObjectAt(3+i,8,15,objectMapLevels-1)
-        setObjectAt(2,3+i,15,objectMapLevels-1)
-        setObjectAt(8,3+i,15,objectMapLevels-1)
-
-
-
-    """eski codelar :
-
-    building1TerrainMap = [
-    [ 2, 2, 2, 2 ],
-    [ 2, 4, 4, 2 ],
-    [ 2, 4, 4, 2 ],
-    [ 2, 2, 2, 2 ]
-    ]
-    #height of building
-    building1HeightMap = [
-    [ 1, 1, 1, 1 ],
-    [ 1, 0, 0, 1 ],
-    [ 1, 0, 0, 1 ],
-    [ 1, 1, 1, 1 ]
-    ]
-    #place of building
-
-    x_offset = mx
-    y_offset = my
-
-    #putting the building
-    for x in range( len( building1TerrainMap[0] )):
-        for y in range( len( building1TerrainMap )):
-            setTerrainAt( x+x_offset, y+y_offset, building1TerrainMap[x][y] )
-            setHeightAt( x+x_offset, y+y_offset, building1HeightMap[x][y] )
-            setObjectAt( x+x_offset, y+y_offset, 0) # add a virtual object: not displayed, but used to forbid agent(s) to come here.
-
-    #adding burning trees
-    for i in range(nbBurningTrees):
-        x = randint(0,getWorldWidth()-1)
-        y = randint(0,getWorldHeight()-1)
-        while getTerrainAt(x,y) != 0 or getObjectAt(x,y) != 0:
-            x = randint(0,getWorldWidth()-1)
-            y = randint(0,getWorldHeight()-1)
-        setObjectAt(x,y,burningTreeId)
-    """
 
 def initWorld():
-    global nbTrees, nbBurningTrees, zombies, humans, nbDetails
+    global nbTrees, nbBurningTrees, zombies, humans, nbDetails 
 
-    cloudspawn()
-    if getWorldWidth() >= 100 :
-        fixEnv()
-        randEnv()
-        addingTrees()
-    else :
-        randEnv()
-        addingTrees()
-
+    # add a pyramid-shape building
+    #type of objectss
+    randEnv()
+    addingTrees()
+    #fixEnv()
+ 
     #adding agents
-
     for i in range(nbAgents):
         zombies.append(Zombie(zombieId,-1,-1))
         if random()<0.5:
@@ -1399,42 +1200,12 @@ def initWorld():
         #ch = choice((m,f))
         #humans.append(ch)
 
-    for i in range(MAXCURE):
-        cure.append(Cure())
-
     return
 
 ### ### ### ### ###
 
 def initAgents():
     return
-
-### ### ### ### ###
-
-def stepWorld( it = 0 ):
-    if it % (maxFps/180) == 0: #tour speed
-        if WEATHER==1: #stormy
-            for x in range(worldWidth):
-                for y in range(worldHeight):
-
-                    if getObjectAt(x,y,objectMapLevels-1) == chargedCloudId:
-                        for neighbours in ((-1,0),(+1,0),(0,-1),(0,+1)):
-                            if getObjectAt((x+neighbours[0]+worldWidth)%worldWidth,(y+neighbours[1]+worldHeight)%worldHeight) == chargedCloudId:
-                                playsound('isoworld/sounds/thunder.wav')
-
-
-    #burning the trees
-    """
-    if getObjectAt(x,y) == treeId:
-        for neighbours in ((-1,0),(+1,0),(0,-1),(0,+1)):
-            if getObjectAt((x+neighbours[0]+worldWidth)%worldWidth,(y+neighbours[1]+worldHeight)%worldHeight) == burningTreeId:
-                setObjectAt(x,y,burningTreeId)
-            elif getAgentAt((x+neighbours[0]+worldWidth)%worldWidth,(y+neighbours[1]+worldHeight)%worldHeight) == zombieId:
-                setObjectAt(x,y,burningTreeId)"""
-                
-    return
-### ### ### ### ###
-
 
 ### ### ### ### ###
 
@@ -1458,30 +1229,17 @@ def met(agent1, agent2):
         exists=True
     return exists
 
-def check_transition(h, zombies):
-
-    if h.infected == 15:
-        h.die()
-
-        Tx=h.x
-        Ty=h.y
-        print("Human", id(h), "became zombie")
-        zombies.append(Zombie(zombieId,Tx,Ty))
-    return
-
 ### ### ### ### ###
 MAXAGE=30
-def stepAgents(maleID,womanId, it = 0 ):
+def stepAgents(it = 0 ):
     # move agent
     if it % (maxFps/4) == 0:
         shuffle(foods)
         shuffle(zombies)
         shuffle(humans)
         Food.randomDrop(it, foods)
+        Food.decomposition(foods)
         Gun.randomDrop(it, guns)
-        #print("num zombies: ", len(zombies))
-        #print("num humans: ", len(humans))
-
         for z in zombies:
             if z.type!=2:
                 z.type=2   # shuffle agents in in-place (i.e. agents is modified)
@@ -1493,27 +1251,26 @@ def stepAgents(maleID,womanId, it = 0 ):
                 z.move3()
                 z.direction=randint(0,3)
         for h in humans:
-           # if not (h.type==3 or h.type==6):
-           #     if h.sex=='M':
-           #         h.type=3 #male
-           #     else:
-           #         h.type=6 #female
-            #    h.type=3
-            if h.age>MAXAGE or h.hunger==-1:
-                h.die()
-            check_transition(h, zombies)
-
-            if h.dead:
-                humans.remove(h)
-            else:
-                if h.infected != 0:
-                    h.infected +=1
+            if not (h.type==3 or h.type==6):
+                if h.sex=='M':
+                    h.type=3
                 else:
-                    h.combat(zombies,humans,foods, met)
-                    h.reproduire(humans, manId, womanId, met)
-                h.age+=1
-                h.hunger-=1
-                h.move3()
+                    h.type=6
+            #    h.type=3
+            if h.age>MAXAGE:
+                h.die()
+                humans.remove(h)
+            elif h.hunger==-1:
+                h.die()
+                humans.remove(h)
+
+            elif h.dead==False:
+
+                h.combat(zombies,humans,met)
+                h.reproduire(humans, manId, womanId, met)
+                h.eat(foods)
+                h.arming(guns)
+
     return
 
 
@@ -1524,24 +1281,31 @@ def stepAgents(maleID,womanId, it = 0 ):
 ###
 ###
 
-filter=pygame.image.load("assets/night.png")
+#filter=pygame.image.load("assets/night.png")
+#night=pygame.image.load("isoworld/assets/stars.png").convert()
+#day=pygame.image.load("isoworld/assets/day.png")
 
-def render( it = 0, list_agents=iconsH_list):
+#IMAGE = pygame.image.load('an_image.png').convert()
+#IMAGE2 = pygame.image.load('an_image_with_transparency.png')
+
+def render( it = 0 ):
     global xViewOffset, yViewOffset
 
     blue=(135,206,235)
     black=(0,0,0)
-
+    
     if DAY:
+        #screen.blit(day,(0,0))
         pygame.draw.rect(screen, blue, (0, 0, screenWidth, screenHeight), 0) # overkill - can be optimized. (most sprites are already "naturally" overwritten)
-
+  
     else:
         pygame.draw.rect(screen, black, (0, 0, screenWidth, screenHeight), 0)
-        #print(type(screenWidth))
-        #print(type(screenHeight))
-        #filter = pygame.surface.Surface(screenWidth, screenHeight)
-        #filter.fill(pygame.color.Color('Grey'))
+       # filter = pygame.surface.Surface(screenWidth, screenHeight)
+       #filter.fill(pygame.color.Color('Grey'))
         #screen.blit(filter,(0,0))
+        #filter.fill(pygame.color.Color('Grey'))
+        #screen.blit(night,(0,0))
+
 
     #pygame.display.update()
 
@@ -1576,17 +1340,12 @@ def render( it = 0, list_agents=iconsH_list):
             for level in range(objectMapLevels):
                 if getObjectAt( xTile , yTile , level)  > 0: # object on terrain?
                     screen.blit( objectType[ getObjectAt( xTile , yTile, level) ] , (xScreen, yScreen - heightMultiplier*(level+1) ))
-
-
             if (getAgentAt( xTile, yTile ) != 0) :
-
-                #if ((getAgentAt( xTile, yTile ) == manId) or (getAgentAt( xTile, yTile ) == womanId)) :
-                for iconId in list_agents:
-                    if (getAgentAt(xTile, yTile)==iconId):
-                        for h in humans:
-                            if  h.dead==False and h.x==xTile and h.y==yTile : # agent on terrain?
-                                screen.blit( agentType[ getAgentAt( xTile, yTile ) ] , (xScreen, yScreen - heightMultiplier ))
-
+                if ((getAgentAt( xTile, yTile ) == manId) or (getAgentAt( xTile, yTile ) == womanId)) :
+                    for h in humans:
+                        if  h.dead==False and h.x==xTile and h.y==yTile : # agent on terrain?
+                            screen.blit( agentType[ getAgentAt( xTile, yTile ) ] , (xScreen, yScreen - heightMultiplier ))
+                
                 if (getAgentAt( xTile, yTile ) == zombieId) :
                     for z in zombies:
                         if z.dead==False and z.x==xTile and z.y==yTile : # agent on terrain?
@@ -1600,10 +1359,6 @@ def render( it = 0, list_agents=iconsH_list):
                     for f in guns:
                         if f.x==xTile and f.y==yTile : # agent on terrain?
                             screen.blit( agentType[ getAgentAt( xTile, yTile ) ] , (xScreen, yScreen - heightMultiplier ))
-                if (getAgentAt( xTile, yTile ) == medicineId) :
-                    for f in cure:
-                        if f.x==xTile and f.y==yTile : # agent on terrain?
-                            screen.blit( agentType[ getAgentAt( xTile, yTile ) ] , (xScreen, yScreen - heightMultiplier ))
                 """else :
                      screen.blit( agentType[ getAgentAt( xTile, yTile ) ] , (xScreen, yScreen - heightMultiplier ))"""
 
@@ -1615,6 +1370,8 @@ def render( it = 0, list_agents=iconsH_list):
 ### MAIN
 ###
 ###
+mx=3
+my=3
 
 timestamp = datetime.datetime.now().timestamp()
 
@@ -1647,19 +1404,21 @@ while userExit == False:
     #screen.blit(pygame.font.render(str(currentFps), True, (255,255,255)), (screenWidth-100, screenHeight-50))
 
     render(it)
-
-    stepAgents(manId, womanId, it)
+    
+    stepAgents(it)
     stepWorld(it)
 
     perdu = False
 
 
     if (len(zombies)==0):
-        perdu = True
+        print("all zombies are dead")
+        perdu = True 
 
     for h in humans:
         #if h.getPosition() == player.getPosition():
         if h.getPosition() == (mx,my):
+            print("CUUUREEE")
             perdu = True
             #playsound('isoworld/sounds/VOXScrm_Wilhelm scream (ID 0477)_BSB.wav')
             break
@@ -1711,40 +1470,6 @@ while userExit == False:
         yViewOffset = (yViewOffset - 1 + getWorldHeight() ) % getWorldHeight()
         if verbose:
             print("View at (",xViewOffset,",",yViewOffset,")")
-    elif keys[pygame.K_UP] and not ( keys[pygame.K_LSHIFT] or keys[pygame.K_RSHIFT] ):
-        yViewOffset = (yViewOffset - 1 + getWorldHeight() ) % getWorldHeight()
-        if verbose:
-            print("View at (",xViewOffset,",",yViewOffset,")")
-
-
-    # single stroke
-    for event in pygame.event.get():
-        if event.type == QUIT:
-            pygame.quit()
-            sys.exit()
-        if event.type == KEYUP:
-            if event.key == K_ESCAPE:
-                userExit = True
-
-            elif event.key == pygame.K_j:
-                player.move2(0,+1);
-            elif event.key == pygame.K_u:
-                player.move2(0,-1);
-            elif event.key == pygame.K_k:
-                player.move2(+1,0);
-            elif event.key == pygame.K_h:
-                player.move2(-1,0);
-
-            elif event.key == pygame.K_n and pygame.key.get_mods() & pygame.KMOD_SHIFT:
-                addNoise = not(addNoise)
-                print ("noise is",addNoise) # easter-egg
-            elif event.key == pygame.K_v:
-                verbose = not(verbose)
-                print ("verbose is",verbose)
-            elif event.key == pygame.K_f:
-                verboseFps = not(verboseFps)
-                print ("verbose FPS is",verboseFps)
-
 
     # single stroke
     for event in pygame.event.get():
