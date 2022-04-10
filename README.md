@@ -21,13 +21,9 @@ When adding agents, pls do not create a new variable and instead just add them t
 
 
 ## TO DO:
-  - couples becoming groups (K) --------------
-  - adding day and night (S) !!!!!
-  - adding images for zombies and humans (S) !!!!!   - visual changements concerning agents and objects (S)
-  - changing the transitioning process from human to zombie (-)
-    - a transitioning period
-    - immunity 
-  - working on a player (-)
+  - code cleaning 
+  - debugging
+  - fixing [spaghetti code](https://www.google.com/search?q=spaghetti+code)
 
 
 
