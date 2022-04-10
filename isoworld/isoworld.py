@@ -65,7 +65,7 @@ nbBurningTrees = 0 #15
 nbAgents = 10
 nbDetails = 18
 DAY=True
-WEATHER=1 #0=sunny 1=cloudy 
+WEATHER=0 #0=sunny 1=cloudy 
 
 ### ### ### ### ### ### ### ### ### ### ### ### ### ### ### ###
 ### ### ### ### ### ### ### ### ### ### ### ### ### ### ### ###
@@ -77,15 +77,15 @@ WEATHER=1 #0=sunny 1=cloudy
 
 # display screen dimensions
 screenWidth = 1400 # 930 #
-screenHeight =900 # 640 #
+screenHeight = 900 # 640 #
 
 # world dimensions (ie. nb of cells in total)
 worldWidth = 32#64
 worldHeight = 32#64
 
 # set surface of displayed tiles (ie. nb of cells that are rendered) -- must be superior to worldWidth and worldHeight
-viewWidth = 32 #32
-viewHeight = 32 #32
+viewWidth = 40 #32
+viewHeight = 40 #32
 
 scaleMultiplier = 0.25 # re-scaling of loaded images = zoom
 
@@ -154,7 +154,7 @@ def loadAllImages():
 
     #!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!
 
-    tileType.append(loadImage('assets/ext/isometric-blocks/PNG/Abstract tiles/abstractTile_27.png')) # grasss
+    tileType.append(loadImage('assets/ext/isometric-blocks/PNG/Abstract tiles/abstractTile_27.png')) # grass
     tileType.append(loadImage('assets/ext/isometric-blocks/PNG/Platformer tiles/platformerTile_30.png')) # brick
     tileType.append(loadImage('assets/ext/isometric-blocks/PNG/Abstract tiles/abstractTile_12.png')) # blue grass (?)
     tileType.append(loadImage('assets/ext/isometric-blocks/PNG/Abstract tiles/abstractTile_09.png')) # grey brock
@@ -1505,7 +1505,8 @@ def stepAgents(it = 0 ):
 #background variables (images and colours)
 night=pygame.image.load("assets/starsbig.png").convert_alpha()
 #nıght=pygame.transform.scale(night, (1200, 1200))
-day=pygame.image.load("assets/daybig.png").convert_alpha()
+day=pygame.image.load("assets/sunnyday.png").convert_alpha()
+cloudy=pygame.image.load("assets/cloudy.png").convert_alpha()
 
 def draw_rect_alpha(surface, color, rect):
     shape_surf = pygame.Surface(pygame.Rect(rect).size, pygame.SRCALPHA)
@@ -1531,7 +1532,10 @@ def render( it = 0 ):
 
     pygame.display.update()
     if DAY:
-        screen.blit(day,(0,0))
+        if WEATHER==1:
+            screen.blit(cloudy,(0,0))
+        else:
+            screen.blit(day,(0,0))
         #pygame.draw.rect(screen, blue, (0, 0, screenWidth, screenHeight), 0) # overkill - can be optimized. (most sprites are already "naturally" overwritten)
 
 
