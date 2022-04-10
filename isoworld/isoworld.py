@@ -72,6 +72,10 @@ WEATHER=True #True=sunny False=storm
 #probs for humans and zombies
 MAXAGE=30
 
+PSHOOT=0.8
+PROB_REPROD = 0.05
+MAXHUNGER=20
+
 
 #probs for foods
 PROBDROPFOOD=0.3
@@ -459,9 +463,6 @@ def setAgentAt(x,y,type):
 ###
 ###
 
-PSHOOT=0.8
-PROB_REPROD = 0.05
-MAXHUNGER=20
 
 class BasicAgent:
     def __init__(self,imageId, newx, newy):
