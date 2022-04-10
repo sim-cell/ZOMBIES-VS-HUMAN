@@ -48,7 +48,7 @@ from pygame.locals import *
 
 ###
 
-versionTag = "2018-12-24_15h06"
+versionTag = "2022"
 
 ### ### ### ### ### ### ### ### ### ### ### ### ### ### ### ###
 ### ### ### ### ### ### ### ### ### ### ### ### ### ### ### ###
@@ -61,32 +61,78 @@ versionTag = "2018-12-24_15h06"
 # all values are for initialisation. May change during runtime.
 
 #numbers of elements
-nbTrees = 25 #350
-nbBurningTrees = 0 #15
-nbAgents = 30
+nbTrees = 15 #350
+nbAgents = 50
 nbDetails = 15
+
+#environmental changes (nature)
 DAY=True
-WEATHER=True #0=sunny 1=cloudy 
+WEATHER=True #True=sunny False=storm
+
+#probs for humans and zombies
+MAXAGE=30
+
+
+#probs for foods
+PROBDROPFOOD=0.3
+DROPDAYFOOD=9
+DECOMPDAYFOOD=15
+NBFOOD=0
+MAXFOOD= 30
+
+
+#probs for gun
+PROBDROPGUN=0.2
+DROPDAYGUN=9
+NBGUN=0
+MAXGUN= 20
+
+#probs for Cure
+PROBDROPCURE=1.0
+DROPDAYCURE=1
+NBCURE=0
+MAXCURE=10
+
+#probs of environment
+PROBTURN = 0.03    #randomly turn of road
+
+#agent lists 
+guns = []
+foods = []
+zombies = []
+humans = []
+cure = []
+lightning=[]
+
+#occupied land by objects lists
+clouds = []
+occupied=[]  #occupied surface by objects
+
+
+
 
 ### ### ### ### ### ### ### ### ### ### ### ### ### ### ### ###
 ### ### ### ### ### ### ### ### ### ### ### ### ### ### ### ###
 ### ### ### ### ### ### ### ### ### ### ### ### ### ### ### ###
 ###
 ### PARAMETERS: rendering
-###x
+###
 ### ### ### ### ### ### ### ### ### ### ### ### ### ### ### ###
+
+
+
 
 # display screen dimensions
 screenWidth = 1400 # 930 #
 screenHeight = 900 # 640 #
 
 # world dimensions (ie. nb of cells in total)
-worldWidth = 32#64
-worldHeight = 32#64
+worldWidth = 40#64
+worldHeight = 40#64
 
 # set surface of displayed tiles (ie. nb of cells that are rendered) -- must be superior to worldWidth and worldHeight
-viewWidth = 32 #32
-viewHeight = 32 #32
+viewWidth = 40 #32
+viewHeight = 40 #32
 
 scaleMultiplier = 0.25 # re-scaling of loaded images = zoom
 
@@ -104,8 +150,10 @@ maxFps = 30 # set up maximum number of frames-per-second
 verbose = False # display message in console on/off
 verboseFps = True # display FPS every once in a while
 
+#max space to fill with objects
 MAXENVOBJ = randint(2,worldWidth //10)
 MAXSURFACE = (worldWidth * worldHeight*30)//100
+
 
 
 ### ### ### ### ### ### ### ### ### ### ### ### ### ### ### ###
@@ -130,27 +178,33 @@ pygame.display.set_caption('Zombieland')
 ###
 ### ### ### ### ### ### ### ### ### ### ### ### ### ### ### ###
 
-#creating clouds (the dimensions are different so do not use loadImage)
+#creating background images
+
+night=pygame.image.load("assets/starsbig.png").convert_alpha()
+day=pygame.image.load("assets/sunnydayy.png").convert_alpha()
+cloudy=pygame.image.load("assets/cloudday.png").convert_alpha()
+
+
+#creating clouds (the dimensions are different so do not use loadImage) 
 cloud = pygame.image.load('assets/cloud30.png').convert_alpha()
-cloud = pygame.transform.scale(cloud, (int(25), int(25)))
+cloud = pygame.transform.scale(cloud, (int(100)*scaleMultiplier, int(100)*scaleMultiplier)) #setting the size
+
 chargedcloud = pygame.image.load('assets/chargedcloud30.png').convert_alpha()
-chargedcloud = pygame.transform.scale(chargedcloud, (int(25), int(25)))
+chargedcloud = pygame.transform.scale(chargedcloud, (int(100)*scaleMultiplier, int(100)*scaleMultiplier))
 
 def loadImage(filename):
     global tileTotalWidthOriginal,tileTotalHeightOriginal,scaleMultiplier
     image = pygame.image.load(filename).convert_alpha()
     image = pygame.transform.scale(image, (int(tileTotalWidthOriginal*scaleMultiplier), int(tileTotalHeightOriginal*scaleMultiplier)))
     return image
-#downloading all images
 
-
+#dloading all images
 def loadAllImages():
     global tileType, objectType, agentType
 
     tileType = []
     objectType = []
     agentType = []
-    #!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!
 
 
     tileType.append(loadImage('assets/ext/isometric-blocks/PNG/Abstract tiles/abstractTile_27.png')) # grass
@@ -196,7 +250,6 @@ def loadAllImages():
     lightningimage=loadImage('assets/basic111x128/lightning.png') #lightning
     lightningimage = pygame.transform.scale((lightningimage), (50, 50))
     objectType.append(lightningimage) 
-
 
     #agent images
     agentType.append(None) # default -- never drawn
@@ -248,6 +301,7 @@ objectType = []
 agentType = []
 #ID
 noObjectId = noAgentId = 0
+
 #objects
 grassId = 0
 treeId = 1
@@ -315,10 +369,13 @@ def displayWelcomeMessage():
 
     print ("")
     print ("=-= =-= =-= =-= =-= =-= =-= =-= =-= =-= =-= =-= =-=")
-    print ("=-=  World of Isotiles                          =-=")
+    print ("=-=  Zombies vs Humans : A Classic War          =-=")
     print ("=-=                                             =-=")
-    print ("=-=  nicolas.bredeche(at)sorbonne-universite.fr =-=")
-    print ("=-=  licence CC:BY:SA                           =-=")
+    print ("=-=  BABANAZAROVA Dilyara                       =-=")
+    print ("=-=  CELIK Simay                                =-=")
+    print ("=-=  KUDRYAVTSEVA Kristina                      =-=")
+    print ("=-=  original code by :                       =-=")
+    print ("=-= nicolas.bredeche(at)sorbonne-universite.fr  =-=")                        
     print ("=-= =-= =-= =-= =-= =-= =-= =-= =-= =-= =-= =-= =-=")
     print (">> v.",versionTag)
     print ("")
@@ -359,7 +416,7 @@ def getViewHeight():
 
 def getTerrainAt(x,y):
     return terrainMap[y][x]
-#changing the type
+
 def setTerrainAt(x,y,type):
     terrainMap[y][x] = type
 
@@ -384,7 +441,7 @@ def setObjectAt(x,y,type,level=0): # negative values are possible: invisible but
         print ("[ERROR] setObjectMap(.) -- Cannot set object. Level does not exist.")
         return 0
 
-def deleteObjectAt(x,y,level): # negative values are possible: invisible but tangible objects (ie. no display, collision)
+def deleteObjectAt(x,y,level): # be sure not to have invalid values (no error checks)
     objectMap[level][y][x] = 0
     return 0
 
@@ -401,8 +458,9 @@ def setAgentAt(x,y,type):
 ### Agents
 ###
 ###
+
 PSHOOT=0.8
-PROB_REPROD = 0.03
+PROB_REPROD = 0.05
 MAXHUNGER=20
 
 class BasicAgent:
@@ -491,7 +549,7 @@ class Human(BasicAgent):
         self.age=0
         self.sex=None
         self.hunger=MAXHUNGER
-        if random()<0.5:
+        if random()<0.8:
             self.gun=randint(1,10)
         else:
             self.gun=0
@@ -531,16 +589,40 @@ class Human(BasicAgent):
                 self.move()
         return
 
+    #when a human sees another human they go towards them
+    
+    def move4(self):
+        if random()<0.4 and self.type==manId:
+                if getAgentAt((self.x+1+worldWidth)%worldWidth, (self.y+worldHeight)%worldHeight ) == womanId: #x+1 y
+                    self.move2(1,0)
+                elif getAgentAt((self.x-1+worldWidth)%worldWidth, (self.y+worldHeight)%worldHeight ) == womanId: #x-1 y
+                    self.move2(-1,0)
+                elif getAgentAt((self.x+worldWidth)%worldWidth, (self.y+1+worldHeight)%worldHeight ) == womanId: #x y+1
+                    self.move2(0,1)
+                elif getAgentAt((self.x+worldWidth)%worldWidth, (self.y-1+worldHeight)%worldHeight ) == womanId: #x y-1
+                    self.move2(0,-1)
+                elif getAgentAt((self.x-1+worldWidth)%worldWidth, (self.y-1+worldHeight)%worldHeight ) == womanId: #x-1 y-1
+                    self.move2(-1,-1)
+                elif getAgentAt((self.x+1+worldWidth)%worldWidth, (self.y-1+worldHeight)%worldHeight ) ==womanId: #x+1 y-1
+                    self.move2(1,-1)
+                elif getAgentAt((self.x+1+worldWidth)%worldWidth, (self.y+1+worldHeight)%worldHeight ) == womanId: #x+1 y+1
+                    self.move2(1,1)
+                elif getAgentAt((self.x-1+worldWidth)%worldWidth, (self.y+1+worldHeight)%worldHeight ) == womanId: #x-1 y+1
+                    self.move2(-1,1)
+                else :
+                    self.move()
+        self.move()
+        return
 
-    def combat(self,zombies,humans,met):
-        success = False
-        if self.gun > 0:
-            success = self.shoot()
+
+    def combat(self,zombies,met):
+        success = self.shoot()
         for z in zombies:
             if (met(self,z)):
                 #if self.shoot()==True:
                 if success:
                     zombies.remove(z)
+                    print("zombie got shot")
                     self.type=winnerhumanId
                 else:
                     Tx=self.x
@@ -576,13 +658,15 @@ class Human(BasicAgent):
                     break
         return
 
-    def eat(self, foods) :
+    def eat(self, foods) : #when they eat food they become younger
         food=False
         for f in foods :
             if self.x== f.x and self.y==f.y :
                 self.hunger+=f.energy
+                self.age-=f.energy
                 foods.remove(f)
                 food=True
+                print("human ate")
         if not food :
             self.hunger-=1
 
@@ -590,6 +674,7 @@ class Human(BasicAgent):
         for g in guns :
             if self.x== g.x and self.y==g.y :
                 self.gun+=1
+                print("armed")
                 guns.remove(g)
     
     def takeCure(self, cure, manId, womanId):
@@ -604,7 +689,7 @@ class Human(BasicAgent):
                         self.type = womanId
                         print("Male ", id(self), " cured")
 
-                cure.remove(i)
+                #cure.remove(i)
                 break
         return
 
@@ -676,27 +761,6 @@ class Zombie(BasicAgent):
         return
 
 
-#probs for foods
-PROBDROPFOOD=0.3
-DROPDAYFOOD=9
-DECOMPDAYFOOD=15
-NBFOOD=0
-MAXFOOD= 20
-
-
-#probs for gun
-PROBDROPGUN=0.2
-DROPDAYGUN=9
-NBGUN=0
-MAXGUN= 20
-
-#probs for Cure
-PROBDROPCURE=1.0
-DROPDAYCURE=1
-NBCURE=0
-MAXCURE=5
-
-
 
 class RandDropAgents:
 
@@ -726,11 +790,10 @@ class Cure(RandDropAgents):
         self.reset()
 
     def randomDrop(list, it):
-        if (it != 0):
-            if random() < PROBDROPCURE:
-                if it%DROPDAYCURE == 0 :
-                    for i in range(0,MAXCURE):
-                        list.append(Cure())
+
+        for i in range(0,MAXCURE):
+            list.append(Cure())
+        
         return
 
 
@@ -778,14 +841,6 @@ class Gun(RandDropAgents) :
                         list.append(Gun())
         return
 
-guns = []
-foods = []
-zombies = []
-humans = []
-cure = []
-lightning=[]
-
-
 
 ### ### ### ### ### ### ### ### ### ### ### ### ### ### ### ###
 ### ### ### ### ### ### ### ### ### ### ### ### ### ### ### ###
@@ -796,7 +851,7 @@ lightning=[]
 
 #create random environment
 
-clouds = []
+
 def cloudspawn():
     #creating the cloud matrix
     #interaction points are the corners and if they are touching every x iteration we hear lightning (maybe their color change)
@@ -823,8 +878,6 @@ def cloudspawn():
 
 
 
-occupied=[]  #occupied surface by objects
-PROBTURN = 0.03    #randomly turn of road
 
 def createRoad(x,y,dir='x'):
     if dir== 'x' :
@@ -1288,7 +1341,8 @@ def initWorld():
  
     #adding agents
     for i in range(nbAgents):
-        zombies.append(Zombie(zombieId,-1,-1))
+        if random()<0.5:
+            zombies.append(Zombie(zombieId,-1,-1))
         if random()<0.5:
             humans.append(Male(manId))
         else:
@@ -1325,7 +1379,7 @@ def stepWorld( it = 0):
                                 if random()<0.07:
                                     lightning.append((x,y))
                                     setObjectAt(x,y,lightningId,objectMapLevels-2)
-                                    if random()<0.012:
+                                    if random()<0.0012:
                                         playsound('sounds/minithunder.wav')
 
                 
@@ -1349,10 +1403,10 @@ def check_transition(h, zombies):
     return
 
 ### ### ### ### ###
-MAXAGE=30
+
 def stepAgents(it = 0 ):
     # move agent
-    if it % (maxFps/8) == 0:
+    if it % (maxFps/16) == 0:
         shuffle(foods)
         shuffle(zombies)
         shuffle(humans)
@@ -1362,7 +1416,7 @@ def stepAgents(it = 0 ):
         for z in zombies:
             if z.type!=2:
                 z.type=2   # shuffle agents in in-place (i.e. agents is modified)
-            if z.decomp>MAXAGE:
+            if z.decomp>MAXAGE/2:
                 z.die()
                 zombies.remove(z)
             elif z.dead==False:
@@ -1370,12 +1424,12 @@ def stepAgents(it = 0 ):
                 z.move3()
                 z.direction=randint(0,3)
         for h in humans:
-            if not (h.type==3 or h.type==6):
+            if not (h.type==winnerhumanId): #if s/he won the combat
                 if h.sex=='M':
-                    h.type=3 #male
+                    h.type=manId 
                 else:
-                    h.type=6 #female
-            #    h.type=3
+                    h.type=womanId 
+
             if h.age>MAXAGE or h.hunger==-1:
                 h.die()
             check_transition(h, zombies)
@@ -1389,11 +1443,13 @@ def stepAgents(it = 0 ):
                 else:
                     h.eat(foods)
                     h.arming(guns)
-                    h.combat(zombies,humans, met)
+                    h.combat(zombies, met)
                     h.reproduire(humans, manId, womanId, met)
                 h.age+=1
                 h.hunger-=1
+                h.move4()
                 h.move3()
+
     return
 
 
@@ -1404,30 +1460,6 @@ def stepAgents(it = 0 ):
 ### CORE: rendering
 ###
 ###
-
-#background variables (images and colours)
-night=pygame.image.load("assets/starsbig.png").convert_alpha()
-#nıght=pygame.transform.scale(night, (1200, 1200))
-day=pygame.image.load("assets/sunnydayy.png").convert_alpha()
-cloudy=pygame.image.load("assets/cloudday.png").convert_alpha()
-
-def draw_rect_alpha(surface, color, rect):
-    shape_surf = pygame.Surface(pygame.Rect(rect).size, pygame.SRCALPHA)
-    pygame.draw.rect(shape_surf, color, shape_surf.get_rect())
-    surface.blit(shape_surf, rect)
-
-filter=pygame.image.load("assets/daybig.png").convert_alpha()
-
-############TRANSPARENT FILTER EXPERIMENTATION AREA ################
-#IMAGE = pygame.image.load('an_image.png').convert()
-#IMAGE2 = pygame.image.load('assets/f10.png').convert()
-#IMAGE2.set_colorkey((0, 0, 0))
-#image = pygame.Surface([640,480], pygame.SRCALPHA, 32)
-#image = image.convert_alpha()
-
-blue=(135,206,235)
-black=(0,0,0)
-surface = pygame.Surface((screenWidth, screenHeight), pygame.SRCALPHA)
 
 
 def render( it = 0, list_agents=iconsH_list):
