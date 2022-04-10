@@ -39,8 +39,8 @@ from random import *
 #import random
 import math
 import time
-#from playsound import playsound
-
+from playsound import playsound
+  
 
 
 import pygame
@@ -66,6 +66,7 @@ nbBurningTrees = 0 #15
 nbAgents = 20
 nbDetails = 18
 DAY=True
+WEATHER=1 #0=sunny 1=cloudy 
 
 ### ### ### ### ### ### ### ### ### ### ### ### ### ### ### ###
 ### ### ### ### ### ### ### ### ### ### ### ### ### ### ### ###
@@ -764,27 +765,6 @@ cure = []
 mx = 3
 my = 3
 MAXMOUNT = (int)(worldHeight/10)
-"""def randEnv():
-    for ind in range(0,randint(0,MAXMOUNT+1)):
-        wid=randint(0,10)
-        len=randint(0,10)
-        terrainMap=[[]]
-        for i in range(wid) :
-
-            terrainMap[i] = [3 for j in range(len)]
-
-        heightMap=[[]]
-        for w in range(wid):
-            for l in range(len):
-                heightMap[w][l]=randint(1,3)
-        x_offset = randint(0,32)
-        y_offset = randint(0,32)
-        for x in range(wid):
-            for y in range(len):
-                setTerrainAt( x+x_offset, y+y_offset, terrainMap[x][y] )
-                setHeightAt( x+x_offset, y+y_offset, heightMap[x][y] )
-                setObjectAt( x+x_offset, y+y_offset, 0)
-    return"""
 
 
 #create random environment
@@ -808,7 +788,10 @@ def cloudspawn():
             w=((x+cx)+worldWidth)%worldWidth
             for y in range(0,yy):
                 l=((y+cy)+worldHeight)%worldHeight
-                setObjectAt(w,l,cloudId,objectMapLevels-1)
+                if random()<0.3:
+                    setObjectAt(w,l,chargedCloudId,objectMapLevels-1)
+                else :
+                    setObjectAt(w,l,cloudId,objectMapLevels-1)
                 clouds.append(1)
 
 
@@ -1208,13 +1191,6 @@ def initWorld():
         setTerrainAt( c[0], c[1], 8 )
         setObjectAt( c[0], c[1], flowerRId)
 
-    """#ajout de fences ????maybeeee
-    for c in [(7,15),(7,17)]:
-        setObjectAt( c[0], c[1], fenceSEId)
-    for c in [(7,19),(7,21)] :
-        setObjectAt( c[0], c[1], fenceNEId)
-    for c in [(0,14),(2,14),(2,22),(0,22)] :
-        setObjectAt( c[0], c[1], fenceNWId)"""
 
     #-----------------------------------------------------------------------------------
 
@@ -1334,46 +1310,9 @@ def initWorld():
         setObjectAt(8,3+i,15,objectMapLevels-1)
 
 
-
-    """eski codelar :
-
-    building1TerrainMap = [
-    [ 2, 2, 2, 2 ],
-    [ 2, 4, 4, 2 ],
-    [ 2, 4, 4, 2 ],
-    [ 2, 2, 2, 2 ]
-    ]
-    #height of building
-    building1HeightMap = [
-    [ 1, 1, 1, 1 ],
-    [ 1, 0, 0, 1 ],
-    [ 1, 0, 0, 1 ],
-    [ 1, 1, 1, 1 ]
-    ]
-    #place of building
-
-    x_offset = mx
-    y_offset = my
-
-    #putting the building
-    for x in range( len( building1TerrainMap[0] )):
-        for y in range( len( building1TerrainMap )):
-            setTerrainAt( x+x_offset, y+y_offset, building1TerrainMap[x][y] )
-            setHeightAt( x+x_offset, y+y_offset, building1HeightMap[x][y] )
-            setObjectAt( x+x_offset, y+y_offset, 0) # add a virtual object: not displayed, but used to forbid agent(s) to come here.
-
-    #adding burning trees
-    for i in range(nbBurningTrees):
-        x = randint(0,getWorldWidth()-1)
-        y = randint(0,getWorldHeight()-1)
-        while getTerrainAt(x,y) != 0 or getObjectAt(x,y) != 0:
-            x = randint(0,getWorldWidth()-1)
-            y = randint(0,getWorldHeight()-1)
-        setObjectAt(x,y,burningTreeId)
-    """
-
 def initWorld():
     global nbTrees, nbBurningTrees, zombies, humans, nbDetails
+    playsound('sounds/VOXScrm_Wilhelm scream (ID 0477)_BSB.wav')
 
     cloudspawn()
     if getWorldWidth() >= 100 :
@@ -1409,33 +1348,27 @@ def initAgents():
 
 def stepWorld( it = 0 ):
     if it % (maxFps/180) == 0: #tour speed
-        for x in range(worldWidth):
-            for y in range(worldHeight):
-                #burning the trees
-                if getObjectAt(x,y) == treeId:
-                    for neighbours in ((-1,0),(+1,0),(0,-1),(0,+1)):
-                        if getObjectAt((x+neighbours[0]+worldWidth)%worldWidth,(y+neighbours[1]+worldHeight)%worldHeight) == burningTreeId:
-                            setObjectAt(x,y,burningTreeId)
-                        elif getAgentAt((x+neighbours[0]+worldWidth)%worldWidth,(y+neighbours[1]+worldHeight)%worldHeight) == zombieId:
-                            setObjectAt(x,y,burningTreeId)
+        if WEATHER==1: #stormy
+            for x in range(worldWidth):
+                for y in range(worldHeight):
+
+                    if getObjectAt(x,y,objectMapLevels-1) == chargedCloudId:
+                        for neighbours in ((-1,0),(+1,0),(0,-1),(0,+1)):
+                            if getObjectAt((x+neighbours[0]+worldWidth)%worldWidth,(y+neighbours[1]+worldHeight)%worldHeight) == chargedCloudId:
+                                playsound('isoworld/sounds/thunder.wav')
+
+
+    #burning the trees
+    
+    """if getObjectAt(x,y) == treeId:
+        for neighbours in ((-1,0),(+1,0),(0,-1),(0,+1)):
+            if getObjectAt((x+neighbours[0]+worldWidth)%worldWidth,(y+neighbours[1]+worldHeight)%worldHeight) == burningTreeId:
+                setObjectAt(x,y,burningTreeId)
+            elif getAgentAt((x+neighbours[0]+worldWidth)%worldWidth,(y+neighbours[1]+worldHeight)%worldHeight) == zombieId:
+                setObjectAt(x,y,burningTreeId)"""
+                
     return
 ### ### ### ### ###
-
-
-### ### ### ### ###
-
-def stepWorld( it = 0 ):
-    if it % (maxFps/180) == 0: #tour speed
-        for x in range(worldWidth):
-            for y in range(worldHeight):
-                #burning the trees
-                if getObjectAt(x,y) == treeId:
-                    for neighbours in ((-1,0),(+1,0),(0,-1),(0,+1)):
-                        if getObjectAt((x+neighbours[0]+worldWidth)%worldWidth,(y+neighbours[1]+worldHeight)%worldHeight) == burningTreeId:
-                            setObjectAt(x,y,burningTreeId)
-                        elif getAgentAt((x+neighbours[0]+worldWidth)%worldWidth,(y+neighbours[1]+worldHeight)%worldHeight) == zombieId:
-                            setObjectAt(x,y,burningTreeId)
-    return
 ### ### ### ### ###
 
 def met(agent1, agent2):
@@ -1647,7 +1580,7 @@ while userExit == False:
         #if h.getPosition() == player.getPosition():
         if h.getPosition() == (mx,my):
             perdu = True
-            #playsound('isoworld/sounds/VOXScrm_Wilhelm scream (ID 0477)_BSB.wav')
+            playsound('isoworld/sounds/VOXScrm_Wilhelm scream (ID 0477)_BSB.wav')
             break
 
     if perdu == True:
