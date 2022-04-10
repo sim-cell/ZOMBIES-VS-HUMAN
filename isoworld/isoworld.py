@@ -38,6 +38,7 @@ from random import *
 #import random
 import math
 import time
+from tkinter import W
 from playsound import playsound
   
 
@@ -65,7 +66,7 @@ nbBurningTrees = 0 #15
 nbAgents = 30
 nbDetails = 15
 DAY=True
-WEATHER=0 #0=sunny 1=cloudy 
+WEATHER=True #0=sunny 1=cloudy 
 
 ### ### ### ### ### ### ### ### ### ### ### ### ### ### ### ###
 ### ### ### ### ### ### ### ### ### ### ### ### ### ### ### ###
@@ -132,6 +133,8 @@ pygame.display.set_caption('Zombieland')
 #creating clouds (the dimensions are different so do not use loadImage)
 cloud = pygame.image.load('assets/cloud30.png').convert_alpha()
 cloud = pygame.transform.scale(cloud, (int(25), int(25)))
+chargedcloud = pygame.image.load('assets/chargedcloud30.png').convert_alpha()
+chargedcloud = pygame.transform.scale(chargedcloud, (int(25), int(25)))
 
 def loadImage(filename):
     global tileTotalWidthOriginal,tileTotalHeightOriginal,scaleMultiplier
@@ -187,7 +190,12 @@ def loadAllImages():
 
     #clouds
     objectType.append(cloud) #normal cloud
-    objectType.append(cloud) #charged cloud
+    objectType.append(chargedcloud) #charged cloud
+
+    #lightning 
+    lightningimage=loadImage('assets/basic111x128/lightning.png') #lightning
+    lightningimage = pygame.transform.scale((lightningimage), (50, 50))
+    objectType.append(lightningimage) 
 
 
     #agent images
@@ -207,6 +215,7 @@ def loadAllImages():
     agentType.append(loadImage('assets/basic111x128/babyGirl.png')) # babyGirl
     agentType.append(loadImage('assets/basic111x128/man2Z.png')) # man
     agentType.append(loadImage('assets/basic111x128/womanZ.png')) # woman
+
 
 
 def resetImages():
@@ -254,6 +263,7 @@ floorGrId = 10
 stepsId = 11
 cloudId = 12
 chargedCloudId = 13
+lightningId=14
 
 
 #agents
@@ -373,6 +383,10 @@ def setObjectAt(x,y,type,level=0): # negative values are possible: invisible but
     else:
         print ("[ERROR] setObjectMap(.) -- Cannot set object. Level does not exist.")
         return 0
+
+def deleteObjectAt(x,y,level): # negative values are possible: invisible but tangible objects (ie. no display, collision)
+    objectMap[level][y][x] = 0
+    return 0
 
 def getAgentAt(x,y):
     return agentMap[y][x]
@@ -684,7 +698,6 @@ MAXCURE=5
 
 
 
-
 class RandDropAgents:
 
     def __init__(self):
@@ -770,6 +783,8 @@ foods = []
 zombies = []
 humans = []
 cure = []
+lightning=[]
+
 
 
 ### ### ### ### ### ### ### ### ### ### ### ### ### ### ### ###
@@ -800,7 +815,7 @@ def cloudspawn():
             w=((x+cx)+worldWidth)%worldWidth
             for y in range(0,yy):
                 l=((y+cy)+worldHeight)%worldHeight
-                if random()<0.3:
+                if random()<0.15:
                     setObjectAt(w,l,chargedCloudId,objectMapLevels-1)
                 else :
                     setObjectAt(w,l,cloudId,objectMapLevels-1)
@@ -1292,16 +1307,26 @@ def initAgents():
 
 ### ### ### ### ###
 
-def stepWorld( it = 0 ):
+
+def stepWorld( it = 0):
+
+    for (x,y) in lightning:
+        deleteObjectAt(x,y,objectMapLevels-2)
+        lightning.remove((x,y))
+    
+
     if it % (maxFps/10) == 0: #tour speed
-        if WEATHER==1: #stormy
+        if WEATHER==False: #stormy
             for x in range(worldWidth):
                 for y in range(worldHeight):
-
                     if getObjectAt(x,y,objectMapLevels-1) == chargedCloudId:
                         for neighbours in ((-1,0),(+1,0),(0,-1),(0,+1)):
-                            if getObjectAt((x+neighbours[0]+worldWidth)%worldWidth,(y+neighbours[1]+worldHeight)%worldHeight) == chargedCloudId:
-                                playsound('isoworld/sounds/thunder.wav')
+                            if getObjectAt((x+neighbours[0]+worldWidth)%worldWidth,(y+neighbours[1]+worldHeight)%worldHeight,objectMapLevels-1) == chargedCloudId:
+                                if random()<0.07:
+                                    lightning.append((x,y))
+                                    setObjectAt(x,y,lightningId,objectMapLevels-2)
+                                    if random()<0.012:
+                                        playsound('sounds/minithunder.wav')
 
                 
     return
@@ -1383,8 +1408,8 @@ def stepAgents(it = 0 ):
 #background variables (images and colours)
 night=pygame.image.load("assets/starsbig.png").convert_alpha()
 #nıght=pygame.transform.scale(night, (1200, 1200))
-day=pygame.image.load("assets/sunnyday.png").convert_alpha()
-cloudy=pygame.image.load("assets/cloudy.png").convert_alpha()
+day=pygame.image.load("assets/sunnydayy.png").convert_alpha()
+cloudy=pygame.image.load("assets/cloudday.png").convert_alpha()
 
 def draw_rect_alpha(surface, color, rect):
     shape_surf = pygame.Surface(pygame.Rect(rect).size, pygame.SRCALPHA)
@@ -1408,12 +1433,13 @@ surface = pygame.Surface((screenWidth, screenHeight), pygame.SRCALPHA)
 def render( it = 0, list_agents=iconsH_list):
     global xViewOffset, yViewOffset
 
+
     pygame.display.update()
     if DAY:
-        if WEATHER==1:
-            screen.blit(cloudy,(0,0))
-        else:
+        if WEATHER:
             screen.blit(day,(0,0))
+        else:
+            screen.blit(cloudy,(0,0))
         #pygame.draw.rect(screen, blue, (0, 0, screenWidth, screenHeight), 0) # overkill - can be optimized. (most sprites are already "naturally" overwritten)
 
 
@@ -1574,6 +1600,11 @@ while userExit == False:
         DAY=False
     if it % 120 == 0:
         DAY=True
+        if random()<0.5 :
+            WEATHER=True
+        else:
+            WEATHER=False
+
 
     # continuous stroke
     keys = pygame.key.get_pressed()
