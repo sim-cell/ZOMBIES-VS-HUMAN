@@ -1472,18 +1472,10 @@ def render( it = 0, list_agents=iconsH_list):
             screen.blit(day,(0,0))
         else:
             screen.blit(cloudy,(0,0))
-        #pygame.draw.rect(screen, blue, (0, 0, screenWidth, screenHeight), 0) # overkill - can be optimized. (most sprites are already "naturally" overwritten)
 
 
     else:
         screen.blit(night,(0,0))
-        #screen.blit(filter,(0,0))
-        #screen.fill((255, 255, 255))
-        #draw_rect_alpha(screen,(0,0,0),(55, 90, 140, 140))
-        #pygame.draw.rect(screen, black, (0, 0, screenWidth, screenHeight), 0)
-       # filter = pygame.surface.Surface(screenWidth, screenHeight)
-        #filter.fill(pygame.color.Color('Grey'))
-        #screen.blit(night,(0,0))
 
 
     #pygame.display.update()
@@ -1665,14 +1657,6 @@ while userExit == False:
         if event.type == KEYUP:
             if event.key == K_ESCAPE:
                 userExit = True
-            elif event.key == pygame.K_j:
-                player.move2(0,+1);
-            elif event.key == pygame.K_u:
-                player.move2(0,-1);
-            elif event.key == pygame.K_k:
-                player.move2(+1,0);
-            elif event.key == pygame.K_h:
-                player.move2(-1,0);
             elif event.key == pygame.K_n and pygame.key.get_mods() & pygame.KMOD_SHIFT:
                 addNoise = not(addNoise)
                 print ("noise is",addNoise) # easter-egg
