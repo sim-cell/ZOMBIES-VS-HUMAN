@@ -81,8 +81,8 @@ screenWidth = 1400 # 930 #
 screenHeight = 900 # 640 #
 
 # world dimensions (ie. nb of cells in total)
-worldWidth = 32#64
-worldHeight = 32#64
+worldWidth = 100#64
+worldHeight = 100#64
 
 # set surface of displayed tiles (ie. nb of cells that are rendered) -- must be superior to worldWidth and worldHeight
 viewWidth = 32 #32
