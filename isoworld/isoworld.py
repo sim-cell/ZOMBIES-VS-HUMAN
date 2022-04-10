@@ -1359,8 +1359,8 @@ def stepWorld( it = 0 ):
 
 
     #burning the trees
-    
-    """if getObjectAt(x,y) == treeId:
+    """
+    if getObjectAt(x,y) == treeId:
         for neighbours in ((-1,0),(+1,0),(0,-1),(0,+1)):
             if getObjectAt((x+neighbours[0]+worldWidth)%worldWidth,(y+neighbours[1]+worldHeight)%worldHeight) == burningTreeId:
                 setObjectAt(x,y,burningTreeId)
