@@ -23,7 +23,7 @@ When adding agents, pls do not create a new variable and instead just add them t
 ## TO DO:
   - code cleaning 
   - debugging
-  - fixing [spaghetti code] (/https://www.google.com/search?q=spaghetti+code)
+  - fixing [spaghetti code](https://www.google.com/search?q=spaghetti+code)
 
 
 
