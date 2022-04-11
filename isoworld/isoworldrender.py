@@ -1514,33 +1514,39 @@ def render( it = 0, list_agents=iconsH_list):
                 if getObjectAt( xTile , yTile , level)  > 0: # object on terrain?
                     screen.blit( objectType[ getObjectAt( xTile , yTile, level) ] , (xScreen, yScreen - heightMultiplier*(level+1) ))
 
-            if (getAgentAt( xTile, yTile ) != 0) :
-                for iconId in list_agents:
-                    if (getAgentAt(xTile, yTile)==iconId):
-                        for h in humans:
-                            if  h.dead==False and h.x==xTile and h.y==yTile : # agent on terrain?
-                                screen.blit( agentType[ getAgentAt( xTile, yTile ) ] , (xScreen, yScreen - heightMultiplier ))
+            
+        for h in humans:
+            if  h.dead==False : # agent on terrain?
+                xScreen = xScreenOffset + h.x * tileTotalWidth / 2 - h.y * tileTotalWidth / 2
+                yScreen = yScreenOffset + h.y * tileVisibleHeight / 2 + h.x * tileVisibleHeight / 2 - height
+                screen.blit( agentType[h.type] , (xScreen, yScreen - heightMultiplier ))
 
-                if ((getAgentAt( xTile, yTile ) == zombieId) or (getAgentAt( xTile, yTile ) == winnerzombieId)) :
-                    for z in zombies:
-                        if z.dead==False and z.x==xTile and z.y==yTile : # agent on terrain?
-                            screen.blit( agentType[ getAgentAt( xTile, yTile ) ] , (xScreen, yScreen - heightMultiplier ))
-                
-                if ((getAgentAt( xTile, yTile ) == foodsId)) :
-                    for f in foods:
-                        if f.x==xTile and f.y==yTile : # agent on terrain?
-                            screen.blit( agentType[ getAgentAt( xTile, yTile ) ] , (xScreen, yScreen - heightMultiplier ))
 
-                if (getAgentAt( xTile, yTile ) == gunId) :
-                    for f in guns:
-                        if f.x==xTile and f.y==yTile : # agent on terrain?
-                            screen.blit( agentType[ getAgentAt( xTile, yTile ) ] , (xScreen, yScreen - heightMultiplier ))
+        for z in zombies:
+            if z.dead==False : # agent on terrain?
+                xScreen = xScreenOffset + z.x * tileTotalWidth / 2 - z.y * tileTotalWidth / 2
+                yScreen = yScreenOffset + z.y * tileVisibleHeight / 2 + z.x * tileVisibleHeight / 2 - height
+                screen.blit( agentType[z.type] , (xScreen, yScreen - heightMultiplier ))
 
-                if (getAgentAt( xTile, yTile ) == medicineId) :
-                    for f in cure:
-                        if f.x==xTile and f.y==yTile : # agent on terrain?
-                            screen.blit( agentType[ getAgentAt( xTile, yTile ) ] , (xScreen, yScreen - heightMultiplier ))
-                
+
+        for f in foods:
+            xScreen = xScreenOffset + f.x * tileTotalWidth / 2 - f.y * tileTotalWidth / 2
+            yScreen = yScreenOffset + f.y * tileVisibleHeight / 2 + f.x * tileVisibleHeight / 2 - height
+            screen.blit(agentType[f.type], (xScreen, yScreen - heightMultiplier ))
+
+
+        for g in guns:
+            xScreen = xScreenOffset + g.x * tileTotalWidth / 2 - g.y * tileTotalWidth / 2
+            yScreen = yScreenOffset + g.y * tileVisibleHeight / 2 + g.x * tileVisibleHeight / 2 - height
+            screen.blit( agentType[g.type] , (xScreen, yScreen - heightMultiplier ))
+
+
+        for c in cure:
+            xScreen = xScreenOffset + c.x * tileTotalWidth / 2 - c.y * tileTotalWidth / 2
+            yScreen = yScreenOffset + c.y * tileVisibleHeight / 2 + c.x * tileVisibleHeight / 2 - height
+
+            screen.blit( agentType[c.type], (xScreen, yScreen - heightMultiplier ))   
+        
 
     return
 
