@@ -1396,8 +1396,8 @@ def stepWorld( it = 0):
                                 if random()<0.07:
                                     lightning.append((x,y))
                                     setObjectAt(x,y,lightningId,objectMapLevels-2)
-                                    if random()<0.0012:
-                                        playsound('sounds/minithunder.wav')
+                                    #if random()<0.0012: #plays the sound of thunder but it is annoying
+                                        #playsound('sounds/minithunder.wav')
 
                 
     return
