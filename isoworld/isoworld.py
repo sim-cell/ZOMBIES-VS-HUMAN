@@ -62,7 +62,7 @@ versionTag = "2022"
 
 #numbers of elements
 nbTrees = 15 #350
-nbAgents = 50
+nbAgents = 40
 nbDetails = 15
 
 #environmental changes (nature)
@@ -70,9 +70,10 @@ DAY=True
 WEATHER=True #True=sunny False=storm
 
 #probs for humans and zombies
-MAXAGE=30
-PSHOOT=1
-PROB_REPROD = 0.05
+MAXAGEH=30
+MAXAGEZ=20
+PSHOOT=0.75
+PROB_REPROD = 0.045
 MAXHUNGER=30
 
 #probs for foods
@@ -543,8 +544,8 @@ class Human(BasicAgent):
         self.age=0
         self.sex=None
         self.hunger=MAXHUNGER
-        if random()<=1:
-            self.gun=randint(5,10)
+        if random()<=0.8:
+            self.gun=randint(1,10)
         else:
             self.gun=0
         self.infected = 0
@@ -579,14 +580,17 @@ class Human(BasicAgent):
                 self.move2(-1,-1)
             elif getAgentAt((self.x-1+worldWidth)%worldWidth, (self.y+1+worldHeight)%worldHeight ) == zombieId: #x-1 y+1
                 self.move2(1,-1)
-            else :
+            elif random()<0.3: #not a high probability because if they always try to stay in the same case they will not move around
                 self.move4()
+            else:
+                self.move() #they can ignore if there is an opposite sex near them and go in a random direction
 
         return
 
     #when a human sees another human they go towards them
 
     def move4(self):
+        
         if self.type==manId:
             if getAgentAt((self.x+1+worldWidth)%worldWidth, (self.y+worldHeight)%worldHeight ) == womanId: #x+1 y
                 self.move2(1,0)
@@ -624,6 +628,7 @@ class Human(BasicAgent):
         success = self.shoot()
         for z in zombies:
             if (met(self,z)):
+                print("combat")
                 if success:
                     zombies.remove(z)
                     print("zombie got shot by ",id(self))
@@ -655,7 +660,7 @@ class Human(BasicAgent):
                 if self.getType()!=h.getType():#self.instanceOf(Male)&&h.instanceOf(Female) || self.instanceOf(Female)&&h.instanceOf(Male):
                     if random()<PROB_REPROD:
                         coords = self.getPosition()
-                        print("a baby is born")
+                        print("a baby is born ")
                         if sex_choice == ImageIdF:
                             list_humans.append(Female(sex_choice, coords[0], coords[1]))
                         else :
@@ -1365,8 +1370,7 @@ def initWorld():
 
     #adding agents
     for i in range(nbAgents):
-        if random()<1.0:
-            zombies.append(Zombie(zombieId,-1,-1))
+        zombies.append(Zombie(zombieId,-1,-1))
         if random()<0.5:
             humans.append(Male(manId))
         else:
@@ -1385,7 +1389,6 @@ def initAgents():
 
 ### ### ### ### ###
 
-
 def stepWorld( it = 0):
 
     for (x,y) in lightning:
@@ -1394,17 +1397,51 @@ def stepWorld( it = 0):
 
 
     if it % (maxFps/10) == 0: #tour speed
+
         if WEATHER==False: #stormy
             for x in range(worldWidth):
                 for y in range(worldHeight):
                     if getObjectAt(x,y,objectMapLevels-1) == chargedCloudId:
                         for neighbours in ((-1,0),(+1,0),(0,-1),(0,+1)):
                             if getObjectAt((x+neighbours[0]+worldWidth)%worldWidth,(y+neighbours[1]+worldHeight)%worldHeight,objectMapLevels-1) == chargedCloudId:
-                                if random()<0.07:
+                                if random()<0.03:
                                     lightning.append((x,y))
                                     setObjectAt(x,y,lightningId,objectMapLevels-2)
                                     #if random()<0.0012: #plays the sound of thunder but it is annoying
                                         #playsound('sounds/minithunder.wav')
+                        if random()<0.005:
+                            setObjectAt(x,y,cloudId,objectMapLevels-1)
+                    elif getObjectAt(x,y,objectMapLevels-1) == cloudId:
+                        for neighbours in ((-1,0),(+1,0),(0,-1),(0,+1)):
+                            if getObjectAt((x+neighbours[0]+worldWidth)%worldWidth,(y+neighbours[1]+worldHeight)%worldHeight,objectMapLevels-1) == chargedCloudId:
+                                if random()<0.01:
+                                    setObjectAt(x,y,chargedCloudId,objectMapLevels-1)
+
+        else:
+            """#if we want random clouds every once in a while
+            if random()<0.1:
+                for x in range(worldWidth):
+                    for y in range(worldHeight):
+                        if getObjectAt(x,y,objectMapLevels-1) == chargedCloudId or  getObjectAt(x,y,objectMapLevels-1) == cloudId:
+                            deleteObjectAt(x,y,objectMapLevels-1)
+                for i in clouds:
+                    clouds.remove(i)
+
+                cloudspawn()"""
+            #if we reinitialize the clouds as mostly uncharged
+            if random()<0.1:
+                for x in range(worldWidth):
+                    for y in range(worldHeight):
+                        if getObjectAt(x,y,objectMapLevels-1) == chargedCloudId :
+                            if random()<0.2:
+                                setObjectAt(x,y,cloudId,objectMapLevels-1)
+                        elif getObjectAt(x,y,objectMapLevels-1) == cloudId :
+                            if random()<0.05:
+                                setObjectAt(x,y,chargedCloudId,objectMapLevels-1)
+            
+
+
+                                
 
 
     return
@@ -1414,8 +1451,8 @@ def stepWorld( it = 0):
 
 def stepAgents(it = 0 ):
     # move agent
-    if it % (maxFps/16) == 0:
-        print("stepped agents")
+    if it % (maxFps/16) == 0: 
+        print("stepped agents human count :",len(humans),"zombie count :",len(zombies))
         shuffle(foods)
         shuffle(zombies)
         shuffle(humans)
@@ -1429,7 +1466,7 @@ def stepAgents(it = 0 ):
         for z in zombies:
             if z.type!=2:
                 z.type=2   # shuffle agents in in-place (i.e. agents is modified)
-            if z.decomp>MAXAGE/2:
+            if z.decomp>MAXAGEZ:
                 z.die()
                 zombies.remove(z)
             elif z.dead==False:
@@ -1443,7 +1480,7 @@ def stepAgents(it = 0 ):
                 else:
                     h.type=womanId
 
-            if h.age>MAXAGE or h.hunger==-1:
+            if h.age>MAXAGEH or h.hunger==-1:
                 h.die()
 
             check_transition(h, zombies)
@@ -1603,10 +1640,10 @@ while userExit == False:
         winner = 1 #1 if humans win(all zombies are dead), 2 if zombies win
 
 
-    #if (len(humans)==0):
-    #    print("all humans are dead")
-    #    perdu = True
-    #    winner = 2
+    if (len(humans)==0):
+        print("all humans are dead")
+        perdu = True
+        winner = 2
 
 
     if perdu == True :
