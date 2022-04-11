@@ -72,7 +72,7 @@ WEATHER=True #True=sunny False=storm
 #probs for humans and zombies
 MAXAGE=30
 PSHOOT=1
-PROB_REPROD = 0.05
+PROB_REPROD = 1
 MAXHUNGER=30
 
 
@@ -650,6 +650,7 @@ class Human(BasicAgent):
                 if self.getType()!=h.getType():#self.instanceOf(Male)&&h.instanceOf(Female) || self.instanceOf(Female)&&h.instanceOf(Male):
                     if random()<PROB_REPROD:
                         coords = self.getPosition()
+                        print("a baby is born")
                         if sex_choice == ImageIdF:
                             list_humans.append(Female(sex_choice, coords[0], coords[1]))
                         else :
@@ -1425,7 +1426,7 @@ def stepAgents(it = 0 ):
                 z.move3()
                 z.direction=randint(0,3)
         for h in humans:
-            if (h.type==winnerhumanId): #if s/he won the combat
+            if (h.type==winnerhumanId or h.type==babyBoyId or h.type==babyGirlId ): #if s/he won the combat
                 if h.sex=='M':
                     h.type=manId 
                 else:
@@ -1446,10 +1447,10 @@ def stepAgents(it = 0 ):
                     h.eat(foods)
                     h.arming(guns)
                     h.combat(zombies, met)
-                    h.reproduire(humans, manId, womanId, met)
+                    h.reproduire(humans, babyBoyId, babyGirlId, met)
                 h.age+=1
                 h.hunger-=1
-                h.move4()
+                #h.move4()
                 h.move3()
 
     return

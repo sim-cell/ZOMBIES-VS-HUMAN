@@ -1517,6 +1517,7 @@ def render( it = 0, list_agents=iconsH_list):
             
         for h in humans:
             if  h.dead==False : # agent on terrain?
+                
                 xScreen = xScreenOffset + h.x * tileTotalWidth / 2 - h.y * tileTotalWidth / 2
                 yScreen = yScreenOffset + h.y * tileVisibleHeight / 2 + h.x * tileVisibleHeight / 2 - height
                 screen.blit( agentType[h.type] , (xScreen, yScreen - heightMultiplier ))
