@@ -1359,10 +1359,10 @@ def initWorld():
     for i in range(nbAgents):
         if random()<0.5:
             zombies.append(Zombie(zombieId,-1,-1))
-        if random()<0.5:
-            humans.append(Male(manId))
-        else:
-            humans.append(Female(womanId))
+        #if random()<0.5:
+        #    humans.append(Male(manId))
+        #else:
+        #    humans.append(Female(womanId))
         #ch = choice((m,f))
         #humans.append(ch)
 
@@ -1514,39 +1514,44 @@ def render( it = 0, list_agents=iconsH_list):
                 if getObjectAt( xTile , yTile , level)  > 0: # object on terrain?
                     screen.blit( objectType[ getObjectAt( xTile , yTile, level) ] , (xScreen, yScreen - heightMultiplier*(level+1) ))
 
-            
-        for h in humans:
-            if  h.dead==False : # agent on terrain?
-                xScreen = xScreenOffset + h.x * tileTotalWidth / 2 - h.y * tileTotalWidth / 2
-                yScreen = yScreenOffset + h.y * tileVisibleHeight / 2 + h.x * tileVisibleHeight / 2 - height
-                screen.blit( agentType[h.type] , (xScreen, yScreen - heightMultiplier ))
+
+    for h in humans:
+        if  h.dead==False : # agent on terrain?
+            height = getHeightAt( h.x, h.y ) * heightMultiplier + heightNoise
+            xScreen = xScreenOffset + h.x * tileTotalWidth / 2 - h.y * tileTotalWidth / 2
+            yScreen = yScreenOffset + h.y * tileVisibleHeight / 2 + h.x * tileVisibleHeight / 2 - height
+            screen.blit( agentType[h.type] , (xScreen, yScreen - heightMultiplier ))
 
 
-        for z in zombies:
-            if z.dead==False : # agent on terrain?
-                xScreen = xScreenOffset + z.x * tileTotalWidth / 2 - z.y * tileTotalWidth / 2
-                yScreen = yScreenOffset + z.y * tileVisibleHeight / 2 + z.x * tileVisibleHeight / 2 - height
-                screen.blit( agentType[z.type] , (xScreen, yScreen - heightMultiplier ))
+    for z in zombies:
+        if z.dead==False : # agent on terrain?
+            height = getHeightAt( z.x, z.y ) * heightMultiplier + heightNoise
+            xScreen = xScreenOffset + z.x * tileTotalWidth / 2 - z.y * tileTotalWidth / 2
+            yScreen = yScreenOffset + z.y * tileVisibleHeight / 2 + z.x * tileVisibleHeight / 2 - height
+            screen.blit( agentType[z.type] , (xScreen, yScreen - heightMultiplier ))
 
 
-        for f in foods:
-            xScreen = xScreenOffset + f.x * tileTotalWidth / 2 - f.y * tileTotalWidth / 2
-            yScreen = yScreenOffset + f.y * tileVisibleHeight / 2 + f.x * tileVisibleHeight / 2 - height
-            screen.blit(agentType[f.type], (xScreen, yScreen - heightMultiplier ))
+    for f in foods:
+        height = getHeightAt( f.x, f.y ) * heightMultiplier + heightNoise
+        xScreen = xScreenOffset + f.x * tileTotalWidth / 2 - f.y * tileTotalWidth / 2
+        yScreen = yScreenOffset + f.y * tileVisibleHeight / 2 + f.x * tileVisibleHeight / 2 - height
+        screen.blit(agentType[f.type], (xScreen, yScreen - heightMultiplier ))
 
 
-        for g in guns:
-            xScreen = xScreenOffset + g.x * tileTotalWidth / 2 - g.y * tileTotalWidth / 2
-            yScreen = yScreenOffset + g.y * tileVisibleHeight / 2 + g.x * tileVisibleHeight / 2 - height
-            screen.blit( agentType[g.type] , (xScreen, yScreen - heightMultiplier ))
+    for g in guns:
+        height = getHeightAt( g.x, g.y ) * heightMultiplier + heightNoise
+        xScreen = xScreenOffset + g.x * tileTotalWidth / 2 - g.y * tileTotalWidth / 2
+        yScreen = yScreenOffset + g.y * tileVisibleHeight / 2 + g.x * tileVisibleHeight / 2 - height
+        screen.blit( agentType[g.type] , (xScreen, yScreen - heightMultiplier ))
 
 
-        for c in cure:
-            xScreen = xScreenOffset + c.x * tileTotalWidth / 2 - c.y * tileTotalWidth / 2
-            yScreen = yScreenOffset + c.y * tileVisibleHeight / 2 + c.x * tileVisibleHeight / 2 - height
+    for c in cure:
+        height = getHeightAt( c.x, c.y ) * heightMultiplier + heightNoise
+        xScreen = xScreenOffset + c.x * tileTotalWidth / 2 - c.y * tileTotalWidth / 2
+        yScreen = yScreenOffset + c.y * tileVisibleHeight / 2 + c.x * tileVisibleHeight / 2 - height
 
-            screen.blit( agentType[c.type], (xScreen, yScreen - heightMultiplier ))   
-        
+        screen.blit( agentType[c.type], (xScreen, yScreen - heightMultiplier ))
+
 
     return
 
@@ -1597,10 +1602,10 @@ while userExit == False:
         perdu = True
         winner = 1 #1 if humans win(all zombies are dead), 2 if zombies win
     
-    if (len(humans)==0):
-        print("all humans are dead")
-        perdu = True
-        winner = 2
+    #if (len(humans)==0):
+    #    print("all humans are dead")
+    #    perdu = True
+    #    winner = 2
     
 
     if perdu == True :
