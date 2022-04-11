@@ -692,8 +692,13 @@ class Human(BasicAgent):
                 break
         return
 
-
-
+    def check_transition(h, zombies):
+        if h.infected == 15:
+            h.die()
+            Tx=h.x
+            Ty=h.y
+            zombies.append(Zombie(zombieId,Tx,Ty))
+        return
 
 class Male(Human):
     def __init__(self,imageId, newx=-1, newy=-1):
@@ -768,16 +773,6 @@ def met(agent1, agent2):
         exists=True
     return exists
 
-def check_transition(h, zombies):
-
-    if h.infected == 15:
-        h.die()
-
-        Tx=h.x
-        Ty=h.y
-        zombies.append(Zombie(zombieId,Tx,Ty))
-    return
-
 
 class RandDropAgents:
 
@@ -809,7 +804,6 @@ class Cure(RandDropAgents):
     def randomDrop(list, it):
         for i in range(0,MAXCURE):
             list.append(Cure())
-        
         return
 
 
@@ -945,7 +939,6 @@ def addingTrees():
             x = randint(0,getWorldWidth()-1)
             y = randint(0,getWorldHeight()-1)
         setObjectAt(x,y,treeId,2)
-
         setObjectAt(x,y, -1,0)
     return
 
@@ -1385,7 +1378,6 @@ def stepWorld( it = 0):
         deleteObjectAt(x,y,objectMapLevels-2)
         lightning.remove((x,y))
     
-
     if it % (maxFps/10) == 0: #tour speed
         if WEATHER==False: #stormy
             for x in range(worldWidth):
@@ -1398,7 +1390,6 @@ def stepWorld( it = 0):
                                     setObjectAt(x,y,lightningId,objectMapLevels-2)
                                     if random()<0.0012:
                                         playsound('sounds/minithunder.wav')
-
                 
     return
 
@@ -1416,9 +1407,9 @@ def stepAgents(it = 0 ):
         Food.decomposition(foods)
         Gun.randomDrop(it, guns)
         for z in zombies:
-            if z.type!=2:
-                z.type=2   # shuffle agents in in-place (i.e. agents is modified)
-            if z.decomp>MAXAGE/2:
+            if z.type!=zombieId:
+                z.type=zombieId   # shuffle agents in in-place (i.e. agents is modified)
+            if z.decomp>MAXAGE:
                 z.die()
                 zombies.remove(z)
             elif z.dead==False:
@@ -1435,7 +1426,7 @@ def stepAgents(it = 0 ):
             if h.age>MAXAGE or h.hunger==-1:
                 h.die()
                 
-            check_transition(h, zombies)
+            h.check_transition(zombies)
 
             if h.dead:
                 humans.remove(h)
