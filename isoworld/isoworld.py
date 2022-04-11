@@ -1407,11 +1407,11 @@ def stepWorld( it = 0):
                     elif getObjectAt(x,y,objectMapLevels-1) == cloudId:
                         for neighbours in ((-1,0),(+1,0),(0,-1),(0,+1)):
                             if getObjectAt((x+neighbours[0]+worldWidth)%worldWidth,(y+neighbours[1]+worldHeight)%worldHeight,objectMapLevels-1) == chargedCloudId:
-                                if random()<0.01:
+                                if random()<0.3:
                                     setObjectAt(x,y,chargedCloudId,objectMapLevels-1)
 
         else:
-            """#if we want random clouds every once in a while
+            #if we want random clouds every once in a while
             if random()<0.1:
                 for x in range(worldWidth):
                     for y in range(worldHeight):
@@ -1420,8 +1420,9 @@ def stepWorld( it = 0):
                 for i in clouds:
                     clouds.remove(i)
 
-                cloudspawn()"""
+                cloudspawn()
             #if we reinitialize the clouds as mostly uncharged
+            """
             if random()<0.1:
                 for x in range(worldWidth):
                     for y in range(worldHeight):
@@ -1430,13 +1431,7 @@ def stepWorld( it = 0):
                                 setObjectAt(x,y,cloudId,objectMapLevels-1)
                         elif getObjectAt(x,y,objectMapLevels-1) == cloudId :
                             if random()<0.05:
-                                setObjectAt(x,y,chargedCloudId,objectMapLevels-1)
-            
-
-
-                                
-
-
+                                setObjectAt(x,y,chargedCloudId,objectMapLevels-1)"""
     return
 
 
