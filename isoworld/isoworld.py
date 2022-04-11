@@ -60,9 +60,9 @@ versionTag = "2022"
 
 # all values are for initialisation. May change during runtime.
 
-#numbers of elements
+#numbers of elements #should be changed according to the world height and width
 nbTrees = 15 #350
-nbAgents = 40
+nbAgents = 20
 nbDetails = 15
 
 #environmental changes (nature)
@@ -130,16 +130,17 @@ screenWidth = 1400 # 930 #
 screenHeight = 900 # 640 #
 
 # world dimensions (ie. nb of cells in total)
-worldWidth = 40#64
-worldHeight = 40#64
+#ALWAYS A PAIR NUMBER AND MINIMUM 10 (no env if <20) #
+worldWidth = 100#64 
+worldHeight = 100#64
 
 # set surface of displayed tiles (ie. nb of cells that are rendered) -- must be superior to worldWidth and worldHeight
-viewWidth = 40 #32
-viewHeight = 40 #32
+viewWidth = 32 #32 #after 64 it lags
+viewHeight = 32 #32
 
 scaleMultiplier = 0.25 # re-scaling of loaded images = zoom
 
-objectMapLevels = 10 # number of levels for the objectMap. This determines how many objects you can pile upon one another.
+objectMapLevels = 15 # number of levels for the objectMap. This determines how many objects you can pile upon one another.
 
 # set scope of displayed tiles
 xViewOffset = 0
@@ -154,7 +155,8 @@ verbose = False # display message in console on/off
 verboseFps = True # display FPS every once in a while
 
 #max space to fill with objects
-MAXENVOBJ = randint(2,worldWidth //10)
+
+MAXENVOBJ = randint(1,worldWidth //10)
 MAXSURFACE = (worldWidth * worldHeight*30)//100
 
 
@@ -189,7 +191,7 @@ cloudy=pygame.image.load("assets/cloudday.png").convert_alpha()
 
 
 #creating clouds (the dimensions are different so do not use loadImage)
-cloud = pygame.image.load('assets/cloud30.png').convert_alpha()
+cloud = pygame.image.load('assets/cloud15.png').convert_alpha()
 cloud = pygame.transform.scale(cloud, (int(100)*scaleMultiplier, int(100)*scaleMultiplier)) #setting the size
 
 chargedcloud = pygame.image.load('assets/chargedcloud30.png').convert_alpha()
@@ -229,7 +231,6 @@ def loadAllImages():
     #treeBig = pygame.transform.rotozoom(treeBig, 0, 1.2)
     objectType.append(treeBig)
     objectType.append(loadImage('assets/ext/isometric-blocks/PNG/Voxel tiles/VoxelTile_27.png')) # block
-    objectType.append(loadImage('assets/basic111x128/tree_small_NW_ret_red.png')) # burning tree
     grassSmall=loadImage('assets/basic111x128/grass.png') #grass detail
     grassSmall = pygame.transform.scale(grassSmall, (25, 18))
     objectType.append(grassSmall)
@@ -258,20 +259,20 @@ def loadAllImages():
     agentType.append(None) # default -- never drawn
     agentType.append(loadImage('assets/basic111x128/vaccine.png')) # cure
     agentType.append(loadImage('assets/basic111x128/zomb.png')) # zombie
-    agentType.append(loadImage('assets/basic111x128/man2.png')) # man
+    agentType.append(loadImage('assets/basic111x128/manwalking.png')) # man
     agentType.append(loadImage('assets/basic111x128/combat.png')) #human wins
     agentType.append(loadImage('assets/basic111x128/bite.png')) #zombie wins
-    agentType.append(loadImage('assets/basic111x128/woman.png')) # woman
-    #agentType.append(loadImage('isoworld/assets/basic111x128/burger.png')) # burger
+    agentType.append(loadImage('assets/basic111x128/womanwalking.png')) # woman
     agentType.append(loadImage('assets/basic111x128/food.png')) # foods
     gunSmall=loadImage('assets/basic111x128/gun.png') # gun
     gunSmall = pygame.transform.scale(gunSmall, (23, 15))
     agentType.append(gunSmall)
     agentType.append(loadImage('assets/basic111x128/babyBoy.png')) # babyBoy
     agentType.append(loadImage('assets/basic111x128/babyGirl.png')) # babyGirl
-    agentType.append(loadImage('assets/basic111x128/man2Z.png')) # man
-    agentType.append(loadImage('assets/basic111x128/womanZ.png')) # woman
-
+    agentType.append(loadImage('assets/basic111x128/infectedMan.png')) # infected man
+    agentType.append(loadImage('assets/basic111x128/infectedWoman.png')) # infected woman
+    agentType.append(loadImage('assets/basic111x128/manrunning.png')) # running man
+    agentType.append(loadImage('assets/basic111x128/womanrunning.png')) # running woman
 
 
 def resetImages():
@@ -309,18 +310,17 @@ noObjectId = noAgentId = 0
 grassId = 0
 treeId = 1
 blockId = 2
-burningTreeId = 3
-grassDetId = 4
-flowerRId = 5
-canoeId = 6
-plantDetId = 7
-doorId = 8
-windowId = 9
-floorGrId = 10
-stepsId = 11
-cloudId = 12
-chargedCloudId = 13
-lightningId=14
+grassDetId = 3
+flowerRId = 4
+canoeId = 5
+plantDetId = 6
+doorId = 7
+windowId = 8
+floorGrId = 9
+stepsId = 10
+cloudId = 11
+chargedCloudId = 12
+lightningId=13
 
 
 #agents
@@ -340,8 +340,9 @@ babyBoyId = 9
 babyGirlId = 10
 manInfId = 11
 womanInfId = 12
-
-iconsH_list = [manId, winnerhumanId, womanId, babyGirlId, babyBoyId, womanInfId, manInfId]
+manRunningId = 13
+womanRunningId = 14
+iconsH_list = [manId, winnerhumanId, womanId, babyGirlId, babyBoyId, womanInfId, manInfId,manRunningId,womanRunningId]
 
 ###
 
@@ -560,7 +561,8 @@ class Human(BasicAgent):
 
 
     def move3(self):
-        PROB=0.6 #less than zombies to be able to get caught
+        PROB=0.5 #less than zombies to be able to get caught
+        nozombie=False
         if not DAY:
             PROB=0.3 #during night they can't see
         if random()<PROB:
@@ -582,8 +584,22 @@ class Human(BasicAgent):
                 self.move2(1,-1)
             elif random()<0.3: #not a high probability because if they always try to stay in the same case they will not move around
                 self.move4()
+                nozombie=True
             else:
                 self.move() #they can ignore if there is an opposite sex near them and go in a random direction
+                nozombie=True
+        if nozombie: #not necessary just to be cautious
+            if self.sex=='M':
+                self.type=manId
+            elif self.sex=='F':
+                self.type=womanId
+        else:
+            print("running away")
+            if self.sex=='M':
+                self.type=manRunningId
+            elif self.sex=='F':
+                self.type=womanRunningId
+
 
         return
 
@@ -878,26 +894,26 @@ class Gun(RandDropAgents) :
 def cloudspawn():
     #creating the cloud matrix
     #interaction points are the corners and if they are touching every x iteration we hear lightning (maybe their color change)
-
-    maxx=worldWidth/4
-    maxy=worldHeight/4
-    cx=randint(0,worldWidth)
-    cy=randint(0,worldHeight)
-
-    while len(clouds)<(worldHeight*worldWidth)//2:
-        xx=randint(2,maxx)
-        yy=randint(2,maxy)
+    if worldWidth>20 and worldHeight>20:
+        maxx=worldWidth/2
+        maxy=worldHeight/2
         cx=randint(0,worldWidth)
         cy=randint(0,worldHeight)
-        for x in range(0,xx):
-            w=((x+cx)+worldWidth)%worldWidth
-            for y in range(0,yy):
-                l=((y+cy)+worldHeight)%worldHeight
-                if random()<0.15:
-                    setObjectAt(w,l,chargedCloudId,objectMapLevels-1)
-                else :
-                    setObjectAt(w,l,cloudId,objectMapLevels-1)
-                clouds.append(1)
+
+        while len(clouds)<(worldHeight*worldWidth)//2:
+            xx=randint(2,maxx)
+            yy=randint(2,maxy)
+            cx=randint(0,worldWidth)
+            cy=randint(0,worldHeight)
+            for x in range(0,xx):
+                w=((x+cx)+worldWidth)%worldWidth
+                for y in range(0,yy):
+                    l=((y+cy)+worldHeight)%worldHeight
+                    if random()<0.15:
+                        setObjectAt(w,l,chargedCloudId,objectMapLevels-1)
+                    else :
+                        setObjectAt(w,l,cloudId,objectMapLevels-1)
+                    clouds.append(1)
 
 
 
@@ -1008,7 +1024,7 @@ def createlake(x,y) :
     return
 
 def createHouse(x,y):
-
+    lev=objectMapLevels-7
     #forbidden area around the house
     xforbidden=((x-1)+worldWidth)%worldWidth
     yborbidden1=((y-1)+worldHeight)%worldHeight
@@ -1028,7 +1044,7 @@ def createHouse(x,y):
         w=((x+i)+worldWidth)%worldWidth
         for j in range(0,7):
             l=((y+j)+worldHeight)%worldHeight
-            for level in range(0,objectMapLevels-3):
+            for level in range(0,lev):
                 setObjectAt(w,l,blockId,level)
                 #print(w,l)
             occupied.append((w,l))
@@ -1040,7 +1056,7 @@ def createHouse(x,y):
     for c in [(faceX,y),(faceX,faceY1),(faceX,faceY2),(faceX,faceY3)]:
         occupied.append((c[0],c[1]))
         setObjectAt(c[0],c[1],-1,0)
-        for level in range(0,objectMapLevels-3):
+        for level in range(0,lev):
             setObjectAt(c[0],c[1],blockId,level)
     faceY4= ((y+1)+worldHeight)%worldHeight
     faceY5= ((y+5)+worldHeight)%worldHeight
@@ -1048,7 +1064,7 @@ def createHouse(x,y):
     for c in [(faceX,faceY4),(faceX,faceY5)]:
         occupied.append((c[0],c[1]))
         setObjectAt(c[0],c[1],-1,0)
-        for level in range(0,objectMapLevels-3):
+        for level in range(0,lev):
             if level == 4 :
                 setObjectAt(c[0],c[1],windowId,level)
                 continue
@@ -1058,7 +1074,7 @@ def createHouse(x,y):
     #adding the door
     for c in [(faceX,faceY6)]:
         occupied.append((c[0],c[1]))
-        for level in range(3,objectMapLevels-3):
+        for level in range(3,lev):
             setObjectAt(c[0],c[1],blockId,level)
 
     setObjectAt(faceX,faceY6,doorId,0)
@@ -1076,7 +1092,8 @@ def createHouse(x,y):
     return
 
 def randEnv():
-    nbobj=randint(2,MAXENVOBJ)
+
+    nbobj=randint(1,MAXENVOBJ)
     i=nbobj
     while i>0 and len(occupied)<MAXSURFACE :
         type = 0
@@ -1135,19 +1152,19 @@ def randEnv():
         elif type == 1 :
             createlake(x,y)
             i-=1
-
-    #adding details : flower, plant or grass
-    for i in range(nbDetails):
-        x = randint(0,getWorldWidth()-6)
-        y = randint(0,20)
-        while getTerrainAt(x,y) != 0 or getObjectAt(x,y) != 0:
-            x = randint(0,getWorldWidth()-1)
+    if worldWidth>20 and worldHeight>20:
+        #adding details : flower, plant or grass
+        for i in range(nbDetails):
+            x = randint(0,getWorldWidth()-6)
             y = randint(0,20)
-        setObjectAt(x,y,grassDetId)
+            while getTerrainAt(x,y) != 0 or getObjectAt(x,y) != 0:
+                x = randint(0,getWorldWidth()-1)
+                y = randint(0,20)
+            setObjectAt(x,y,grassDetId)
     return
 
 def fixEnv():
-
+    lev=objectMapLevels-7
     #adding lake
     lakeTerrainMap =[
     [ 0, 0, 0, 0, 0, 0, 0, 0, 0 ],
@@ -1208,19 +1225,19 @@ def fixEnv():
     for x in range(1,4):
         for y in range(13,20) :
             setObjectAt(x,y,-1,0)
-            for level in range(1,objectMapLevels):
+            for level in range(1,lev):
                 setObjectAt(x,y,blockId,level)
 
 
     for c in [(4,13),(4,15),(4,17),(4,19)]:
         setObjectAt(c[0],c[1],-1,0)
-        for level in range(1,objectMapLevels):
+        for level in range(1,lev):
             setObjectAt(c[0],c[1],blockId,level)
 
     #adding windows
     for c in [(4,14),(4,18)]:
         setObjectAt(c[0],c[1],-1,0)
-        for level in range(1,objectMapLevels):
+        for level in range(1,lev):
             if level == 4 :
                 setObjectAt(c[0],c[1],windowId,level)
                 continue
@@ -1228,7 +1245,7 @@ def fixEnv():
 
     #adding the door
     for c in [(4,16)]:
-        for level in range(3,objectMapLevels):
+        for level in range(3,lev):
             setObjectAt(c[0],c[1],blockId,level)
     #they can go through the door
     setObjectAt(4,16,doorId,1)
@@ -1245,18 +1262,18 @@ def fixEnv():
     for x in range(13,20):
         for y in range(1,4) :
             setObjectAt(x,y,-1,0)
-            for level in range(1,objectMapLevels):
+            for level in range(1,lev):
                 setObjectAt(x,y,blockId,level)
 
     for c in [(13,4),(15,4),(17,4),(19,4)]:
         setObjectAt(c[0],c[1],-1,0)
-        for level in range(1,objectMapLevels):
+        for level in range(1,lev):
             setObjectAt(c[0],c[1],blockId,level)
 
     #adding windows
     for c in [(14,4),(18,4)]:
         setObjectAt(c[0],c[1],-1,0)
-        for level in range(1,objectMapLevels):
+        for level in range(1,lev):
             if level == 4 :
                 setObjectAt(c[0],c[1],windowId,level)
                 continue
@@ -1264,7 +1281,7 @@ def fixEnv():
 
     #adding the door
     for c in [(16,4)]:
-        for level in range(3,objectMapLevels):
+        for level in range(3,lev):
             setObjectAt(c[0],c[1],blockId,level)
     setObjectAt(16,4,doorId,1)
     setObjectAt(16,4,doorId,2)
@@ -1357,7 +1374,7 @@ def initWorld():
         fixEnv()
         randEnv()
         addingTrees()
-    else :
+    elif worldHeight>=20 and worldWidth>=20 :
         randEnv()
         addingTrees()
 
@@ -1457,8 +1474,8 @@ def stepAgents(it = 0 ):
             for i in objList:
                 setAgentAt(i.x, i.y, i.type)
         for z in zombies:
-            if z.type!=2:
-                z.type=2   # shuffle agents in in-place (i.e. agents is modified)
+            if z.type!=zombieId:
+                z.type=zombieId  # shuffle agents in in-place (i.e. agents is modified)
             if z.decomp>MAXAGEZ:
                 z.die()
                 zombies.remove(z)
@@ -1467,7 +1484,7 @@ def stepAgents(it = 0 ):
                 z.move3()
                 z.direction=randint(0,3)
         for h in humans:
-            if (h.type==winnerhumanId or h.type==babyBoyId or h.type==babyGirlId ): #if s/he won the combat
+            if (h.type==winnerhumanId or h.type==babyBoyId or h.type==babyGirlId or h.type==womanRunningId or h.type==manRunningId ): #if s/he won the combat
                 if h.sex=='M':
                     h.type=manId
                 else:
