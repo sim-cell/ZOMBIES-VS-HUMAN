@@ -185,16 +185,16 @@ pygame.display.set_caption('Zombieland')
 
 #creating background images
 
-night=pygame.image.load("assets/starsbig.png").convert_alpha()
-day=pygame.image.load("assets/sunnydayy.png").convert_alpha()
-cloudy=pygame.image.load("assets/cloudday.png").convert_alpha()
+night=pygame.image.load("assets/background/starsbig.png").convert_alpha()
+day=pygame.image.load("assets/background/sunnydayy.png").convert_alpha()
+cloudy=pygame.image.load("assets/background/cloudday.png").convert_alpha()
 
 
 #creating clouds (the dimensions are different so do not use loadImage)
-cloud = pygame.image.load('assets/cloud15.png').convert_alpha()
+cloud = pygame.image.load('assets/cloud/cloud15.png').convert_alpha()
 cloud = pygame.transform.scale(cloud, (int(100)*scaleMultiplier, int(100)*scaleMultiplier)) #setting the size
 
-chargedcloud = pygame.image.load('assets/chargedcloud30.png').convert_alpha()
+chargedcloud = pygame.image.load('assets/cloud/chargedcloud30.png').convert_alpha()
 chargedcloud = pygame.transform.scale(chargedcloud, (int(100)*scaleMultiplier, int(100)*scaleMultiplier))
 
 def loadImage(filename):
