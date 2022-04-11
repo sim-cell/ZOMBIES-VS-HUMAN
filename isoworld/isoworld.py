@@ -40,7 +40,7 @@ import math
 import time
 from tkinter import W
 from playsound import playsound
-  
+
 
 
 import pygame
@@ -98,7 +98,7 @@ MAXCURE=20
 #probs of environment
 PROBTURN = 0.03    #randomly turn of road
 
-#agent lists 
+#agent lists
 guns = []
 foods = []
 zombies = []
@@ -187,7 +187,7 @@ day=pygame.image.load("assets/sunnydayy.png").convert_alpha()
 cloudy=pygame.image.load("assets/cloudday.png").convert_alpha()
 
 
-#creating clouds (the dimensions are different so do not use loadImage) 
+#creating clouds (the dimensions are different so do not use loadImage)
 cloud = pygame.image.load('assets/cloud30.png').convert_alpha()
 cloud = pygame.transform.scale(cloud, (int(100)*scaleMultiplier, int(100)*scaleMultiplier)) #setting the size
 
@@ -248,10 +248,10 @@ def loadAllImages():
     objectType.append(cloud) #normal cloud
     objectType.append(chargedcloud) #charged cloud
 
-    #lightning 
+    #lightning
     lightningimage=loadImage('assets/basic111x128/lightning.png') #lightning
     lightningimage = pygame.transform.scale((lightningimage), (50, 50))
-    objectType.append(lightningimage) 
+    objectType.append(lightningimage)
 
     #agent images
     agentType.append(None) # default -- never drawn
@@ -377,7 +377,7 @@ def displayWelcomeMessage():
     print ("=-=  CELIK Simay                                =-=")
     print ("=-=  KUDRYAVTSEVA Kristina                      =-=")
     print ("=-=  original code by :                       =-=")
-    print ("=-= nicolas.bredeche(at)sorbonne-universite.fr  =-=")                        
+    print ("=-= nicolas.bredeche(at)sorbonne-universite.fr  =-=")
     print ("=-= =-= =-= =-= =-= =-= =-= =-= =-= =-= =-= =-= =-=")
     print (">> v.",versionTag)
     print ("")
@@ -507,12 +507,7 @@ class BasicAgent:
             xNew = ( self.x + [-1,+1][randint(0,1)] + getWorldWidth() ) % getWorldWidth()
         else:
             yNew = ( self.y + [-1,+1][randint(0,1)] + getWorldHeight() ) % getWorldHeight()
-        if getObjectAt(xNew,yNew) == 0: # dont move if collide with object (note that negative values means cell cannot be walked on)
-            setAgentAt(self.x,self.y,noAgentId)
-            self.x = xNew
-            self.y = yNew
-            setAgentAt(self.x,self.y,self.type)
-        elif getObjectAt(xNew,yNew) == 2: # dont move if collide with object (note that negative values means cell cannot be walked on)
+        if getObjectAt(xNew,yNew) == 0 or getObjectAt(xNew,yNew) == 2: # dont move if collide with object (note that negative values means cell cannot be walked on)
             setAgentAt(self.x,self.y,noAgentId)
             self.x = xNew
             self.y = yNew
@@ -584,15 +579,15 @@ class Human(BasicAgent):
                 self.move2(-1,-1)
             elif getAgentAt((self.x-1+worldWidth)%worldWidth, (self.y+1+worldHeight)%worldHeight ) == zombieId: #x-1 y+1
                 self.move2(1,-1)
-            else :
-                self.move()
+            else self.move4()
+
         return
 
     #when a human sees another human they go towards them
-    
+
     def move4(self):
-        if random()<0.4 and self.type==manId:
-                if getAgentAt((self.x+1+worldWidth)%worldWidth, (self.y+worldHeight)%worldHeight ) == womanId: #x+1 y
+        if self.type==manId:
+            if getAgentAt((self.x+1+worldWidth)%worldWidth, (self.y+worldHeight)%worldHeight ) == womanId: #x+1 y
                     self.move2(1,0)
                 elif getAgentAt((self.x-1+worldWidth)%worldWidth, (self.y+worldHeight)%worldHeight ) == womanId: #x-1 y
                     self.move2(-1,0)
@@ -610,7 +605,9 @@ class Human(BasicAgent):
                     self.move2(-1,1)
                 else :
                     self.move()
-        self.move()
+            elif self.type=womanId:
+                for x in [1,-1,0]:
+                    for y in [1,-1,0]
         return
 
 
@@ -675,7 +672,7 @@ class Human(BasicAgent):
                 self.gun+=1
                 print("armed")
                 guns.remove(g)
-    
+
     def takeCure(self, cure, manId, womanId):
         if self.infected >0:
             for i in cure:
@@ -798,6 +795,7 @@ class RandDropAgents:
     def getType(self):
         return self.type
 
+
 class Cure(RandDropAgents):
     def __init__(self) :
         super().__init__()
@@ -809,7 +807,7 @@ class Cure(RandDropAgents):
     def randomDrop(list, it):
         for i in range(0,MAXCURE):
             list.append(Cure())
-        
+
         return
 
 
@@ -1345,7 +1343,7 @@ def fixEnv():
 
 
 def initWorld():
-    global nbTrees, nbBurningTrees, zombies, humans, nbDetails 
+    global nbTrees, nbBurningTrees, zombies, humans, nbDetails
 
     cloudspawn()
     if getWorldWidth() >= 100 :
@@ -1355,15 +1353,15 @@ def initWorld():
     else :
         randEnv()
         addingTrees()
- 
+
     #adding agents
     for i in range(nbAgents):
-        if random()<0.5:
+        if random()<1.0:
             zombies.append(Zombie(zombieId,-1,-1))
-        if random()<0.5:
-            humans.append(Male(manId))
-        else:
-            humans.append(Female(womanId))
+       # if random()<0.5:
+       #     humans.append(Male(manId))
+       # else:
+       #     humans.append(Female(womanId))
         #ch = choice((m,f))
         #humans.append(ch)
 
@@ -1384,7 +1382,7 @@ def stepWorld( it = 0):
     for (x,y) in lightning:
         deleteObjectAt(x,y,objectMapLevels-2)
         lightning.remove((x,y))
-    
+
 
     if it % (maxFps/10) == 0: #tour speed
         if WEATHER==False: #stormy
@@ -1399,7 +1397,7 @@ def stepWorld( it = 0):
                                     #if random()<0.0012: #plays the sound of thunder but it is annoying
                                         #playsound('sounds/minithunder.wav')
 
-                
+
     return
 
 
@@ -1415,6 +1413,10 @@ def stepAgents(it = 0 ):
         Food.randomDrop(it, foods)
         Food.decomposition(foods)
         Gun.randomDrop(it, guns)
+
+        for objList in [foods, guns, cure]:
+            for i in objList:
+                setAgentAt(i.x, i.y, i.type)
         for z in zombies:
             if z.type!=2:
                 z.type=2   # shuffle agents in in-place (i.e. agents is modified)
@@ -1428,13 +1430,13 @@ def stepAgents(it = 0 ):
         for h in humans:
             if (h.type==winnerhumanId or h.type==babyBoyId or h.type==babyGirlId ): #if s/he won the combat
                 if h.sex=='M':
-                    h.type=manId 
+                    h.type=manId
                 else:
-                    h.type=womanId 
+                    h.type=womanId
 
             if h.age>MAXAGE or h.hunger==-1:
                 h.die()
-                
+
             check_transition(h, zombies)
 
             if h.dead:
@@ -1450,7 +1452,7 @@ def stepAgents(it = 0 ):
                     h.reproduire(humans, babyBoyId, babyGirlId, met)
                 h.age+=1
                 h.hunger-=1
-                #h.move4()
+                h.move4()
                 h.move3()
 
     return
@@ -1531,19 +1533,17 @@ def render( it = 0, list_agents=iconsH_list):
                     for f in foods:
                         if f.x==xTile and f.y==yTile : # agent on terrain?
                             screen.blit( agentType[ getAgentAt( xTile, yTile ) ] , (xScreen, yScreen - heightMultiplier ))
-                
+
                 if (getAgentAt( xTile, yTile ) == gunId) :
                     for f in guns:
                         if f.x==xTile and f.y==yTile : # agent on terrain?
                             screen.blit( agentType[ getAgentAt( xTile, yTile ) ] , (xScreen, yScreen - heightMultiplier ))
-                
+
                 if (getAgentAt( xTile, yTile ) == medicineId) :
                     for f in cure:
                         if f.x==xTile and f.y==yTile : # agent on terrain?
                             screen.blit( agentType[ getAgentAt( xTile, yTile ) ] , (xScreen, yScreen - heightMultiplier ))
-                
-            
-                
+
 
     return
 
@@ -1593,7 +1593,13 @@ while userExit == False:
         print("all zombies are dead")
         perdu = True
         winner = 1 #1 if humans win(all zombies are dead), 2 if zombies win
-    
+
+
+    #if (len(humans)==0):
+    #    print("all humans are dead")
+    #    perdu = True
+    #    winner = 2
+
 
     if perdu == True :
         if winner == 1:
@@ -1609,11 +1615,6 @@ while userExit == False:
             pygame.quit()
             sys.exit()
 
-    if (len(humans)==0):
-        print("all humans are dead")
-        perdu = True
-        winner = 2
-    
     if perdu == True :
         if winner == 2:
             print ("")
