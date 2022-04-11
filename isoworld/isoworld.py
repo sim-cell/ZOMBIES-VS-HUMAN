@@ -1525,6 +1525,7 @@ def render( it = 0, list_agents=iconsH_list):
                     for z in zombies:
                         if z.dead==False and z.x==xTile and z.y==yTile : # agent on terrain?
                             screen.blit( agentType[ getAgentAt( xTile, yTile ) ] , (xScreen, yScreen - heightMultiplier ))
+
                 if ((getAgentAt( xTile, yTile ) == foodsId)) :
                     for f in foods:
                         if f.x==xTile and f.y==yTile : # agent on terrain?
