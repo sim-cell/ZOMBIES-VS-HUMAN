@@ -75,7 +75,6 @@ PSHOOT=1
 PROB_REPROD = 0.05
 MAXHUNGER=30
 
-
 #probs for foods
 PROBDROPFOOD=0.3
 DROPDAYFOOD=9
@@ -825,6 +824,7 @@ class Food(RandDropAgents):
     def decomposition(foods) :
         for f in foods :
             if f.decomp==DECOMPDAYFOOD :
+                print("food decomposition")
                 foods.remove(f)
             else :
                 f.decomp+=1
@@ -1525,21 +1525,23 @@ def render( it = 0, list_agents=iconsH_list):
                     for z in zombies:
                         if z.dead==False and z.x==xTile and z.y==yTile : # agent on terrain?
                             screen.blit( agentType[ getAgentAt( xTile, yTile ) ] , (xScreen, yScreen - heightMultiplier ))
-                
+
                 if ((getAgentAt( xTile, yTile ) == foodsId)) :
                     for f in foods:
                         if f.x==xTile and f.y==yTile : # agent on terrain?
                             screen.blit( agentType[ getAgentAt( xTile, yTile ) ] , (xScreen, yScreen - heightMultiplier ))
-
+                
                 if (getAgentAt( xTile, yTile ) == gunId) :
                     for f in guns:
                         if f.x==xTile and f.y==yTile : # agent on terrain?
                             screen.blit( agentType[ getAgentAt( xTile, yTile ) ] , (xScreen, yScreen - heightMultiplier ))
-
+                
                 if (getAgentAt( xTile, yTile ) == medicineId) :
                     for f in cure:
                         if f.x==xTile and f.y==yTile : # agent on terrain?
                             screen.blit( agentType[ getAgentAt( xTile, yTile ) ] , (xScreen, yScreen - heightMultiplier ))
+                
+            
                 
 
     return
@@ -1591,11 +1593,6 @@ while userExit == False:
         perdu = True
         winner = 1 #1 if humans win(all zombies are dead), 2 if zombies win
     
-    if (len(humans)==0):
-        print("all humans are dead")
-        perdu = True
-        winner = 2
-    
 
     if perdu == True :
         if winner == 1:
@@ -1610,7 +1607,14 @@ while userExit == False:
             print ("")
             pygame.quit()
             sys.exit()
-        else :
+
+    if (len(humans)==0):
+        print("all humans are dead")
+        perdu = True
+        winner = 2
+    
+    if perdu == True :
+        if winner == 2:
             print ("")
             print ("#### #### #### #### ####")
             print ("####                ####")
