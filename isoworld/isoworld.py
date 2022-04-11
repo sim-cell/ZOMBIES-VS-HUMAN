@@ -72,7 +72,7 @@ WEATHER=True #True=sunny False=storm
 #probs for humans and zombies
 MAXAGE=30
 PSHOOT=1
-PROB_REPROD = 1
+PROB_REPROD = 0.05
 MAXHUNGER=30
 
 #probs for foods
@@ -579,7 +579,8 @@ class Human(BasicAgent):
                 self.move2(-1,-1)
             elif getAgentAt((self.x-1+worldWidth)%worldWidth, (self.y+1+worldHeight)%worldHeight ) == zombieId: #x-1 y+1
                 self.move2(1,-1)
-            else self.move4()
+            else :
+                self.move4()
 
         return
 
@@ -588,26 +589,34 @@ class Human(BasicAgent):
     def move4(self):
         if self.type==manId:
             if getAgentAt((self.x+1+worldWidth)%worldWidth, (self.y+worldHeight)%worldHeight ) == womanId: #x+1 y
-                    self.move2(1,0)
-                elif getAgentAt((self.x-1+worldWidth)%worldWidth, (self.y+worldHeight)%worldHeight ) == womanId: #x-1 y
-                    self.move2(-1,0)
-                elif getAgentAt((self.x+worldWidth)%worldWidth, (self.y+1+worldHeight)%worldHeight ) == womanId: #x y+1
-                    self.move2(0,1)
-                elif getAgentAt((self.x+worldWidth)%worldWidth, (self.y-1+worldHeight)%worldHeight ) == womanId: #x y-1
-                    self.move2(0,-1)
-                elif getAgentAt((self.x-1+worldWidth)%worldWidth, (self.y-1+worldHeight)%worldHeight ) == womanId: #x-1 y-1
-                    self.move2(-1,-1)
-                elif getAgentAt((self.x+1+worldWidth)%worldWidth, (self.y-1+worldHeight)%worldHeight ) ==womanId: #x+1 y-1
-                    self.move2(1,-1)
-                elif getAgentAt((self.x+1+worldWidth)%worldWidth, (self.y+1+worldHeight)%worldHeight ) == womanId: #x+1 y+1
-                    self.move2(1,1)
-                elif getAgentAt((self.x-1+worldWidth)%worldWidth, (self.y+1+worldHeight)%worldHeight ) == womanId: #x-1 y+1
-                    self.move2(-1,1)
-                else :
-                    self.move()
-            elif self.type=womanId:
-                for x in [1,-1,0]:
-                    for y in [1,-1,0]
+                self.move2(1,0)
+            elif getAgentAt((self.x-1+worldWidth)%worldWidth, (self.y+worldHeight)%worldHeight ) == womanId: #x-1 y
+                self.move2(-1,0)
+            elif getAgentAt((self.x+worldWidth)%worldWidth, (self.y+1+worldHeight)%worldHeight ) == womanId: #x y+1
+                self.move2(0,1)
+            elif getAgentAt((self.x+worldWidth)%worldWidth, (self.y-1+worldHeight)%worldHeight ) == womanId: #x y-1
+                self.move2(0,-1)
+            elif getAgentAt((self.x-1+worldWidth)%worldWidth, (self.y-1+worldHeight)%worldHeight ) == womanId: #x-1 y-1
+                self.move2(-1,-1)
+            elif getAgentAt((self.x+1+worldWidth)%worldWidth, (self.y-1+worldHeight)%worldHeight ) ==womanId: #x+1 y-1
+                self.move2(1,-1)
+            elif getAgentAt((self.x+1+worldWidth)%worldWidth, (self.y+1+worldHeight)%worldHeight ) == womanId: #x+1 y+1
+                self.move2(1,1)
+            elif getAgentAt((self.x-1+worldWidth)%worldWidth, (self.y+1+worldHeight)%worldHeight ) == womanId: #x-1 y+1
+                self.move2(-1,1)
+            else :
+                self.move()
+        elif self.type==womanId:
+            maninneighbor=False
+            for i in [0,1,-1]:
+                for j in [0,1,-1]:
+                    if not (i==0 and j==0): #not in the same case  
+                        if getAgentAt((self.x+i+worldWidth)%worldWidth, (self.y+j+worldHeight)%worldHeight )==manId: #there is a man in neighbor
+                            maninneigbor=True
+            if not maninneighbor:
+                self.move() #if there is no man then woman moves randomly if there is a man she does not move
+
+
         return
 
 
@@ -1358,10 +1367,10 @@ def initWorld():
     for i in range(nbAgents):
         if random()<1.0:
             zombies.append(Zombie(zombieId,-1,-1))
-       # if random()<0.5:
-       #     humans.append(Male(manId))
-       # else:
-       #     humans.append(Female(womanId))
+        if random()<0.5:
+            humans.append(Male(manId))
+        else:
+            humans.append(Female(womanId))
         #ch = choice((m,f))
         #humans.append(ch)
 
@@ -1452,7 +1461,6 @@ def stepAgents(it = 0 ):
                     h.reproduire(humans, babyBoyId, babyGirlId, met)
                 h.age+=1
                 h.hunger-=1
-                h.move4()
                 h.move3()
 
     return
