@@ -579,15 +579,15 @@ class Human(BasicAgent):
                 self.move2(-1,-1)
             elif getAgentAt((self.x-1+worldWidth)%worldWidth, (self.y+1+worldHeight)%worldHeight ) == zombieId: #x-1 y+1
                 self.move2(1,-1)
-            else :
-                self.move()
+            else self.move4()
+
         return
 
     #when a human sees another human they go towards them
 
     def move4(self):
-        if random()<0.4 and self.type==manId:
-                if getAgentAt((self.x+1+worldWidth)%worldWidth, (self.y+worldHeight)%worldHeight ) == womanId: #x+1 y
+        if self.type==manId:
+            if getAgentAt((self.x+1+worldWidth)%worldWidth, (self.y+worldHeight)%worldHeight ) == womanId: #x+1 y
                     self.move2(1,0)
                 elif getAgentAt((self.x-1+worldWidth)%worldWidth, (self.y+worldHeight)%worldHeight ) == womanId: #x-1 y
                     self.move2(-1,0)
@@ -605,7 +605,9 @@ class Human(BasicAgent):
                     self.move2(-1,1)
                 else :
                     self.move()
-        self.move()
+            elif self.type=womanId:
+                for x in [1,-1,0]:
+                    for y in [1,-1,0]
         return
 
 
@@ -1450,7 +1452,7 @@ def stepAgents(it = 0 ):
                     h.reproduire(humans, babyBoyId, babyGirlId, met)
                 h.age+=1
                 h.hunger-=1
-                #h.move4()
+                h.move4()
                 h.move3()
 
     return
