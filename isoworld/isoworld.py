@@ -703,8 +703,13 @@ class Human(BasicAgent):
                 break
         return
 
-
-
+    def check_transition(h, zombies):
+        if h.infected == 15:
+            h.die()
+            Tx=h.x
+            Ty=h.y
+            zombies.append(Zombie(zombieId,Tx,Ty))
+        return
 
 class Male(Human):
     def __init__(self,imageId, newx=-1, newy=-1):
@@ -779,16 +784,6 @@ def met(agent1, agent2):
         exists=True
     return exists
 
-def check_transition(h, zombies):
-
-    if h.infected == 15:
-        h.die()
-
-        Tx=h.x
-        Ty=h.y
-        zombies.append(Zombie(zombieId,Tx,Ty))
-    return
-
 
 class RandDropAgents:
 
@@ -821,7 +816,6 @@ class Cure(RandDropAgents):
     def randomDrop(list, it):
         for i in range(0,MAXCURE):
             list.append(Cure())
-
         return
 
 
@@ -957,7 +951,6 @@ def addingTrees():
             x = randint(0,getWorldWidth()-1)
             y = randint(0,getWorldHeight()-1)
         setObjectAt(x,y,treeId,2)
-
         setObjectAt(x,y, -1,0)
     return
 
@@ -1482,8 +1475,8 @@ def stepAgents(it = 0 ):
 
             if h.age>MAXAGEH or h.hunger==-1:
                 h.die()
-
-            check_transition(h, zombies)
+                
+            h.check_transition(zombies)
 
             if h.dead:
                 humans.remove(h)
