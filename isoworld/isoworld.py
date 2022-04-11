@@ -72,9 +72,8 @@ WEATHER=True #True=sunny False=storm
 #probs for humans and zombies
 MAXAGE=30
 PSHOOT=1
-PROB_REPROD = 0.05
+PROB_REPROD = 1
 MAXHUNGER=30
-
 
 #probs for foods
 PROBDROPFOOD=0.3
@@ -645,6 +644,7 @@ class Human(BasicAgent):
                 if self.getType()!=h.getType():#self.instanceOf(Male)&&h.instanceOf(Female) || self.instanceOf(Female)&&h.instanceOf(Male):
                     if random()<PROB_REPROD:
                         coords = self.getPosition()
+                        print("a baby is born")
                         if sex_choice == ImageIdF:
                             list_humans.append(Female(sex_choice, coords[0], coords[1]))
                         else :
@@ -793,6 +793,7 @@ class RandDropAgents:
     def getType(self):
         return self.type
 
+
 class Cure(RandDropAgents):
     def __init__(self) :
         super().__init__()
@@ -820,6 +821,7 @@ class Food(RandDropAgents):
     def decomposition(foods) :
         for f in foods :
             if f.decomp==DECOMPDAYFOOD :
+                print("food decomposition")
                 foods.remove(f)
             else :
                 f.decomp+=1
@@ -1352,12 +1354,12 @@ def initWorld():
 
     #adding agents
     for i in range(nbAgents):
-        if random()<0.5:
+        if random()<1.0:
             zombies.append(Zombie(zombieId,-1,-1))
-        if random()<0.5:
-            humans.append(Male(manId))
-        else:
-            humans.append(Female(womanId))
+       # if random()<0.5:
+       #     humans.append(Male(manId))
+       # else:
+       #     humans.append(Female(womanId))
         #ch = choice((m,f))
         #humans.append(ch)
 
@@ -1409,6 +1411,10 @@ def stepAgents(it = 0 ):
         Food.randomDrop(it, foods)
         Food.decomposition(foods)
         Gun.randomDrop(it, guns)
+
+        for objList in [foods, guns, cure]:
+            for i in objList:
+                setAgentAt(i.x, i.y, i.type)
         for z in zombies:
             if z.type!=2:
                 z.type=2   # shuffle agents in in-place (i.e. agents is modified)
@@ -1420,7 +1426,7 @@ def stepAgents(it = 0 ):
                 z.move3()
                 z.direction=randint(0,3)
         for h in humans:
-            if (h.type==winnerhumanId): #if s/he won the combat
+            if (h.type==winnerhumanId or h.type==babyBoyId or h.type==babyGirlId ): #if s/he won the combat
                 if h.sex=='M':
                     h.type=manId
                 else:
@@ -1441,10 +1447,10 @@ def stepAgents(it = 0 ):
                     h.eat(foods)
                     h.arming(guns)
                     h.combat(zombies, met)
-                    h.reproduire(humans, manId, womanId, met)
+                    h.reproduire(humans, babyBoyId, babyGirlId, met)
                 h.age+=1
                 h.hunger-=1
-                h.move4()
+                #h.move4()
                 h.move3()
 
     return
@@ -1586,10 +1592,11 @@ while userExit == False:
         perdu = True
         winner = 1 #1 if humans win(all zombies are dead), 2 if zombies win
 
-    if (len(humans)==0):
-        print("all humans are dead")
-        perdu = True
-        winner = 2
+
+    #if (len(humans)==0):
+    #    print("all humans are dead")
+    #    perdu = True
+    #    winner = 2
 
 
     if perdu == True :
@@ -1605,7 +1612,9 @@ while userExit == False:
             print ("")
             pygame.quit()
             sys.exit()
-        else :
+
+    if perdu == True :
+        if winner == 2:
             print ("")
             print ("#### #### #### #### ####")
             print ("####                ####")
