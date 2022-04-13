@@ -20,4 +20,6 @@ Le code principal (appele isoworld.py) est dans le repertoire appele isoworld et
  On a quelques versions du code pour facilement tester le code (pour avoir des exemplaires du fonctionnement du code ). 
  Il ya des explications au debut de ces codes sur les changements.
 
+ Recommende de lire le README.md dans le repertoire isoworld
+
  Nous vous remercions 
