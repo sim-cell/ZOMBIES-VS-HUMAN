@@ -554,35 +554,34 @@ class Human(BasicAgent):
             if getAgentAt((self.x+1+worldWidth)%worldWidth, (self.y+worldHeight)%worldHeight ) == zombieId: #x+1 y
                 self.type=new
                 self.move2(-1,0)
-                print("running")
             elif getAgentAt((self.x-1+worldWidth)%worldWidth, (self.y+worldHeight)%worldHeight ) == zombieId: #x-1 y
                 self.type=new
                 self.move2(1,0)
-                print("running")
+                
             elif getAgentAt((self.x+worldWidth)%worldWidth, (self.y+1+worldHeight)%worldHeight ) == zombieId: #x y+1
                 self.type=new
                 self.move2(0,-1)
-                print("running")
+                 
             elif getAgentAt((self.x+worldWidth)%worldWidth, (self.y-1+worldHeight)%worldHeight ) == zombieId: #x y-1
                 self.type=new
                 self.move2(0,1)
-                print("running")
+                 
             elif getAgentAt((self.x-1+worldWidth)%worldWidth, (self.y-1+worldHeight)%worldHeight ) == zombieId: #x-1 y-1
                 self.type=new
                 self.move2(1,1)
-                print("running")
+                 
             elif getAgentAt((self.x+1+worldWidth)%worldWidth, (self.y-1+worldHeight)%worldHeight ) == zombieId: #x+1 y-1
                 self.type=new
                 self.move2(-1,1)
-                print("running")
+                 
             elif getAgentAt((self.x+1+worldWidth)%worldWidth, (self.y+1+worldHeight)%worldHeight ) == zombieId: #x+1 y+1
                 self.type=new
                 self.move2(-1,-1)
-                print("running")
+                 
             elif getAgentAt((self.x-1+worldWidth)%worldWidth, (self.y+1+worldHeight)%worldHeight ) == zombieId: #x-1 y+1
                 self.type=new
                 self.move2(1,-1)
-                print("running")
+                 
             elif random()<0.3: #not a high probability because if they always try to stay in the same case they will not move around
                 self.move4()
                 nozombie=True
