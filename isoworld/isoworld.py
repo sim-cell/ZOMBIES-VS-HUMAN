@@ -132,8 +132,8 @@ screenHeight = 640 #900 #
 
 # world dimensions (ie. nb of cells in total)
 #ALWAYS A PAIR NUMBER AND MINIMUM 10 (no env if <20) #
-worldWidth = 32#64 
-worldHeight = 32 #64
+worldWidth = 100#64 
+worldHeight = 100 #64
 
 # set surface of displayed tiles (ie. nb of cells that are rendered) -- must be superior to worldWidth and worldHeight
 viewWidth = 32 #32 #after 64 it lags
@@ -629,7 +629,6 @@ class Human(BasicAgent):
             elif self.sex=='F':
                 self.type=womanRunningId"""
 
-
         return
 
     #when a human sees another human they go towards them
@@ -924,8 +923,8 @@ def cloudspawn():
     #creating the cloud matrix
     #interaction points are the corners and if they are touching every x iteration we hear lightning (maybe their color change)
     if worldWidth>20 and worldHeight>20:
-        maxx=worldWidth/2
-        maxy=worldHeight/2
+        maxx=worldWidth//2
+        maxy=worldHeight//2
         cx=randint(0,worldWidth)
         cy=randint(0,worldHeight)
 
@@ -1453,10 +1452,11 @@ def stepWorld( it = 0):
                     elif getObjectAt(x,y,objectMapLevels-1) == cloudId:
                         for neighbours in ((-1,0),(+1,0),(0,-1),(0,+1)):
                             if getObjectAt((x+neighbours[0]+worldWidth)%worldWidth,(y+neighbours[1]+worldHeight)%worldHeight,objectMapLevels-1) == chargedCloudId:
-                                if random()<0.3:
+                                if random()<0.1:
                                     setObjectAt(x,y,chargedCloudId,objectMapLevels-1)
 
         else:
+            
             #if we want random clouds every once in a while
             if random()<0.1:
                 for x in range(worldWidth):
@@ -1468,7 +1468,7 @@ def stepWorld( it = 0):
 
                 cloudspawn()
             #if we reinitialize the clouds as mostly uncharged
-            """
+            """"
             if random()<0.1:
                 for x in range(worldWidth):
                     for y in range(worldHeight):
@@ -1675,7 +1675,6 @@ while userExit == False:
 
     perdu = False
     winner = 0
-
 
     if (len(zombies)==0):
         print("all zombies are dead")
