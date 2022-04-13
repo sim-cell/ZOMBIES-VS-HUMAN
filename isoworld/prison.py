@@ -1,35 +1,10 @@
-#
-# World of Isotiles
-# Author: nicolas.bredeche(at)sorbonne-universite.fr
-#
-# Started: 2018-11-17
-# purpose: basic code developped for teaching artificial life and ecological simulation at Sorbonne Univ. (SU)
-# course: L2, 2i013 Projet, "Vie Artificielle"
-# licence: CC-BY-SA
-#
-# Requirements: Python3, Pygame
-#
-# Credits for third party resources used in this project:
-# - Assets: https://www.kenney.nl/ (great assets by Kenney Vleugels with *public domain license*)
-# - https://www.uihere.com/free-cliparts/space-medicines-extreme-2-video-game-arcade-game-8-bit-space-medicines-3996521
-#
-# Random bookmarks:
-# - scaling images: https://stackoverflow.com/questions/43196126/how-do-you-scale-a-design-resolution-to-other-resolutions-with-pygame
-# - thoughts on grid worlds: http://www-cs-students.stanford.edu/~amitp/game-programming/grids/
-# - key pressed? https://stackoverflow.com/questions/16044229/how-to-get-keyboard-input-in-pygame
-# - basic example to display tiles: https://stackoverflow.com/questions/20629885/how-to-render-an-isometric-tile-based-world-in-python
-# - pygame key codes: https://www.pygame.org/docs/ref/key.html
-# - pygame capture key combination: https://stackoverflow.com/questions/24923078/python-keydown-combinations-ctrl-key-or-shift-key
-# - methods to initialize a 2D array: https://stackoverflow.com/questions/2397141/how-to-initialize-a-two-dimensional-array-in-python
-# - bug with SysFont - cf. https://www.reddit.com/r/pygame/comments/1fhq6d/pygamefontsysfont_causes_my_script_to_freeze_why/
-#       myfont = pygame.font.SysFont(pygame.font.get_default_font(), 16)
-#       myText = myfont.render("Hello, World", True, (0, 128, 0))
-#       screen.blit(myText, (screenWidth/2 - text.get_width() / 2, screenHeight/2 - text.get_height() / 2))
-#       ... will fail.
-#
-# TODO list
-# - double buffer
-# -.multiple agents
+### ### ### ### ### ### ### ### ### ### ### ### ### ### ### ###
+### ### ### ### ### ### ### ### ### ### ### ### ### ### ### ###
+### ### ### ### ### ### ### ### ### ### ### ### ### ### ### ###
+###
+### created to show that humans cannot go through objects 
+###
+### ### ### ### ### ### ### ### ### ### ### ### ### ### ### ###
 
 
 import sys
@@ -70,11 +45,11 @@ DAY=True
 WEATHER=True #True=sunny False=storm
 
 #probs for humans and zombies
-MAXAGEH=50
+MAXAGEH=100
 MAXAGEZ=50
 PSHOOT=0.75
 PROB_REPROD = 0.045
-MAXHUNGER=30
+MAXHUNGER=100
 
 #probs for foods
 PROBDROPFOOD=0.3
@@ -132,8 +107,8 @@ screenHeight = 640 #900 #
 
 # world dimensions (ie. nb of cells in total)
 #ALWAYS A PAIR NUMBER AND MINIMUM 10 (no env if <20) #
-worldWidth = 100#64 
-worldHeight = 100 #64
+worldWidth = 30#64 
+worldHeight = 30 #64
 
 # set surface of displayed tiles (ie. nb of cells that are rendered) -- must be superior to worldWidth and worldHeight
 viewWidth = 32 #32 #after 64 it lags
@@ -258,7 +233,7 @@ def loadAllImages():
     lightningimage=loadImage('assets/basic111x128/lightning.png') #lightning
     lightningimage = pygame.transform.scale((lightningimage), (50, 50))
     objectType.append(lightningimage)
-
+    
     #cure image
     cure=loadImage('assets/basic111x128/vaccine.png')
     cure = pygame.transform.scale((cure), (20, 20))
@@ -523,6 +498,8 @@ class BasicAgent:
             self.x = xNew
             self.y = yNew
             setAgentAt(self.x,self.y,self.type)
+        else:
+            print("oh no the road is blocked")
 
         if verbose == True:
             print ("agent of type ",str(self.type),"located at (",self.x,",",self.y,")")
@@ -537,6 +514,8 @@ class BasicAgent:
             self.y = ( self.y + yNew + worldHeight ) % worldHeight
             setAgentAt( self.x, self.y, self.type)
             success = True
+        else:
+            print("oh no the road is blocked")
         if verbose == True:
             if success == False:
                 print ("agent of type ",str(self.type)," cannot move.")
@@ -628,6 +607,7 @@ class Human(BasicAgent):
                 self.type=manRunningId
             elif self.sex=='F':
                 self.type=womanRunningId"""
+
 
         return
 
@@ -923,8 +903,8 @@ def cloudspawn():
     #creating the cloud matrix
     #interaction points are the corners and if they are touching every x iteration we hear lightning (maybe their color change)
     if worldWidth>20 and worldHeight>20:
-        maxx=worldWidth//2
-        maxy=worldHeight//2
+        maxx=worldWidth/2
+        maxy=worldHeight/2
         cx=randint(0,worldWidth)
         cy=randint(0,worldHeight)
 
@@ -1397,22 +1377,31 @@ def fixEnv():
 def initWorld():
     global nbTrees, nbBurningTrees, zombies, humans, nbDetails
 
-    cloudspawn()
     if getWorldWidth() >= 100 :
         fixEnv()
         randEnv()
         addingTrees()
-    elif worldHeight>=20 and worldWidth>=20 :
-        randEnv()
-        addingTrees()
+
+    for x in [14,18]:
+        for y in range (14,18):
+            setObjectAt(x,y,treeId,2)
+            setObjectAt(x,y, -1,0)
+    for y in [14,18]:
+        for x in range (14,18):
+            setObjectAt(x,y,treeId,2)
+            setObjectAt(x,y, -1,0)
+
 
     #adding agents
-    for i in range(nbAgents):
-        zombies.append(Zombie(zombieId,-1,-1))
-        if random()<0.5:
-            humans.append(Male(manId))
-        else:
-            humans.append(Female(womanId))
+    for i in range(1):
+        #zombies.append(Zombie(zombieId,-1,-
+        humans.append(Male(manId))
+
+    h=humans[0]
+    h.x=16
+    h.y=16
+    setAgentAt(h.x,h.y,h.type)
+
 
     Cure.randomDrop(cure,it=1)
 
@@ -1427,55 +1416,6 @@ def initAgents():
 
 def stepWorld( it = 0):
 
-    for (x,y) in lightning:
-        deleteObjectAt(x,y,objectMapLevels-2)
-        lightning.remove((x,y))
-
-
-    if it % (maxFps/10) == 0: #tour speed
-
-        if WEATHER==False: #stormy
-            for x in range(worldWidth):
-                for y in range(worldHeight):
-                    if getObjectAt(x,y,objectMapLevels-1) == chargedCloudId:
-                        for neighbours in ((-1,0),(+1,0),(0,-1),(0,+1)):
-                            if getObjectAt((x+neighbours[0]+worldWidth)%worldWidth,(y+neighbours[1]+worldHeight)%worldHeight,objectMapLevels-1) == chargedCloudId:
-                                if random()<0.003:
-                                    lightning.append((x,y))
-                                    setObjectAt(x,y,lightningId,objectMapLevels-2)
-                                    #if random()<0.0012: #plays the sound of thunder but it is annoying
-                                        #playsound('sounds/minithunder.wav')
-                        if random()<0.005:
-                            setObjectAt(x,y,cloudId,objectMapLevels-1)
-                    elif getObjectAt(x,y,objectMapLevels-1) == cloudId:
-                        for neighbours in ((-1,0),(+1,0),(0,-1),(0,+1)):
-                            if getObjectAt((x+neighbours[0]+worldWidth)%worldWidth,(y+neighbours[1]+worldHeight)%worldHeight,objectMapLevels-1) == chargedCloudId:
-                                if random()<0.1:
-                                    setObjectAt(x,y,chargedCloudId,objectMapLevels-1)
-
-        else:
-            
-            #if we want random clouds every once in a while
-            if random()<0.1:
-                for x in range(worldWidth):
-                    for y in range(worldHeight):
-                        if getObjectAt(x,y,objectMapLevels-1) == chargedCloudId or  getObjectAt(x,y,objectMapLevels-1) == cloudId:
-                            deleteObjectAt(x,y,objectMapLevels-1)
-                for i in clouds:
-                    clouds.remove(i)
-
-                cloudspawn()
-            #if we reinitialize the clouds as mostly uncharged
-            """"
-            if random()<0.1:
-                for x in range(worldWidth):
-                    for y in range(worldHeight):
-                        if getObjectAt(x,y,objectMapLevels-1) == chargedCloudId :
-                            if random()<0.2:
-                                setObjectAt(x,y,cloudId,objectMapLevels-1)
-                        elif getObjectAt(x,y,objectMapLevels-1) == cloudId :
-                            if random()<0.05:
-                                setObjectAt(x,y,chargedCloudId,objectMapLevels-1)"""
     return
 
 
@@ -1495,6 +1435,17 @@ def stepAgents(it = 0 ):
         for objList in [foods, guns, cure]: #spawning static agents 
             for i in objList:
                 setAgentAt(i.x, i.y, i.type)
+
+        for z in zombies: #removing dead zombies, moving them
+            if z.type!=zombieId:
+                z.type=zombieId  # shuffle agents in in-place (i.e. agents is modified)
+            if z.decomp>MAXAGEZ:
+                z.die()
+                zombies.remove(z)
+            elif z.dead==False:
+                z.decomp+=1
+                z.move3()
+                z.direction=randint(0,3)
 
         for h in humans:
             if (h.type==winnerhumanId or h.type==babyBoyId or h.type==babyGirlId or h.type==womanRunningId or h.type==manRunningId ): #reinitialising the images
@@ -1522,17 +1473,6 @@ def stepAgents(it = 0 ):
                 h.age+=1
                 h.hunger-=1
                 h.move3()
-
-        for z in zombies: #removing dead zombies, moving them
-            if z.type!=zombieId:
-                z.type=zombieId  # shuffle agents in in-place (i.e. agents is modified)
-            if z.decomp>MAXAGEZ:
-                z.die()
-                zombies.remove(z)
-            elif z.dead==False:
-                z.decomp+=1
-                z.move3()
-                z.direction=randint(0,3)
 
     return
 
@@ -1603,26 +1543,7 @@ def render( it = 0, list_agents=iconsH_list):
                             if  h.dead==False and h.x==xTile and h.y==yTile : # agent on terrain?
                                 screen.blit( agentType[ getAgentAt( xTile, yTile ) ] , (xScreen, yScreen - heightMultiplier ))
 
-                if ((getAgentAt( xTile, yTile ) == zombieId) or (getAgentAt( xTile, yTile ) == winnerzombieId)) :
-                    for z in zombies:
-                        if z.dead==False and z.x==xTile and z.y==yTile : # agent on terrain?
-                            screen.blit( agentType[ getAgentAt( xTile, yTile ) ] , (xScreen, yScreen - heightMultiplier ))
-
-                if ((getAgentAt( xTile, yTile ) == foodsId)) :
-                    for f in foods:
-                        if f.x==xTile and f.y==yTile : # agent on terrain?
-                            screen.blit( agentType[ getAgentAt( xTile, yTile ) ] , (xScreen, yScreen - heightMultiplier ))
-
-                if (getAgentAt( xTile, yTile ) == gunId) :
-                    for f in guns:
-                        if f.x==xTile and f.y==yTile : # agent on terrain?
-                            screen.blit( agentType[ getAgentAt( xTile, yTile ) ] , (xScreen, yScreen - heightMultiplier ))
-
-                if (getAgentAt( xTile, yTile ) == medicineId) :
-                    for f in cure:
-                        if f.x==xTile and f.y==yTile : # agent on terrain?
-                            screen.blit( agentType[ getAgentAt( xTile, yTile ) ] , (xScreen, yScreen - heightMultiplier ))
-
+                
 
     return
 
@@ -1669,11 +1590,12 @@ while userExit == False:
     perdu = False
     winner = 0
 
+    """
     if (len(zombies)==0):
         print("all zombies are dead")
         perdu = True
         winner = 1 #1 if humans win(all zombies are dead), 2 if zombies win
-
+    """
 
     if (len(humans)==0):
         print("all humans are dead")

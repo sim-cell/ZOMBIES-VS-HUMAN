@@ -1,35 +1,10 @@
-#
-# World of Isotiles
-# Author: nicolas.bredeche(at)sorbonne-universite.fr
-#
-# Started: 2018-11-17
-# purpose: basic code developped for teaching artificial life and ecological simulation at Sorbonne Univ. (SU)
-# course: L2, 2i013 Projet, "Vie Artificielle"
-# licence: CC-BY-SA
-#
-# Requirements: Python3, Pygame
-#
-# Credits for third party resources used in this project:
-# - Assets: https://www.kenney.nl/ (great assets by Kenney Vleugels with *public domain license*)
-# - https://www.uihere.com/free-cliparts/space-medicines-extreme-2-video-game-arcade-game-8-bit-space-medicines-3996521
-#
-# Random bookmarks:
-# - scaling images: https://stackoverflow.com/questions/43196126/how-do-you-scale-a-design-resolution-to-other-resolutions-with-pygame
-# - thoughts on grid worlds: http://www-cs-students.stanford.edu/~amitp/game-programming/grids/
-# - key pressed? https://stackoverflow.com/questions/16044229/how-to-get-keyboard-input-in-pygame
-# - basic example to display tiles: https://stackoverflow.com/questions/20629885/how-to-render-an-isometric-tile-based-world-in-python
-# - pygame key codes: https://www.pygame.org/docs/ref/key.html
-# - pygame capture key combination: https://stackoverflow.com/questions/24923078/python-keydown-combinations-ctrl-key-or-shift-key
-# - methods to initialize a 2D array: https://stackoverflow.com/questions/2397141/how-to-initialize-a-two-dimensional-array-in-python
-# - bug with SysFont - cf. https://www.reddit.com/r/pygame/comments/1fhq6d/pygamefontsysfont_causes_my_script_to_freeze_why/
-#       myfont = pygame.font.SysFont(pygame.font.get_default_font(), 16)
-#       myText = myfont.render("Hello, World", True, (0, 128, 0))
-#       screen.blit(myText, (screenWidth/2 - text.get_width() / 2, screenHeight/2 - text.get_height() / 2))
-#       ... will fail.
-#
-# TODO list
-# - double buffer
-# -.multiple agents
+### ### ### ### ### ### ### ### ### ### ### ### ### ### ### ###
+### ### ### ### ### ### ### ### ### ### ### ### ### ### ### ###
+### ### ### ### ### ### ### ### ### ### ### ### ### ### ### ###
+###
+### created to show that humans cannot go through objects 
+###
+### ### ### ### ### ### ### ### ### ### ### ### ### ### ### ###
 
 
 import sys
@@ -40,7 +15,7 @@ import math
 import time
 from tkinter import W
 from playsound import playsound
-  
+
 
 
 import pygame
@@ -60,9 +35,9 @@ versionTag = "2022"
 
 # all values are for initialisation. May change during runtime.
 
-#numbers of elements
-nbTrees = 15 #350
-nbAgents = 50
+#numbers of elements #should be changed according to the world height and width
+nbTrees = 20 #350
+nbAgents = 30
 nbDetails = 15
 
 #environmental changes (nature)
@@ -70,11 +45,11 @@ DAY=True
 WEATHER=True #True=sunny False=storm
 
 #probs for humans and zombies
-MAXAGE=30
-PSHOOT=1
-PROB_REPROD = 0.05
+MAXAGEH=50
+MAXAGEZ=50
+PSHOOT=0.75
+PROB_REPROD = 0.045
 MAXHUNGER=30
-
 
 #probs for foods
 PROBDROPFOOD=0.3
@@ -97,19 +72,20 @@ NBCURE=0
 MAXCURE=20
 
 #probs of environment
-PROBTURN = 0.03    #randomly turn of road
+PROBTURN = 0.01    #randomly turn of road
 
-#agent lists 
+#agent lists
 guns = []
 foods = []
 zombies = []
 humans = []
 cure = []
-lightning=[]
+
 
 #occupied land by objects lists
 clouds = []
 occupied=[]  #occupied surface by objects
+lightning=[]
 
 
 
@@ -118,7 +94,7 @@ occupied=[]  #occupied surface by objects
 ### ### ### ### ### ### ### ### ### ### ### ### ### ### ### ###
 ### ### ### ### ### ### ### ### ### ### ### ### ### ### ### ###
 ###
-### PARAMETERS: rendering
+### PARAMETERS: rendering 
 ###
 ### ### ### ### ### ### ### ### ### ### ### ### ### ### ### ###
 
@@ -126,20 +102,21 @@ occupied=[]  #occupied surface by objects
 
 
 # display screen dimensions
-screenWidth = 1400 # 930 #
-screenHeight = 900 # 640 #
+screenWidth =  930 #1400 #
+screenHeight = 640 #900 #
 
 # world dimensions (ie. nb of cells in total)
-worldWidth = 40#64
-worldHeight = 40#64
+#ALWAYS A PAIR NUMBER AND MINIMUM 10 (no env if <20) #
+worldWidth = 30#64 
+worldHeight = 30 #64
 
 # set surface of displayed tiles (ie. nb of cells that are rendered) -- must be superior to worldWidth and worldHeight
-viewWidth = 40 #32
-viewHeight = 40 #32
+viewWidth = 32 #32 #after 64 it lags
+viewHeight = 32#32
 
 scaleMultiplier = 0.25 # re-scaling of loaded images = zoom
 
-objectMapLevels = 10 # number of levels for the objectMap. This determines how many objects you can pile upon one another.
+objectMapLevels = 15 # number of levels for the objectMap. This determines how many objects you can pile upon one another.
 
 # set scope of displayed tiles
 xViewOffset = 0
@@ -154,8 +131,10 @@ verbose = False # display message in console on/off
 verboseFps = True # display FPS every once in a while
 
 #max space to fill with objects
-MAXENVOBJ = randint(2,worldWidth //10)
-MAXSURFACE = (worldWidth * worldHeight*30)//100
+MAXENVOBJ = 0 
+if worldHeight >= 10 and worldWidth >=10 :
+    MAXENVOBJ = randint(1,worldWidth //10)
+    MAXSURFACE = (worldWidth * worldHeight*30)//100
 
 
 
@@ -180,19 +159,21 @@ pygame.display.set_caption('Zombieland')
 ### CORE/USER: Image management
 ###
 ### ### ### ### ### ### ### ### ### ### ### ### ### ### ### ###
+### ### ### ### ### ### ### ### ### ### ### ### ### ### ### ###
+### ### ### ### ### ### ### ### ### ### ### ### ### ### ### ###
 
 #creating background images
 
-night=pygame.image.load("assets/starsbig.png").convert_alpha()
-day=pygame.image.load("assets/sunnydayy.png").convert_alpha()
-cloudy=pygame.image.load("assets/cloudday.png").convert_alpha()
+night=pygame.image.load("assets/background/starsbig.png").convert_alpha()
+day=pygame.image.load("assets/background/sunnydayy.png").convert_alpha()
+cloudy=pygame.image.load("assets/background/cloudday.png").convert_alpha()
 
 
-#creating clouds (the dimensions are different so do not use loadImage) 
-cloud = pygame.image.load('assets/cloud30.png').convert_alpha()
+#creating clouds (the dimensions are different so do not use loadImage)
+cloud = pygame.image.load('assets/cloud/cloud15.png').convert_alpha()
 cloud = pygame.transform.scale(cloud, (int(100)*scaleMultiplier, int(100)*scaleMultiplier)) #setting the size
 
-chargedcloud = pygame.image.load('assets/chargedcloud30.png').convert_alpha()
+chargedcloud = pygame.image.load('assets/cloud/chargedcloud30.png').convert_alpha()
 chargedcloud = pygame.transform.scale(chargedcloud, (int(100)*scaleMultiplier, int(100)*scaleMultiplier))
 
 def loadImage(filename):
@@ -229,7 +210,6 @@ def loadAllImages():
     #treeBig = pygame.transform.rotozoom(treeBig, 0, 1.2)
     objectType.append(treeBig)
     objectType.append(loadImage('assets/ext/isometric-blocks/PNG/Voxel tiles/VoxelTile_27.png')) # block
-    objectType.append(loadImage('assets/basic111x128/tree_small_NW_ret_red.png')) # burning tree
     grassSmall=loadImage('assets/basic111x128/grass.png') #grass detail
     grassSmall = pygame.transform.scale(grassSmall, (25, 18))
     objectType.append(grassSmall)
@@ -249,29 +229,33 @@ def loadAllImages():
     objectType.append(cloud) #normal cloud
     objectType.append(chargedcloud) #charged cloud
 
-    #lightning 
+    #lightning
     lightningimage=loadImage('assets/basic111x128/lightning.png') #lightning
     lightningimage = pygame.transform.scale((lightningimage), (50, 50))
-    objectType.append(lightningimage) 
+    objectType.append(lightningimage)
+    
+    #cure image
+    cure=loadImage('assets/basic111x128/vaccine.png')
+    cure = pygame.transform.scale((cure), (20, 20))
 
     #agent images
     agentType.append(None) # default -- never drawn
-    agentType.append(loadImage('assets/basic111x128/vaccine.png')) # cure
+    agentType.append(cure) # cure
     agentType.append(loadImage('assets/basic111x128/zomb.png')) # zombie
-    agentType.append(loadImage('assets/basic111x128/man2.png')) # man
+    agentType.append(loadImage('assets/basic111x128/manwalking.png')) # man
     agentType.append(loadImage('assets/basic111x128/combat.png')) #human wins
     agentType.append(loadImage('assets/basic111x128/bite.png')) #zombie wins
-    agentType.append(loadImage('assets/basic111x128/woman.png')) # woman
-    #agentType.append(loadImage('isoworld/assets/basic111x128/burger.png')) # burger
+    agentType.append(loadImage('assets/basic111x128/womanwalking.png')) # woman
     agentType.append(loadImage('assets/basic111x128/food.png')) # foods
     gunSmall=loadImage('assets/basic111x128/gun.png') # gun
     gunSmall = pygame.transform.scale(gunSmall, (23, 15))
     agentType.append(gunSmall)
     agentType.append(loadImage('assets/basic111x128/babyBoy.png')) # babyBoy
     agentType.append(loadImage('assets/basic111x128/babyGirl.png')) # babyGirl
-    agentType.append(loadImage('assets/basic111x128/man2Z.png')) # man
-    agentType.append(loadImage('assets/basic111x128/womanZ.png')) # woman
-
+    agentType.append(loadImage('assets/basic111x128/infectedMan.png')) # infected man
+    agentType.append(loadImage('assets/basic111x128/infectedWoman.png')) # infected woman
+    agentType.append(loadImage('assets/basic111x128/manrunning.png')) # running man
+    agentType.append(loadImage('assets/basic111x128/womanrunning.png')) # running woman
 
 
 def resetImages():
@@ -309,18 +293,17 @@ noObjectId = noAgentId = 0
 grassId = 0
 treeId = 1
 blockId = 2
-burningTreeId = 3
-grassDetId = 4
-flowerRId = 5
-canoeId = 6
-plantDetId = 7
-doorId = 8
-windowId = 9
-floorGrId = 10
-stepsId = 11
-cloudId = 12
-chargedCloudId = 13
-lightningId=14
+grassDetId = 3
+flowerRId = 4
+canoeId = 5
+plantDetId = 6
+doorId = 7
+windowId = 8
+floorGrId = 9
+stepsId = 10
+cloudId = 11
+chargedCloudId = 12
+lightningId=13
 
 
 #agents
@@ -340,8 +323,9 @@ babyBoyId = 9
 babyGirlId = 10
 manInfId = 11
 womanInfId = 12
-
-iconsH_list = [manId, winnerhumanId, womanId, babyGirlId, babyBoyId, womanInfId, manInfId]
+manRunningId = 13
+womanRunningId = 14
+iconsH_list = [manId, winnerhumanId, womanId, babyGirlId, babyBoyId, womanInfId, manInfId,manRunningId,womanRunningId]
 
 ###
 
@@ -378,7 +362,7 @@ def displayWelcomeMessage():
     print ("=-=  CELIK Simay                                =-=")
     print ("=-=  KUDRYAVTSEVA Kristina                      =-=")
     print ("=-=  original code by :                       =-=")
-    print ("=-= nicolas.bredeche(at)sorbonne-universite.fr  =-=")                        
+    print ("=-= nicolas.bredeche(at)sorbonne-universite.fr  =-=")
     print ("=-= =-= =-= =-= =-= =-= =-= =-= =-= =-= =-= =-= =-=")
     print (">> v.",versionTag)
     print ("")
@@ -466,7 +450,7 @@ def setAgentAt(x,y,type):
 class BasicAgent:
     def __init__(self,imageId, newx, newy):
         self.type = imageId
-        self.dead=False
+        self.dead=False #commune for all agents
         if newx<0:
             self.reset()
         else :
@@ -501,6 +485,7 @@ class BasicAgent:
 
     def getPosition(self):
         return (self.x,self.y)
+
     def move(self):
         xNew = self.x
         yNew = self.y
@@ -508,12 +493,7 @@ class BasicAgent:
             xNew = ( self.x + [-1,+1][randint(0,1)] + getWorldWidth() ) % getWorldWidth()
         else:
             yNew = ( self.y + [-1,+1][randint(0,1)] + getWorldHeight() ) % getWorldHeight()
-        if getObjectAt(xNew,yNew) == 0: # dont move if collide with object (note that negative values means cell cannot be walked on)
-            setAgentAt(self.x,self.y,noAgentId)
-            self.x = xNew
-            self.y = yNew
-            setAgentAt(self.x,self.y,self.type)
-        elif getObjectAt(xNew,yNew) == 2: # dont move if collide with object (note that negative values means cell cannot be walked on)
+        if getObjectAt(xNew,yNew) == 0 or getObjectAt(xNew,yNew) == 2: # dont move if collide with object (note that negative values means cell cannot be walked on)
             setAgentAt(self.x,self.y,noAgentId)
             self.x = xNew
             self.y = yNew
@@ -549,8 +529,8 @@ class Human(BasicAgent):
         self.age=0
         self.sex=None
         self.hunger=MAXHUNGER
-        if random()<=1:
-            self.gun=randint(5,10)
+        if random()<=0.8:
+            self.gun=randint(1,10)
         else:
             self.gun=0
         self.infected = 0
@@ -566,52 +546,100 @@ class Human(BasicAgent):
 
     def move3(self):
         PROB=0.6 #less than zombies to be able to get caught
+        nozombie=False
+        new=0
+        if self.sex=='M':
+                new=manRunningId
+        elif self.sex=='F':
+                new=womanRunningId
         if not DAY:
             PROB=0.3 #during night they can't see
         if random()<PROB:
             if getAgentAt((self.x+1+worldWidth)%worldWidth, (self.y+worldHeight)%worldHeight ) == zombieId: #x+1 y
+                self.type=new
                 self.move2(-1,0)
             elif getAgentAt((self.x-1+worldWidth)%worldWidth, (self.y+worldHeight)%worldHeight ) == zombieId: #x-1 y
+                self.type=new
                 self.move2(1,0)
+                
             elif getAgentAt((self.x+worldWidth)%worldWidth, (self.y+1+worldHeight)%worldHeight ) == zombieId: #x y+1
+                self.type=new
                 self.move2(0,-1)
+                 
             elif getAgentAt((self.x+worldWidth)%worldWidth, (self.y-1+worldHeight)%worldHeight ) == zombieId: #x y-1
+                self.type=new
                 self.move2(0,1)
+                 
             elif getAgentAt((self.x-1+worldWidth)%worldWidth, (self.y-1+worldHeight)%worldHeight ) == zombieId: #x-1 y-1
+                self.type=new
                 self.move2(1,1)
+                 
             elif getAgentAt((self.x+1+worldWidth)%worldWidth, (self.y-1+worldHeight)%worldHeight ) == zombieId: #x+1 y-1
+                self.type=new
                 self.move2(-1,1)
+                 
             elif getAgentAt((self.x+1+worldWidth)%worldWidth, (self.y+1+worldHeight)%worldHeight ) == zombieId: #x+1 y+1
+                self.type=new
                 self.move2(-1,-1)
+                 
             elif getAgentAt((self.x-1+worldWidth)%worldWidth, (self.y+1+worldHeight)%worldHeight ) == zombieId: #x-1 y+1
+                self.type=new
                 self.move2(1,-1)
-            else :
-                self.move()
+                 
+            elif random()<0.3: #not a high probability because if they always try to stay in the same case they will not move around
+                self.move4()
+                nozombie=True
+            else:
+                self.move() #they can ignore if there is an opposite sex near them and go in a random direction
+                nozombie=True
+        """if nozombie: #not necessary just to be cautious
+            if self.sex=='M':
+                self.type=manId
+            elif self.sex=='F':
+                self.type=womanId
+        else:
+            if self.sex=='M':
+                self.type=manRunningId
+            elif self.sex=='F':
+                self.type=womanRunningId"""
+
+
         return
 
     #when a human sees another human they go towards them
-    
+
     def move4(self):
-        if random()<0.4 and self.type==manId:
-                if getAgentAt((self.x+1+worldWidth)%worldWidth, (self.y+worldHeight)%worldHeight ) == womanId: #x+1 y
-                    self.move2(1,0)
-                elif getAgentAt((self.x-1+worldWidth)%worldWidth, (self.y+worldHeight)%worldHeight ) == womanId: #x-1 y
-                    self.move2(-1,0)
-                elif getAgentAt((self.x+worldWidth)%worldWidth, (self.y+1+worldHeight)%worldHeight ) == womanId: #x y+1
-                    self.move2(0,1)
-                elif getAgentAt((self.x+worldWidth)%worldWidth, (self.y-1+worldHeight)%worldHeight ) == womanId: #x y-1
-                    self.move2(0,-1)
-                elif getAgentAt((self.x-1+worldWidth)%worldWidth, (self.y-1+worldHeight)%worldHeight ) == womanId: #x-1 y-1
-                    self.move2(-1,-1)
-                elif getAgentAt((self.x+1+worldWidth)%worldWidth, (self.y-1+worldHeight)%worldHeight ) ==womanId: #x+1 y-1
-                    self.move2(1,-1)
-                elif getAgentAt((self.x+1+worldWidth)%worldWidth, (self.y+1+worldHeight)%worldHeight ) == womanId: #x+1 y+1
-                    self.move2(1,1)
-                elif getAgentAt((self.x-1+worldWidth)%worldWidth, (self.y+1+worldHeight)%worldHeight ) == womanId: #x-1 y+1
-                    self.move2(-1,1)
-                else :
-                    self.move()
-        self.move()
+        
+        if self.type==manId:
+            if getAgentAt((self.x+1+worldWidth)%worldWidth, (self.y+worldHeight)%worldHeight ) == womanId: #x+1 y
+                self.move2(1,0)
+            elif getAgentAt((self.x-1+worldWidth)%worldWidth, (self.y+worldHeight)%worldHeight ) == womanId: #x-1 y
+                self.move2(-1,0)
+            elif getAgentAt((self.x+worldWidth)%worldWidth, (self.y+1+worldHeight)%worldHeight ) == womanId: #x y+1
+                self.move2(0,1)
+            elif getAgentAt((self.x+worldWidth)%worldWidth, (self.y-1+worldHeight)%worldHeight ) == womanId: #x y-1
+                self.move2(0,-1)
+            elif getAgentAt((self.x-1+worldWidth)%worldWidth, (self.y-1+worldHeight)%worldHeight ) == womanId: #x-1 y-1
+                self.move2(-1,-1)
+            elif getAgentAt((self.x+1+worldWidth)%worldWidth, (self.y-1+worldHeight)%worldHeight ) ==womanId: #x+1 y-1
+                self.move2(1,-1)
+            elif getAgentAt((self.x+1+worldWidth)%worldWidth, (self.y+1+worldHeight)%worldHeight ) == womanId: #x+1 y+1
+                self.move2(1,1)
+            elif getAgentAt((self.x-1+worldWidth)%worldWidth, (self.y+1+worldHeight)%worldHeight ) == womanId: #x-1 y+1
+                self.move2(-1,1)
+            else :
+                self.move()
+        elif self.type==womanId:
+            maninneighbor=False
+            for i in [0,1,-1]:
+                for j in [0,1,-1]:
+                    if not (i==0 and j==0): #not in the same case  
+                        if getAgentAt((self.x+i+worldWidth)%worldWidth, (self.y+j+worldHeight)%worldHeight )==manId: #there is a man in neighbor
+                            maninneigbor=True
+            if not maninneighbor:
+                self.move() #if there is no man then woman moves randomly if there is a man she does not move
+
+
         return
 
 
@@ -619,25 +647,23 @@ class Human(BasicAgent):
         success = self.shoot()
         for z in zombies:
             if (met(self,z)):
+                #print("combat")
                 if success:
                     zombies.remove(z)
-                    print("zombie got shot by ",id(self))
+                    #print("zombie got shot by ",id(self))
                     self.type=winnerhumanId
                 else:
                     Tx=self.x
                     Ty=self.y
-                    print("Human", id(self), "was infected and had gun :",self.gun)
+                    #print("Human", id(self), "was infected and had gun :",self.gun)
                     self.infected += 1
                     if self.sex=='M':
                         self.type = manInfId
-                        print("infected M")
+                        #print("infected M")
                     else:
                         self.type = womanInfId
-                        print("infected F")
+                        #print("infected F")
                 break
-                   # print("will remove a Z now")
-                    #zombies.append(Zombie(winnerzombieId,Tx,Ty))
-                   # print("Z removed")
 
         return
 
@@ -650,6 +676,7 @@ class Human(BasicAgent):
                 if self.getType()!=h.getType():#self.instanceOf(Male)&&h.instanceOf(Female) || self.instanceOf(Female)&&h.instanceOf(Male):
                     if random()<PROB_REPROD:
                         coords = self.getPosition()
+                        #print("a baby is born ")
                         if sex_choice == ImageIdF:
                             list_humans.append(Female(sex_choice, coords[0], coords[1]))
                         else :
@@ -657,15 +684,15 @@ class Human(BasicAgent):
                     break
         return
 
-    def eat(self, foods) : #when they eat food they become younger
+    def eat(self, foods) : #when they eat food they become younger and their energy increases
         food=False
         for f in foods :
             if self.x== f.x and self.y==f.y :
                 self.hunger+=f.energy
-                self.age-=f.energy
+                self.age-=f.energy//2
                 foods.remove(f)
                 food=True
-                print("human ate")
+                #print("human ate")
         if not food :
             self.hunger-=1
 
@@ -673,9 +700,9 @@ class Human(BasicAgent):
         for g in guns :
             if self.x== g.x and self.y==g.y :
                 self.gun+=1
-                print("armed")
+                #print("armed")
                 guns.remove(g)
-    
+
     def takeCure(self, cure, manId, womanId):
         if self.infected >0:
             for i in cure:
@@ -683,17 +710,23 @@ class Human(BasicAgent):
                     self.infected = 0
                     if self.sex =='M':
                         self.type = manId
-                        print("Female ", id(self), " cured")
+                        #print("Female ", id(self), " cured")
                     else:
                         self.type = womanId
-                        print("Male ", id(self), " cured")
+                        #print("Male ", id(self), " cured")
 
                 #cure.remove(i)
                 break
         return
 
-
-
+    def check_transition(h, zombies):
+        if h.infected == 20:
+            h.die()
+            Tx=h.x
+            Ty=h.y
+            #print("Human turned into a zombie")
+            zombies.append(Zombie(zombieId,Tx,Ty))
+        return
 
 class Male(Human):
     def __init__(self,imageId, newx=-1, newy=-1):
@@ -768,16 +801,6 @@ def met(agent1, agent2):
         exists=True
     return exists
 
-def check_transition(h, zombies):
-
-    if h.infected == 15:
-        h.die()
-
-        Tx=h.x
-        Ty=h.y
-        zombies.append(Zombie(zombieId,Tx,Ty))
-    return
-
 
 class RandDropAgents:
 
@@ -798,6 +821,7 @@ class RandDropAgents:
     def getType(self):
         return self.type
 
+
 class Cure(RandDropAgents):
     def __init__(self) :
         super().__init__()
@@ -809,7 +833,6 @@ class Cure(RandDropAgents):
     def randomDrop(list, it):
         for i in range(0,MAXCURE):
             list.append(Cure())
-        
         return
 
 
@@ -825,12 +848,14 @@ class Food(RandDropAgents):
     def decomposition(foods) :
         for f in foods :
             if f.decomp==DECOMPDAYFOOD :
+                #print("food decomposition")
                 foods.remove(f)
             else :
                 f.decomp+=1
         return
 
     def randomDrop(it,list):
+        #print("food drops")
         if (it != 0):
             if random() < PROBDROPFOOD:
                 if it%DROPDAYFOOD==0 :
@@ -848,6 +873,7 @@ class Gun(RandDropAgents) :
         self.reset()
 
     def randomDrop(it,list):
+        #print("gun drops")
         if (it != 0):
             if random() < PROBDROPGUN:
                 if it%DROPDAYGUN == 0 :
@@ -871,28 +897,26 @@ class Gun(RandDropAgents) :
 def cloudspawn():
     #creating the cloud matrix
     #interaction points are the corners and if they are touching every x iteration we hear lightning (maybe their color change)
-
-    maxx=worldWidth/4
-    maxy=worldHeight/4
-    cx=randint(0,worldWidth)
-    cy=randint(0,worldHeight)
-
-    while len(clouds)<(worldHeight*worldWidth)//2:
-        xx=randint(2,maxx)
-        yy=randint(2,maxy)
+    if worldWidth>20 and worldHeight>20:
+        maxx=worldWidth/2
+        maxy=worldHeight/2
         cx=randint(0,worldWidth)
         cy=randint(0,worldHeight)
-        for x in range(0,xx):
-            w=((x+cx)+worldWidth)%worldWidth
-            for y in range(0,yy):
-                l=((y+cy)+worldHeight)%worldHeight
-                if random()<0.15:
-                    setObjectAt(w,l,chargedCloudId,objectMapLevels-1)
-                else :
-                    setObjectAt(w,l,cloudId,objectMapLevels-1)
-                clouds.append(1)
 
-
+        while len(clouds)<(worldHeight*worldWidth)//2:
+            xx=randint(2,maxx)
+            yy=randint(2,maxy)
+            cx=randint(0,worldWidth)
+            cy=randint(0,worldHeight)
+            for x in range(0,xx):
+                w=((x+cx)+worldWidth)%worldWidth
+                for y in range(0,yy):
+                    l=((y+cy)+worldHeight)%worldHeight
+                    if random()<0.15:
+                        setObjectAt(w,l,chargedCloudId,objectMapLevels-1)
+                    else :
+                        setObjectAt(w,l,cloudId,objectMapLevels-1)
+                    clouds.append(1)
 
 
 def createRoad(x,y,dir='x'):
@@ -944,7 +968,6 @@ def addingTrees():
             x = randint(0,getWorldWidth()-1)
             y = randint(0,getWorldHeight()-1)
         setObjectAt(x,y,treeId,2)
-
         setObjectAt(x,y, -1,0)
     return
 
@@ -1002,7 +1025,7 @@ def createlake(x,y) :
     return
 
 def createHouse(x,y):
-
+    lev=objectMapLevels-7
     #forbidden area around the house
     xforbidden=((x-1)+worldWidth)%worldWidth
     yborbidden1=((y-1)+worldHeight)%worldHeight
@@ -1022,7 +1045,7 @@ def createHouse(x,y):
         w=((x+i)+worldWidth)%worldWidth
         for j in range(0,7):
             l=((y+j)+worldHeight)%worldHeight
-            for level in range(0,objectMapLevels-3):
+            for level in range(0,lev):
                 setObjectAt(w,l,blockId,level)
                 #print(w,l)
             occupied.append((w,l))
@@ -1034,7 +1057,7 @@ def createHouse(x,y):
     for c in [(faceX,y),(faceX,faceY1),(faceX,faceY2),(faceX,faceY3)]:
         occupied.append((c[0],c[1]))
         setObjectAt(c[0],c[1],-1,0)
-        for level in range(0,objectMapLevels-3):
+        for level in range(0,lev):
             setObjectAt(c[0],c[1],blockId,level)
     faceY4= ((y+1)+worldHeight)%worldHeight
     faceY5= ((y+5)+worldHeight)%worldHeight
@@ -1042,7 +1065,7 @@ def createHouse(x,y):
     for c in [(faceX,faceY4),(faceX,faceY5)]:
         occupied.append((c[0],c[1]))
         setObjectAt(c[0],c[1],-1,0)
-        for level in range(0,objectMapLevels-3):
+        for level in range(0,lev):
             if level == 4 :
                 setObjectAt(c[0],c[1],windowId,level)
                 continue
@@ -1052,7 +1075,7 @@ def createHouse(x,y):
     #adding the door
     for c in [(faceX,faceY6)]:
         occupied.append((c[0],c[1]))
-        for level in range(3,objectMapLevels-3):
+        for level in range(3,lev):
             setObjectAt(c[0],c[1],blockId,level)
 
     setObjectAt(faceX,faceY6,doorId,0)
@@ -1070,78 +1093,81 @@ def createHouse(x,y):
     return
 
 def randEnv():
-    nbobj=randint(2,MAXENVOBJ)
-    i=nbobj
-    while i>0 and len(occupied)<MAXSURFACE :
-        type = 0
-        if random()<0.3:
-            type=1 #if 0 then house if 1 then lake
-        nb=8 #tjrs pair
-        x = randint(0,getWorldWidth()-1)
-        y = randint(0,getWorldHeight()-1)
-        while True and len(occupied)>0:
-            nottrouve=True
-            for (a,b) in occupied:
-                if nottrouve :
-                    if (x==a) and (y==b):
-                        nottrouve=False
-                        print("trouve x,y")
+
+    
+    if MAXENVOBJ > 0 :
+        nbobj=randint(1,MAXENVOBJ)
+        i=nbobj
+        while i>0 and len(occupied)<MAXSURFACE :
+            type = 0
+            if random()<0.3:
+                type=1 #if 0 then house if 1 then lake
+            nb=8 #tjrs pair
+            x = randint(0,getWorldWidth()-1)
+            y = randint(0,getWorldHeight()-1)
+            while True and len(occupied)>0:
+                nottrouve=True
+                for (a,b) in occupied:
+                    if nottrouve :
+                        if (x==a) and (y==b):
+                            nottrouve=False
+                            #print("trouve x,y")
+                            break
+                        elif (((x+nb+worldWidth)%worldWidth)==a and ((y+nb+worldHeight)%worldHeight)==b) :
+                            nottrouve=False
+                            #print("trouve x+,y+")
+                            break
+                        elif ((x==a) and ((y+nb+worldHeight)%worldHeight)==b) :
+                            nottrouve=False
+                            #print("trouve x,y+")
+                            break
+                        elif (((x+nb+worldWidth)%worldWidth)==a and y==b) :
+                            nottrouve=False
+                            #print("trouve x+,y")
+                            break
+                        elif (((x+nb/2+worldWidth)%worldWidth)==a and y==b):
+                            nottrouve=False
+                            #print("trouve x/,y mil")
+                            break
+                        elif ((x==a) and ((y+nb/2+worldHeight)%worldHeight)):
+                            nottrouve=False
+                            #print("trouve x,y/ mil")
+                            break
+                        elif (((x+nb/2+worldWidth)%worldWidth)==a and ((y+nb+worldHeight)%worldHeight)==b) :
+                            nottrouve=False
+                            #print("trouve x/,y+ mil")
+                            break
+                        elif (((x+nb+worldWidth)%worldWidth)==a and ((y+nb/2+worldHeight)%worldHeight)==b) :
+                            nottrouve=False
+                            #print("trouve x+,y/ mil")
+                            break
+                    else :
                         break
-                    elif (((x+nb+worldWidth)%worldWidth)==a and ((y+nb+worldHeight)%worldHeight)==b) :
-                        nottrouve=False
-                        print("trouve x+,y+")
-                        break
-                    elif ((x==a) and ((y+nb+worldHeight)%worldHeight)==b) :
-                        nottrouve=False
-                        print("trouve x,y+")
-                        break
-                    elif (((x+nb+worldWidth)%worldWidth)==a and y==b) :
-                        nottrouve=False
-                        print("trouve x+,y")
-                        break
-                    elif (((x+nb/2+worldWidth)%worldWidth)==a and y==b):
-                        nottrouve=False
-                        print("trouve x/,y mil")
-                        break
-                    elif ((x==a) and ((y+nb/2+worldHeight)%worldHeight)):
-                        nottrouve=False
-                        print("trouve x,y/ mil")
-                        break
-                    elif (((x+nb/2+worldWidth)%worldWidth)==a and ((y+nb+worldHeight)%worldHeight)==b) :
-                        nottrouve=False
-                        print("trouve x/,y+ mil")
-                        break
-                    elif (((x+nb+worldWidth)%worldWidth)==a and ((y+nb/2+worldHeight)%worldHeight)==b) :
-                        nottrouve=False
-                        print("trouve x+,y/ mil")
-                        break
+                if (not  nottrouve) :
+                    x = randint(0,getWorldWidth()-1)
+                    y = randint(0,getWorldHeight()-1)
+                    continue
                 else :
                     break
-            if (not  nottrouve) :
-                x = randint(0,getWorldWidth()-1)
-                y = randint(0,getWorldHeight()-1)
-                continue
-            else :
-                break
-        if type == 0 :
-            createHouse(x,y)
-            i-=1
-        elif type == 1 :
-            createlake(x,y)
-            i-=1
-
-    #adding details : flower, plant or grass
-    for i in range(nbDetails):
-        x = randint(0,getWorldWidth()-6)
-        y = randint(0,20)
-        while getTerrainAt(x,y) != 0 or getObjectAt(x,y) != 0:
-            x = randint(0,getWorldWidth()-1)
-            y = randint(0,20)
-        setObjectAt(x,y,grassDetId)
+            if type == 0 :
+                createHouse(x,y)
+                i-=1
+            elif type == 1 :
+                createlake(x,y)
+                i-=1
+        if worldWidth>20 and worldHeight>20:
+            #adding details : flower, plant or grass
+            for i in range(nbDetails):
+                x = randint(0,getWorldWidth()-6)
+                y = randint(0,20)
+                while getTerrainAt(x,y) != 0 or getObjectAt(x,y) != 0:
+                    x = randint(0,getWorldWidth()-1)
+                    y = randint(0,20)
+                setObjectAt(x,y,grassDetId)
     return
 
 def fixEnv():
-
+    lev=objectMapLevels-7
     #adding lake
     lakeTerrainMap =[
     [ 0, 0, 0, 0, 0, 0, 0, 0, 0 ],
@@ -1202,19 +1228,19 @@ def fixEnv():
     for x in range(1,4):
         for y in range(13,20) :
             setObjectAt(x,y,-1,0)
-            for level in range(1,objectMapLevels):
+            for level in range(1,lev):
                 setObjectAt(x,y,blockId,level)
 
 
     for c in [(4,13),(4,15),(4,17),(4,19)]:
         setObjectAt(c[0],c[1],-1,0)
-        for level in range(1,objectMapLevels):
+        for level in range(1,lev):
             setObjectAt(c[0],c[1],blockId,level)
 
     #adding windows
     for c in [(4,14),(4,18)]:
         setObjectAt(c[0],c[1],-1,0)
-        for level in range(1,objectMapLevels):
+        for level in range(1,lev):
             if level == 4 :
                 setObjectAt(c[0],c[1],windowId,level)
                 continue
@@ -1222,7 +1248,7 @@ def fixEnv():
 
     #adding the door
     for c in [(4,16)]:
-        for level in range(3,objectMapLevels):
+        for level in range(3,lev):
             setObjectAt(c[0],c[1],blockId,level)
     #they can go through the door
     setObjectAt(4,16,doorId,1)
@@ -1239,18 +1265,18 @@ def fixEnv():
     for x in range(13,20):
         for y in range(1,4) :
             setObjectAt(x,y,-1,0)
-            for level in range(1,objectMapLevels):
+            for level in range(1,lev):
                 setObjectAt(x,y,blockId,level)
 
     for c in [(13,4),(15,4),(17,4),(19,4)]:
         setObjectAt(c[0],c[1],-1,0)
-        for level in range(1,objectMapLevels):
+        for level in range(1,lev):
             setObjectAt(c[0],c[1],blockId,level)
 
     #adding windows
     for c in [(14,4),(18,4)]:
         setObjectAt(c[0],c[1],-1,0)
-        for level in range(1,objectMapLevels):
+        for level in range(1,lev):
             if level == 4 :
                 setObjectAt(c[0],c[1],windowId,level)
                 continue
@@ -1258,7 +1284,7 @@ def fixEnv():
 
     #adding the door
     for c in [(16,4)]:
-        for level in range(3,objectMapLevels):
+        for level in range(3,lev):
             setObjectAt(c[0],c[1],blockId,level)
     setObjectAt(16,4,doorId,1)
     setObjectAt(16,4,doorId,2)
@@ -1344,27 +1370,15 @@ def fixEnv():
 
 
 def initWorld():
-    global nbTrees, nbBurningTrees, zombies, humans, nbDetails 
+    global nbTrees, nbBurningTrees, zombies, humans, nbDetails
 
-    cloudspawn()
-    if getWorldWidth() >= 100 :
-        fixEnv()
-        randEnv()
-        addingTrees()
-    else :
-        randEnv()
-        addingTrees()
- 
     #adding agents
     for i in range(nbAgents):
+        zombies.append(Zombie(zombieId,-1,-1))
         if random()<0.5:
-            zombies.append(Zombie(zombieId,-1,-1))
-        #if random()<0.5:
-        #    humans.append(Male(manId))
-        #else:
-        #    humans.append(Female(womanId))
-        #ch = choice((m,f))
-        #humans.append(ch)
+            humans.append(Male(manId))
+        else:
+            humans.append(Female(womanId))
 
     Cure.randomDrop(cure,it=1)
 
@@ -1377,28 +1391,8 @@ def initAgents():
 
 ### ### ### ### ###
 
-
 def stepWorld( it = 0):
 
-    for (x,y) in lightning:
-        deleteObjectAt(x,y,objectMapLevels-2)
-        lightning.remove((x,y))
-    
-
-    if it % (maxFps/10) == 0: #tour speed
-        if WEATHER==False: #stormy
-            for x in range(worldWidth):
-                for y in range(worldHeight):
-                    if getObjectAt(x,y,objectMapLevels-1) == chargedCloudId:
-                        for neighbours in ((-1,0),(+1,0),(0,-1),(0,+1)):
-                            if getObjectAt((x+neighbours[0]+worldWidth)%worldWidth,(y+neighbours[1]+worldHeight)%worldHeight,objectMapLevels-1) == chargedCloudId:
-                                if random()<0.07:
-                                    lightning.append((x,y))
-                                    setObjectAt(x,y,lightningId,objectMapLevels-2)
-                                    if random()<0.0012:
-                                        playsound('sounds/minithunder.wav')
-
-                
     return
 
 
@@ -1406,51 +1400,56 @@ def stepWorld( it = 0):
 
 def stepAgents(it = 0 ):
     # move agent
-    if it % (maxFps/16) == 0:
-        print("stepped agents")
+    if it % (maxFps/8) == 0: 
+        #print("stepped agents human count :",len(humans),"zombie count :",len(zombies))
         shuffle(foods)
         shuffle(zombies)
         shuffle(humans)
         Food.randomDrop(it, foods)
         Food.decomposition(foods)
         Gun.randomDrop(it, guns)
-        for z in zombies:
-            if z.type!=2:
-                z.type=2   # shuffle agents in in-place (i.e. agents is modified)
-            if z.decomp>MAXAGE/2:
+
+        for objList in [foods, guns, cure]: #spawning static agents 
+            for i in objList:
+                setAgentAt(i.x, i.y, i.type)
+
+        for h in humans:
+            if (h.type==winnerhumanId or h.type==babyBoyId or h.type==babyGirlId or h.type==womanRunningId or h.type==manRunningId ): #reinitialising the images
+                if h.sex=='M':
+                    h.type=manId
+                else:
+                    h.type=womanId
+
+            if h.age>MAXAGEH or h.hunger==-1: #death from old age and hunger
+                h.die()
+                 
+            h.check_transition(zombies) #if at the end of the transformation period kill the human (to remove) and add a zombie in the same place
+
+            if h.dead: #removing the dead
+                humans.remove(h)
+            else:
+                if h.infected != 0:
+                    h.infected +=1
+                    h.takeCure(cure, manId, womanId) #checks if there is a cure in the same spot
+                else:
+                    h.eat(foods) #checks if there is any food in the same spot, if yes eats it
+                    h.arming(guns) #checks if there is any gun in the same spot, if yes takes it
+                    h.combat(zombies, met) # if has a gun and probability is on his side, kills the zombie otherwise becomes infected 
+                    h.reproduire(humans, babyBoyId, babyGirlId, met) #if there is an opposite sex in the same case reproduction (possible to have twins)
+                h.age+=1
+                h.hunger-=1
+                h.move3()
+
+        for z in zombies: #removing dead zombies, moving them
+            if z.type!=zombieId:
+                z.type=zombieId  # shuffle agents in in-place (i.e. agents is modified)
+            if z.decomp>MAXAGEZ:
                 z.die()
                 zombies.remove(z)
             elif z.dead==False:
                 z.decomp+=1
                 z.move3()
                 z.direction=randint(0,3)
-        for h in humans:
-            if (h.type==winnerhumanId): #if s/he won the combat
-                if h.sex=='M':
-                    h.type=manId 
-                else:
-                    h.type=womanId 
-
-            if h.age>MAXAGE or h.hunger==-1:
-                h.die()
-                
-            check_transition(h, zombies)
-
-            if h.dead:
-                humans.remove(h)
-            else:
-                if h.infected != 0:
-                    h.infected +=1
-                    h.takeCure(cure, manId, womanId)
-                else:
-                    h.eat(foods)
-                    h.arming(guns)
-                    h.combat(zombies, met)
-                    h.reproduire(humans, manId, womanId, met)
-                h.age+=1
-                h.hunger-=1
-                h.move4()
-                h.move3()
 
     return
 
@@ -1481,7 +1480,7 @@ def render( it = 0, list_agents=iconsH_list):
 
 
     #pygame.display.update()
-
+    #go through all the cases and blit the images
     for y in range(getViewHeight()):
         for x in range(getViewWidth()):
             # assume: north-is-upper-right
@@ -1514,50 +1513,32 @@ def render( it = 0, list_agents=iconsH_list):
                 if getObjectAt( xTile , yTile , level)  > 0: # object on terrain?
                     screen.blit( objectType[ getObjectAt( xTile , yTile, level) ] , (xScreen, yScreen - heightMultiplier*(level+1) ))
 
-            
-        for h in humans:
-            if  h.dead==False : # agent on terrain?
-                
-                xScreen = xScreenOffset + h.x * tileTotalWidth / 2 - h.y * tileTotalWidth / 2
-                yScreen = yScreenOffset + h.y * tileVisibleHeight / 2 + h.x * tileVisibleHeight / 2 - height
-                screen.blit( agentType[h.type] , (xScreen, yScreen - heightMultiplier ))
+            if (getAgentAt( xTile, yTile ) != 0) :
+                for iconId in list_agents:
+                    if (getAgentAt(xTile, yTile)==iconId):
+                        for h in humans:
+                            if  h.dead==False and h.x==xTile and h.y==yTile : # agent on terrain?
+                                screen.blit( agentType[ getAgentAt( xTile, yTile ) ] , (xScreen, yScreen - heightMultiplier ))
 
-    for h in humans:
-        if  h.dead==False : # agent on terrain?
-            height = getHeightAt( h.x, h.y ) * heightMultiplier + heightNoise
-            xScreen = xScreenOffset + h.x * tileTotalWidth / 2 - h.y * tileTotalWidth / 2
-            yScreen = yScreenOffset + h.y * tileVisibleHeight / 2 + h.x * tileVisibleHeight / 2 - height
-            screen.blit( agentType[h.type] , (xScreen, yScreen - heightMultiplier ))
+                if ((getAgentAt( xTile, yTile ) == zombieId) or (getAgentAt( xTile, yTile ) == winnerzombieId)) :
+                    for z in zombies:
+                        if z.dead==False and z.x==xTile and z.y==yTile : # agent on terrain?
+                            screen.blit( agentType[ getAgentAt( xTile, yTile ) ] , (xScreen, yScreen - heightMultiplier ))
 
+                if ((getAgentAt( xTile, yTile ) == foodsId)) :
+                    for f in foods:
+                        if f.x==xTile and f.y==yTile : # agent on terrain?
+                            screen.blit( agentType[ getAgentAt( xTile, yTile ) ] , (xScreen, yScreen - heightMultiplier ))
 
-    for z in zombies:
-        if z.dead==False : # agent on terrain?
-            height = getHeightAt( z.x, z.y ) * heightMultiplier + heightNoise
-            xScreen = xScreenOffset + z.x * tileTotalWidth / 2 - z.y * tileTotalWidth / 2
-            yScreen = yScreenOffset + z.y * tileVisibleHeight / 2 + z.x * tileVisibleHeight / 2 - height
-            screen.blit( agentType[z.type] , (xScreen, yScreen - heightMultiplier ))
+                if (getAgentAt( xTile, yTile ) == gunId) :
+                    for f in guns:
+                        if f.x==xTile and f.y==yTile : # agent on terrain?
+                            screen.blit( agentType[ getAgentAt( xTile, yTile ) ] , (xScreen, yScreen - heightMultiplier ))
 
-
-    for f in foods:
-        height = getHeightAt( f.x, f.y ) * heightMultiplier + heightNoise
-        xScreen = xScreenOffset + f.x * tileTotalWidth / 2 - f.y * tileTotalWidth / 2
-        yScreen = yScreenOffset + f.y * tileVisibleHeight / 2 + f.x * tileVisibleHeight / 2 - height
-        screen.blit(agentType[f.type], (xScreen, yScreen - heightMultiplier ))
-
-
-    for g in guns:
-        height = getHeightAt( g.x, g.y ) * heightMultiplier + heightNoise
-        xScreen = xScreenOffset + g.x * tileTotalWidth / 2 - g.y * tileTotalWidth / 2
-        yScreen = yScreenOffset + g.y * tileVisibleHeight / 2 + g.x * tileVisibleHeight / 2 - height
-        screen.blit( agentType[g.type] , (xScreen, yScreen - heightMultiplier ))
-
-
-    for c in cure:
-        height = getHeightAt( c.x, c.y ) * heightMultiplier + heightNoise
-        xScreen = xScreenOffset + c.x * tileTotalWidth / 2 - c.y * tileTotalWidth / 2
-        yScreen = yScreenOffset + c.y * tileVisibleHeight / 2 + c.x * tileVisibleHeight / 2 - height
-
-        screen.blit( agentType[c.type], (xScreen, yScreen - heightMultiplier ))
+                if (getAgentAt( xTile, yTile ) == medicineId) :
+                    for f in cure:
+                        if f.x==xTile and f.y==yTile : # agent on terrain?
+                            screen.blit( agentType[ getAgentAt( xTile, yTile ) ] , (xScreen, yScreen - heightMultiplier ))
 
 
     return
@@ -1590,6 +1571,8 @@ while userExit == False:
 
     if it != 0 and it % 100 == 0 and verboseFps:
         print ("[fps] ", ( it - itStamp ) / ( datetime.datetime.now().timestamp()-timeStamp ) )
+        print ("Number of humans left = ", len(humans) ) 
+        print ("Number of zombies left = ", len(zombies) ) 
         timeStamp = datetime.datetime.now().timestamp()
         itStamp = it
 
@@ -1608,12 +1591,13 @@ while userExit == False:
         print("all zombies are dead")
         perdu = True
         winner = 1 #1 if humans win(all zombies are dead), 2 if zombies win
-    
-    #if (len(humans)==0):
-    #    print("all humans are dead")
-    #    perdu = True
-    #    winner = 2
-    
+
+
+    if (len(humans)==0):
+        print("all humans are dead")
+        perdu = True
+        winner = 2
+
 
     if perdu == True :
         if winner == 1:
@@ -1628,7 +1612,9 @@ while userExit == False:
             print ("")
             pygame.quit()
             sys.exit()
-        else :
+
+    if perdu == True :
+        if winner == 2:
             print ("")
             print ("#### #### #### #### ####")
             print ("####                ####")
@@ -1649,6 +1635,7 @@ while userExit == False:
             WEATHER=True
         else:
             WEATHER=False
+
 
 
     # continuous stroke
