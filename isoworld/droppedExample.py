@@ -52,11 +52,11 @@ PROB_REPROD = 0.045
 MAXHUNGER=50
 
 #probs for foods
-PROBDROPFOOD=1
+PROBDROPFOOD=0.7
 DROPDAYFOOD=2
 DECOMPDAYFOOD=15
 NBFOOD=0
-MAXFOOD= 70
+MAXFOOD= 20
 
 
 #probs for gun
@@ -641,6 +641,31 @@ class Human(BasicAgent):
 
 
         return
+
+    def move5(self):
+        if self.infected>0:
+            if getObjectAt((self.x+1+worldWidth)%worldWidth, (self.y+worldHeight)%worldHeight ) == medicineId: #x+1 y
+                self.move2(1,0)
+            elif getObjectAt((self.x-1+worldWidth)%worldWidth, (self.y+worldHeight)%worldHeight ) == medicineId: #x-1 y
+                self.move2(-1,0)
+            elif getObjectAt((self.x+worldWidth)%worldWidth, (self.y+1+worldHeight)%worldHeight ) == medicineId: #x y+1
+                self.move2(0,1)
+            elif getObjectAt((self.x+worldWidth)%worldWidth, (self.y-1+worldHeight)%worldHeight ) == medicineId: #x y-1
+                self.move2(0,-1)
+            elif getObjectAt((self.x-1+worldWidth)%worldWidth, (self.y-1+worldHeight)%worldHeight ) == medicineId: #x-1 y-1
+                self.move2(-1,-1)
+            elif getObjectAt((self.x+1+worldWidth)%worldWidth, (self.y-1+worldHeight)%worldHeight ) == medicineId: #x+1 y-1
+                self.move2(1,-1)
+            elif getObjectAt((self.x+1+worldWidth)%worldWidth, (self.y+1+worldHeight)%worldHeight ) == medicineId: #x+1 y+1
+                self.move2(1,1)
+            elif getObjectAt((self.x-1+worldWidth)%worldWidth, (self.y+1+worldHeight)%worldHeight ) == medicineId: #x-1 y+1
+                self.move2(-1,1)
+            else :
+                self.move()
+
+        return
+
+    
 
 
     def combat(self,zombies,met):
@@ -1426,6 +1451,10 @@ def stepAgents(it = 0 ):
                 if h.infected != 0:
                     h.infected +=1
                     h.takeCure(cure, manId, womanId) #checks if there is a cure in the same spot
+                    h.age+=1
+                    h.hunger-=1
+                    h.move5()
+                    continue
                 else:
                     h.eat(foods) #checks if there is any food in the same spot, if yes eats it
                     h.arming(guns) #checks if there is any gun in the same spot, if yes takes it
@@ -1509,6 +1538,12 @@ def render( it = 0, list_agents=iconsH_list):
                     screen.blit( objectType[ getObjectAt( xTile , yTile, level) ] , (xScreen, yScreen - heightMultiplier*(level+1) ))
 
             if (getAgentAt( xTile, yTile ) != 0) :
+
+                if ((getAgentAt( xTile, yTile ) == foodsId)) :
+                    for f in foods:
+                        if f.x==xTile and f.y==yTile : # agent on terrain?
+                            screen.blit( agentType[ getAgentAt( xTile, yTile ) ] , (xScreen, yScreen - heightMultiplier ))
+
                 for iconId in list_agents:
                     if (getAgentAt(xTile, yTile)==iconId):
                         for h in humans:
@@ -1520,11 +1555,8 @@ def render( it = 0, list_agents=iconsH_list):
                         if z.dead==False and z.x==xTile and z.y==yTile : # agent on terrain?
                             screen.blit( agentType[ getAgentAt( xTile, yTile ) ] , (xScreen, yScreen - heightMultiplier ))
 
-                if ((getAgentAt( xTile, yTile ) == foodsId)) :
-                    for f in foods:
-                        if f.x==xTile and f.y==yTile : # agent on terrain?
-                            screen.blit( agentType[ getAgentAt( xTile, yTile ) ] , (xScreen, yScreen - heightMultiplier ))
 
+                """
                 if (getAgentAt( xTile, yTile ) == gunId) :
                     for f in guns:
                         if f.x==xTile and f.y==yTile : # agent on terrain?
@@ -1533,7 +1565,7 @@ def render( it = 0, list_agents=iconsH_list):
                 if (getAgentAt( xTile, yTile ) == medicineId) :
                     for f in cure:
                         if f.x==xTile and f.y==yTile : # agent on terrain?
-                            screen.blit( agentType[ getAgentAt( xTile, yTile ) ] , (xScreen, yScreen - heightMultiplier ))
+                            screen.blit( agentType[ getAgentAt( xTile, yTile ) ] , (xScreen, yScreen - heightMultiplier ))"""
 
 
     return
@@ -1615,6 +1647,10 @@ while userExit == False:
             print ("")
             pygame.quit()
             sys.exit()
+
+    if NBFOOD>=(worldHeight*worldWidth)*0.5:
+        pygame.quit()
+        sys.exit()
 
     if it % 60 == 0:
         DAY=False

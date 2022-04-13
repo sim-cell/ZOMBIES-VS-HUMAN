@@ -1,4 +1,4 @@
-
+# PROGRAMME . isoworld.py
 Welcome to our post apocalyptic world!
 
 Nous remercions a M. Bredeche pour nous fournir le code initial.
@@ -14,7 +14,8 @@ Le code principal (appele isoworld.py) est dans le repertoire appele isoworld et
 
  La plupart des probabilites et les parametres du monde et du simulation sont au debut du code pour les faire varier.
 
- On a quelques versions du code pour facilement tester le code (pour avoir des exemplaires du fonctionnement du code ).    
+ On a quelques versions du code pour facilement tester le code (pour avoir des exemplaires du fonctionnement du code ).  
+ Risques des petit bugs etant donne que les programmes contiennent une petit partie du code original 
  - prison.py -> pour voir l'interaction objet-agent
  - agentsOnly.py -> un monde sans objets pour observer seulement les agents (basic et dropped)
  - boxingRing.py -> un monde petit avec un seul humain et un seul zombie pour observer le combat. (boucle infini jusqu'a 'esc')
