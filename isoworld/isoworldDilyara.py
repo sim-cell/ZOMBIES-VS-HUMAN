@@ -131,8 +131,7 @@ screenHeight = 640 #900 #
 
 # world dimensions (ie. nb of cells in total)
 #ALWAYS A PAIR NUMBER AND MINIMUM 10 (no env if <20) #
-
-worldWidth = 30#64
+worldWidth = 30#64 
 worldHeight = 30 #64
 
 # set surface of displayed tiles (ie. nb of cells that are rendered) -- must be superior to worldWidth and worldHeight
@@ -156,9 +155,7 @@ verbose = False # display message in console on/off
 verboseFps = True # display FPS every once in a while
 
 #max space to fill with objects
-
-MAXENVOBJ = 0
-
+MAXENVOBJ = 0 
 if worldHeight >= 10 and worldWidth >=10 :
     MAXENVOBJ = randint(1,worldWidth //10)
     MAXSURFACE = (worldWidth * worldHeight*30)//100
@@ -609,7 +606,7 @@ class Human(BasicAgent):
     #when a human sees another human they go towards them
 
     def move4(self):
-
+        
         if self.type==manId:
             if getAgentAt((self.x+1+worldWidth)%worldWidth, (self.y+worldHeight)%worldHeight ) == womanId: #x+1 y
                 self.move2(1,0)
@@ -633,7 +630,7 @@ class Human(BasicAgent):
             maninneighbor=False
             for i in [0,1,-1]:
                 for j in [0,1,-1]:
-                    if not (i==0 and j==0): #not in the same case
+                    if not (i==0 and j==0): #not in the same case  
                         if getAgentAt((self.x+i+worldWidth)%worldWidth, (self.y+j+worldHeight)%worldHeight )==manId: #there is a man in neighbor
                             maninneigbor=True
             if not maninneighbor:
@@ -1097,6 +1094,7 @@ def createHouse(x,y):
 
 def randEnv():
 
+    
     if MAXENVOBJ > 0 :
         nbobj=randint(1,MAXENVOBJ)
         i=nbobj
@@ -1461,9 +1459,7 @@ def stepWorld( it = 0):
 
 def stepAgents(it = 0 ):
     # move agent
-
-    if it % (maxFps/16) == 0:
-
+    if it % (maxFps/16) == 0: 
         #print("stepped agents human count :",len(humans),"zombie count :",len(zombies))
         shuffle(foods)
         shuffle(zombies)
@@ -1494,7 +1490,7 @@ def stepAgents(it = 0 ):
 
             if h.age>MAXAGEH or h.hunger==-1:
                 h.die()
-
+                
             h.check_transition(zombies)
 
             if h.dead:
@@ -1650,10 +1646,14 @@ while userExit == False:
         print("all zombies are dead")
         perdu = True
         winner = 1 #1 if humans win(all zombies are dead), 2 if zombies win
+
+
     if (len(humans)==0):
         print("all humans are dead")
         perdu = True
         winner = 2
+
+
     if perdu == True :
         if winner == 1:
             print ("")
@@ -1667,6 +1667,7 @@ while userExit == False:
             print ("")
             pygame.quit()
             sys.exit()
+
     if perdu == True :
         if winner == 2:
             print ("")
