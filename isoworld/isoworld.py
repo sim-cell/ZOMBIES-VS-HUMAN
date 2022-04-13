@@ -132,8 +132,8 @@ screenHeight = 640 #900 #
 
 # world dimensions (ie. nb of cells in total)
 #ALWAYS A PAIR NUMBER AND MINIMUM 10 (no env if <20) #
-worldWidth = 30#64 
-worldHeight = 30 #64
+worldWidth = 32#64 
+worldHeight = 32 #64
 
 # set surface of displayed tiles (ie. nb of cells that are rendered) -- must be superior to worldWidth and worldHeight
 viewWidth = 32 #32 #after 64 it lags
