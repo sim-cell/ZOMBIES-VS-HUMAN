@@ -608,38 +608,28 @@ class Human(BasicAgent):
 
     #when a human sees another human they go towards them
 
-    def move4(self):
+    def move4(self): # poursuit of a sexual partner
+        return
 
-        if self.type==manId:
-            if getAgentAt((self.x+1+worldWidth)%worldWidth, (self.y+worldHeight)%worldHeight ) == womanId: #x+1 y
-                self.move2(1,0)
-            elif getAgentAt((self.x-1+worldWidth)%worldWidth, (self.y+worldHeight)%worldHeight ) == womanId: #x-1 y
-                self.move2(-1,0)
-            elif getAgentAt((self.x+worldWidth)%worldWidth, (self.y+1+worldHeight)%worldHeight ) == womanId: #x y+1
-                self.move2(0,1)
-            elif getAgentAt((self.x+worldWidth)%worldWidth, (self.y-1+worldHeight)%worldHeight ) == womanId: #x y-1
-                self.move2(0,-1)
-            elif getAgentAt((self.x-1+worldWidth)%worldWidth, (self.y-1+worldHeight)%worldHeight ) == womanId: #x-1 y-1
-                self.move2(-1,-1)
-            elif getAgentAt((self.x+1+worldWidth)%worldWidth, (self.y-1+worldHeight)%worldHeight ) ==womanId: #x+1 y-1
-                self.move2(1,-1)
-            elif getAgentAt((self.x+1+worldWidth)%worldWidth, (self.y+1+worldHeight)%worldHeight ) == womanId: #x+1 y+1
-                self.move2(1,1)
-            elif getAgentAt((self.x-1+worldWidth)%worldWidth, (self.y+1+worldHeight)%worldHeight ) == womanId: #x-1 y+1
-                self.move2(-1,1)
-            else :
-                self.move()
-        elif self.type==womanId:
-            maninneighbor=False
-            for i in [0,1,-1]:
-                for j in [0,1,-1]:
-                    if not (i==0 and j==0): #not in the same case
-                        if getAgentAt((self.x+i+worldWidth)%worldWidth, (self.y+j+worldHeight)%worldHeight )==manId: #there is a man in neighbor
-                            maninneigbor=True
-            if not maninneighbor:
-                self.move() #if there is no man then woman moves randomly if there is a man she does not move
-
-
+    def move5(self):
+        if getAgentAt((self.x+1+worldWidth)%worldWidth, (self.y+worldHeight)%worldHeight ) == medicineId: #x+1 y
+            self.move2(1,0)
+        elif getAgentAt((self.x-1+worldWidth)%worldWidth, (self.y+worldHeight)%worldHeight ) == medicineId: #x-1 y
+            self.move2(-1,0)
+        elif getAgentAt((self.x+worldWidth)%worldWidth, (self.y+1+worldHeight)%worldHeight ) == medicineId: #x y+1
+            self.move2(0,1)
+        elif getAgentAt((self.x+worldWidth)%worldWidth, (self.y-1+worldHeight)%worldHeight ) == medicineId: #x y-1
+            self.move2(0,-1)
+        elif getAgentAt((self.x-1+worldWidth)%worldWidth, (self.y-1+worldHeight)%worldHeight ) == medicineId: #x-1 y-1
+            self.move2(-1,-1)
+        elif getAgentAt((self.x+1+worldWidth)%worldWidth, (self.y-1+worldHeight)%worldHeight ) == medicineId: #x+1 y-1
+            self.move2(1,-1)
+        elif getAgentAt((self.x+1+worldWidth)%worldWidth, (self.y+1+worldHeight)%worldHeight ) == medicineId: #x+1 y+1
+            self.move2(1,1)
+        elif getAgentAt((self.x-1+worldWidth)%worldWidth, (self.y+1+worldHeight)%worldHeight ) == medicineId: #x-1 y+1
+            self.move2(-1,1)
+        else :
+            self.move()
         return
 
 
@@ -682,8 +672,11 @@ class Human(BasicAgent):
                         #print("a baby is born ")
                         if sex_choice == ImageIdF:
                             list_humans.append(Female(sex_choice, coords[0], coords[1]))
+                            print("Female born")
                         else :
                             list_humans.append(Male(sex_choice, coords[0], coords[1]))
+                            print("Male born")
+
                     break
         return
 
@@ -713,13 +706,12 @@ class Human(BasicAgent):
                     self.infected = 0
                     if self.sex =='M':
                         self.type = manId
-                        print("Female ", id(self), " cured")
+                        print("Male ", id(self), " cured")
                     else:
                         self.type = womanId
-                        print("Male ", id(self), " cured")
-
-                #cure.remove(i)
-                break
+                        print("Female ", id(self), " cured")
+                    cure.remove(i)
+                    break
         return
 
     def check_transition(h, zombies):
@@ -735,11 +727,43 @@ class Male(Human):
     def __init__(self,imageId, newx=-1, newy=-1):
         super().__init__(imageId, newx=-1, newy=-1)
         self.sex='M'
+
+        def move4(self):
+            if getAgentAt((self.x+1+worldWidth)%worldWidth, (self.y+worldHeight)%worldHeight ) == womanId: #x+1 y
+                self.move2(1,0)
+            elif getAgentAt((self.x-1+worldWidth)%worldWidth, (self.y+worldHeight)%worldHeight ) == womanId: #x-1 y
+                self.move2(-1,0)
+            elif getAgentAt((self.x+worldWidth)%worldWidth, (self.y+1+worldHeight)%worldHeight ) == womanId: #x y+1
+                self.move2(0,1)
+            elif getAgentAt((self.x+worldWidth)%worldWidth, (self.y-1+worldHeight)%worldHeight ) == womanId: #x y-1
+                self.move2(0,-1)
+            elif getAgentAt((self.x-1+worldWidth)%worldWidth, (self.y-1+worldHeight)%worldHeight ) == womanId: #x-1 y-1
+                self.move2(-1,-1)
+            elif getAgentAt((self.x+1+worldWidth)%worldWidth, (self.y-1+worldHeight)%worldHeight ) ==womanId: #x+1 y-1
+                self.move2(1,-1)
+            elif getAgentAt((self.x+1+worldWidth)%worldWidth, (self.y+1+worldHeight)%worldHeight ) == womanId: #x+1 y+1
+                self.move2(1,1)
+            elif getAgentAt((self.x-1+worldWidth)%worldWidth, (self.y+1+worldHeight)%worldHeight ) == womanId: #x-1 y+1
+                self.move2(-1,1)
+            else :
+                self.move()
+            return
+
 class Female(Human):
     def __init__(self,imageId, newx=-1, newy=-1):
         super().__init__(imageId, newx=-1, newy=-1)
         self.sex='F'
 
+        def move4(self):
+            maninneighbor=False
+            for i in [0,1,-1]:
+                for j in [0,1,-1]:
+                    if not (i==0 and j==0): #not in the same case
+                        if getAgentAt((self.x+i+worldWidth)%worldWidth, (self.y+j+worldHeight)%worldHeight )==manId: #there is a man in neighbor
+                            maninneigbor=True
+            if not maninneighbor:
+                self.move() #if there is no man then woman moves randomly if there is a man she does not move
+            return
 
 
 class Zombie(BasicAgent):
@@ -1470,7 +1494,7 @@ def stepAgents(it = 0 ):
         shuffle(humans)
         Food.randomDrop(it, foods)
         Food.decomposition(foods)
-        #Gun.randomDrop(it, guns)
+        Gun.randomDrop(it, guns)
 
         for objList in [foods, guns, cure]:
             for i in objList:
@@ -1503,14 +1527,16 @@ def stepAgents(it = 0 ):
                 if h.infected != 0:
                     h.infected +=1
                     h.takeCure(cure, manId, womanId)
+                    h.move5()
                 else:
                     h.eat(foods)
                     h.arming(guns)
                     h.combat(zombies, met)
                     h.reproduire(humans, babyBoyId, babyGirlId, met)
+                    h.move3()
                 h.age+=1
                 h.hunger-=1
-                h.move3()
+
 
     return
 
@@ -1640,46 +1666,42 @@ while userExit == False:
     render(it)
 
     stepAgents(it)
-    #stepWorld(it)
+    stepWorld(it)
 
-    perdu = False
     winner = 0
 
-    """
+
     if (len(zombies)==0):
         print("all zombies are dead")
-        perdu = True
         winner = 1 #1 if humans win(all zombies are dead), 2 if zombies win
     if (len(humans)==0):
         print("all humans are dead")
-        perdu = True
         winner = 2
-    if perdu == True :
-        if winner == 1:
-            print ("")
-            print ("#### #### #### #### ####")
-            print ("####                ####")
-            print ("####     HUMANS WIN !    ####")
-            print ("####                ####")
-            print ("#### #### #### #### ####")
-            print ("")
-            print (">>> Score:",it,"--> BRAVO! ")
-            print ("")
-            pygame.quit()
-            sys.exit()
-    if perdu == True :
-        if winner == 2:
-            print ("")
-            print ("#### #### #### #### ####")
-            print ("####                ####")
-            print ("####     ZOMBIES WIN !    ####")
-            print ("####                ####")
-            print ("#### #### #### #### ####")
-            print ("")
-            print (">>> Score:",it,"--> BRAVO! ")
-            print ("")
-            pygame.quit()
-            sys.exit()"""
+
+    if winner == 1:
+        print ("")
+        print ("#### #### #### #### ####")
+        print ("####                ####")
+        print ("####     HUMANS WIN !    ####")
+        print ("####                ####")
+        print ("#### #### #### #### ####")
+        print ("")
+        print (">>> Score:",it,"--> BRAVO! ")
+        print ("")
+        pygame.quit()
+        sys.exit()
+    if winner == 2:
+        print ("")
+        print ("#### #### #### #### ####")
+        print ("####                ####")
+        print ("####     ZOMBIES WIN !    ####")
+        print ("####                ####")
+        print ("#### #### #### #### ####")
+        print ("")
+        print (">>> Score:",it,"--> BRAVO! ")
+        print ("")
+        pygame.quit()
+        sys.exit()
 
     if it % 60 == 0:
         DAY=False
