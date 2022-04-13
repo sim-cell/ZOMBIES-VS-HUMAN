@@ -1,35 +1,10 @@
-#
-# World of Isotiles
-# Author: nicolas.bredeche(at)sorbonne-universite.fr
-#
-# Started: 2018-11-17
-# purpose: basic code developped for teaching artificial life and ecological simulation at Sorbonne Univ. (SU)
-# course: L2, 2i013 Projet, "Vie Artificielle"
-# licence: CC-BY-SA
-#
-# Requirements: Python3, Pygame
-#
-# Credits for third party resources used in this project:
-# - Assets: https://www.kenney.nl/ (great assets by Kenney Vleugels with *public domain license*)
-# - https://www.uihere.com/free-cliparts/space-medicines-extreme-2-video-game-arcade-game-8-bit-space-medicines-3996521
-#
-# Random bookmarks:
-# - scaling images: https://stackoverflow.com/questions/43196126/how-do-you-scale-a-design-resolution-to-other-resolutions-with-pygame
-# - thoughts on grid worlds: http://www-cs-students.stanford.edu/~amitp/game-programming/grids/
-# - key pressed? https://stackoverflow.com/questions/16044229/how-to-get-keyboard-input-in-pygame
-# - basic example to display tiles: https://stackoverflow.com/questions/20629885/how-to-render-an-isometric-tile-based-world-in-python
-# - pygame key codes: https://www.pygame.org/docs/ref/key.html
-# - pygame capture key combination: https://stackoverflow.com/questions/24923078/python-keydown-combinations-ctrl-key-or-shift-key
-# - methods to initialize a 2D array: https://stackoverflow.com/questions/2397141/how-to-initialize-a-two-dimensional-array-in-python
-# - bug with SysFont - cf. https://www.reddit.com/r/pygame/comments/1fhq6d/pygamefontsysfont_causes_my_script_to_freeze_why/
-#       myfont = pygame.font.SysFont(pygame.font.get_default_font(), 16)
-#       myText = myfont.render("Hello, World", True, (0, 128, 0))
-#       screen.blit(myText, (screenWidth/2 - text.get_width() / 2, screenHeight/2 - text.get_height() / 2))
-#       ... will fail.
-#
-# TODO list
-# - double buffer
-# -.multiple agents
+### ### ### ### ### ### ### ### ### ### ### ### ### ### ### ###
+### ### ### ### ### ### ### ### ### ### ### ### ### ### ### ###
+### ### ### ### ### ### ### ### ### ### ### ### ### ### ### ###
+###
+### created to show that humans cannot go through objects 
+###
+### ### ### ### ### ### ### ### ### ### ### ### ### ### ### ###
 
 
 import sys
@@ -1394,15 +1369,6 @@ def fixEnv():
 def initWorld():
     global nbTrees, nbBurningTrees, zombies, humans, nbDetails
 
-    cloudspawn()
-    if getWorldWidth() >= 100 :
-        fixEnv()
-        randEnv()
-        addingTrees()
-    elif worldHeight>=20 and worldWidth>=20 :
-        randEnv()
-        addingTrees()
-
     #adding agents
     for i in range(nbAgents):
         zombies.append(Zombie(zombieId,-1,-1))
@@ -1424,54 +1390,6 @@ def initAgents():
 
 def stepWorld( it = 0):
 
-    for (x,y) in lightning:
-        deleteObjectAt(x,y,objectMapLevels-2)
-        lightning.remove((x,y))
-
-
-    if it % (maxFps/10) == 0: #tour speed
-
-        if WEATHER==False: #stormy
-            for x in range(worldWidth):
-                for y in range(worldHeight):
-                    if getObjectAt(x,y,objectMapLevels-1) == chargedCloudId:
-                        for neighbours in ((-1,0),(+1,0),(0,-1),(0,+1)):
-                            if getObjectAt((x+neighbours[0]+worldWidth)%worldWidth,(y+neighbours[1]+worldHeight)%worldHeight,objectMapLevels-1) == chargedCloudId:
-                                if random()<0.003:
-                                    lightning.append((x,y))
-                                    setObjectAt(x,y,lightningId,objectMapLevels-2)
-                                    #if random()<0.0012: #plays the sound of thunder but it is annoying
-                                        #playsound('sounds/minithunder.wav')
-                        if random()<0.005:
-                            setObjectAt(x,y,cloudId,objectMapLevels-1)
-                    elif getObjectAt(x,y,objectMapLevels-1) == cloudId:
-                        for neighbours in ((-1,0),(+1,0),(0,-1),(0,+1)):
-                            if getObjectAt((x+neighbours[0]+worldWidth)%worldWidth,(y+neighbours[1]+worldHeight)%worldHeight,objectMapLevels-1) == chargedCloudId:
-                                if random()<0.3:
-                                    setObjectAt(x,y,chargedCloudId,objectMapLevels-1)
-
-        else:
-            #if we want random clouds every once in a while
-            if random()<0.1:
-                for x in range(worldWidth):
-                    for y in range(worldHeight):
-                        if getObjectAt(x,y,objectMapLevels-1) == chargedCloudId or  getObjectAt(x,y,objectMapLevels-1) == cloudId:
-                            deleteObjectAt(x,y,objectMapLevels-1)
-                for i in clouds:
-                    clouds.remove(i)
-
-                cloudspawn()
-            #if we reinitialize the clouds as mostly uncharged
-            """
-            if random()<0.1:
-                for x in range(worldWidth):
-                    for y in range(worldHeight):
-                        if getObjectAt(x,y,objectMapLevels-1) == chargedCloudId :
-                            if random()<0.2:
-                                setObjectAt(x,y,cloudId,objectMapLevels-1)
-                        elif getObjectAt(x,y,objectMapLevels-1) == cloudId :
-                            if random()<0.05:
-                                setObjectAt(x,y,chargedCloudId,objectMapLevels-1)"""
     return
 
 
