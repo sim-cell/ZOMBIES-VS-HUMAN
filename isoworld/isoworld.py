@@ -689,7 +689,7 @@ class Human(BasicAgent):
         for f in foods :
             if self.x== f.x and self.y==f.y :
                 self.hunger+=f.energy
-                self.age-=f.energy
+                self.age-=f.energy//2
                 foods.remove(f)
                 food=True
                 print("human ate")
