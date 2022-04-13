@@ -583,35 +583,35 @@ class Human(BasicAgent):
             if getAgentAt((self.x+1+worldWidth)%worldWidth, (self.y+worldHeight)%worldHeight ) == zombieId: #x+1 y
                 self.type=new
                 self.move2(-1,0)
-                print("running")
+
             elif getAgentAt((self.x-1+worldWidth)%worldWidth, (self.y+worldHeight)%worldHeight ) == zombieId: #x-1 y
                 self.type=new
                 self.move2(1,0)
-                print("running")
+
             elif getAgentAt((self.x+worldWidth)%worldWidth, (self.y+1+worldHeight)%worldHeight ) == zombieId: #x y+1
                 self.type=new
                 self.move2(0,-1)
-                print("running")
+
             elif getAgentAt((self.x+worldWidth)%worldWidth, (self.y-1+worldHeight)%worldHeight ) == zombieId: #x y-1
                 self.type=new
                 self.move2(0,1)
-                print("running")
+
             elif getAgentAt((self.x-1+worldWidth)%worldWidth, (self.y-1+worldHeight)%worldHeight ) == zombieId: #x-1 y-1
                 self.type=new
                 self.move2(1,1)
-                print("running")
+
             elif getAgentAt((self.x+1+worldWidth)%worldWidth, (self.y-1+worldHeight)%worldHeight ) == zombieId: #x+1 y-1
                 self.type=new
                 self.move2(-1,1)
-                print("running")
+
             elif getAgentAt((self.x+1+worldWidth)%worldWidth, (self.y+1+worldHeight)%worldHeight ) == zombieId: #x+1 y+1
                 self.type=new
                 self.move2(-1,-1)
-                print("running")
+
             elif getAgentAt((self.x-1+worldWidth)%worldWidth, (self.y+1+worldHeight)%worldHeight ) == zombieId: #x-1 y+1
                 self.type=new
                 self.move2(1,-1)
-                print("running")
+
             elif random()<0.3: #not a high probability because if they always try to stay in the same case they will not move around
                 self.move4()
                 nozombie=True
@@ -1407,7 +1407,15 @@ def initWorld():
         randEnv()
         addingTrees()
 
+
+
+    return
+
+### ### ### ### ###
+
+def initAgents():
     #adding agents
+    global zombies, humans
     for i in range(nbAgents):
         zombies.append(Zombie(zombieId,-1,-1))
         if random()<0.5:
@@ -1416,12 +1424,6 @@ def initWorld():
             humans.append(Female(womanId))
 
     Cure.randomDrop(cure,it=1)
-
-    return
-
-### ### ### ### ###
-
-def initAgents():
     return
 
 ### ### ### ### ###
@@ -1441,7 +1443,7 @@ def stepWorld( it = 0):
                     if getObjectAt(x,y,objectMapLevels-1) == chargedCloudId:
                         for neighbours in ((-1,0),(+1,0),(0,-1),(0,+1)):
                             if getObjectAt((x+neighbours[0]+worldWidth)%worldWidth,(y+neighbours[1]+worldHeight)%worldHeight,objectMapLevels-1) == chargedCloudId:
-                                if random()<0.003:
+                                if random()<0.001:
                                     lightning.append((x,y))
                                     setObjectAt(x,y,lightningId,objectMapLevels-2)
                                     #if random()<0.0012: #plays the sound of thunder but it is annoying
@@ -1503,7 +1505,7 @@ def stepAgents(it = 0 ):
                 else:
                     h.type=womanId
 
-            if h.age>MAXAGEH or h.hunger==-1: #death from old age and hunger
+            if h.age>MAXAGEH or h.hunger<=-1: #death from old age and hunger
                 h.die()
                  
             h.check_transition(zombies) #if at the end of the transformation period kill the human (to remove) and add a zombie in the same place
@@ -1596,7 +1598,15 @@ def render( it = 0, list_agents=iconsH_list):
                 if getObjectAt( xTile , yTile , level)  > 0: # object on terrain?
                     screen.blit( objectType[ getObjectAt( xTile , yTile, level) ] , (xScreen, yScreen - heightMultiplier*(level+1) ))
 
+               
+
             if (getAgentAt( xTile, yTile ) != 0) :
+
+                if (getAgentAt( xTile, yTile ) == medicineId) :
+                    for f in cure:
+                        if f.x==xTile and f.y==yTile : # agent on terrain?
+                            screen.blit( agentType[ getAgentAt( xTile, yTile ) ] , (xScreen, yScreen - heightMultiplier ))
+
                 for iconId in list_agents:
                     if (getAgentAt(xTile, yTile)==iconId):
                         for h in humans:
@@ -1618,10 +1628,7 @@ def render( it = 0, list_agents=iconsH_list):
                         if f.x==xTile and f.y==yTile : # agent on terrain?
                             screen.blit( agentType[ getAgentAt( xTile, yTile ) ] , (xScreen, yScreen - heightMultiplier ))
 
-                if (getAgentAt( xTile, yTile ) == medicineId) :
-                    for f in cure:
-                        if f.x==xTile and f.y==yTile : # agent on terrain?
-                            screen.blit( agentType[ getAgentAt( xTile, yTile ) ] , (xScreen, yScreen - heightMultiplier ))
+
 
 
     return
