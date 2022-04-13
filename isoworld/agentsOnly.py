@@ -233,10 +233,14 @@ def loadAllImages():
     lightningimage=loadImage('assets/basic111x128/lightning.png') #lightning
     lightningimage = pygame.transform.scale((lightningimage), (50, 50))
     objectType.append(lightningimage)
+    
+    #cure image
+    cure=loadImage('assets/basic111x128/vaccine.png')
+    cure = pygame.transform.scale((cure), (20, 20))
 
     #agent images
     agentType.append(None) # default -- never drawn
-    agentType.append(loadImage('assets/basic111x128/vaccine.png')) # cure
+    agentType.append(cure) # cure
     agentType.append(loadImage('assets/basic111x128/zomb.png')) # zombie
     agentType.append(loadImage('assets/basic111x128/manwalking.png')) # man
     agentType.append(loadImage('assets/basic111x128/combat.png')) #human wins
