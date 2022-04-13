@@ -860,7 +860,7 @@ class Food(RandDropAgents):
             if random() < PROBDROPFOOD:
                 if it%DROPDAYFOOD==0 :
                     for i in range(0, randint(5, 10)):
-                        if len(list)== MAXFOOD :
+                        if len(list)+i>= MAXFOOD :
                             break
                         list.append(Food())
         return
@@ -878,7 +878,7 @@ class Gun(RandDropAgents) :
             if random() < PROBDROPGUN:
                 if it%DROPDAYGUN == 0 :
                     for i in range(0,randint(5, 10)):
-                        if len(list)== MAXGUN :
+                        if len(list)+i>= MAXGUN :
                             break
                         list.append(Gun())
         return
