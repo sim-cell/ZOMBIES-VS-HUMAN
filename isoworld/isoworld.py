@@ -61,8 +61,8 @@ versionTag = "2022"
 # all values are for initialisation. May change during runtime.
 
 #numbers of elements #should be changed according to the world height and width
-nbTrees = 15 #350
-nbAgents = 20
+nbTrees = 20 #350
+nbAgents = 30
 nbDetails = 15
 
 #environmental changes (nature)
@@ -70,8 +70,8 @@ DAY=True
 WEATHER=True #True=sunny False=storm
 
 #probs for humans and zombies
-MAXAGEH=30
-MAXAGEZ=20
+MAXAGEH=50
+MAXAGEZ=50
 PSHOOT=0.75
 PROB_REPROD = 0.045
 MAXHUNGER=30
@@ -97,7 +97,7 @@ NBCURE=0
 MAXCURE=20
 
 #probs of environment
-PROBTURN = 0.03    #randomly turn of road
+PROBTURN = 0.01    #randomly turn of road
 
 #agent lists
 guns = []
@@ -126,17 +126,17 @@ occupied=[]  #occupied surface by objects
 
 
 # display screen dimensions
-screenWidth = 1400 # 930 #
-screenHeight = 900 # 640 #
+screenWidth =  930 #1400 #
+screenHeight = 640 #900 #
 
 # world dimensions (ie. nb of cells in total)
 #ALWAYS A PAIR NUMBER AND MINIMUM 10 (no env if <20) #
-worldWidth = 100#64 
-worldHeight = 100#64
+worldWidth = 30#64
+worldHeight = 30 #64
 
 # set surface of displayed tiles (ie. nb of cells that are rendered) -- must be superior to worldWidth and worldHeight
 viewWidth = 32 #32 #after 64 it lags
-viewHeight = 32 #32
+viewHeight = 32#32
 
 scaleMultiplier = 0.25 # re-scaling of loaded images = zoom
 
@@ -155,9 +155,10 @@ verbose = False # display message in console on/off
 verboseFps = True # display FPS every once in a while
 
 #max space to fill with objects
-
-MAXENVOBJ = randint(1,worldWidth //10)
-MAXSURFACE = (worldWidth * worldHeight*30)//100
+MAXENVOBJ = 0
+if worldHeight >= 10 and worldWidth >=10 :
+    MAXENVOBJ = randint(1,worldWidth //10)
+    MAXSURFACE = (worldWidth * worldHeight*30)//100
 
 
 
@@ -594,7 +595,6 @@ class Human(BasicAgent):
             elif self.sex=='F':
                 self.type=womanId
         else:
-            print("running away")
             if self.sex=='M':
                 self.type=manRunningId
             elif self.sex=='F':
@@ -606,7 +606,7 @@ class Human(BasicAgent):
     #when a human sees another human they go towards them
 
     def move4(self):
-        
+
         if self.type==manId:
             if getAgentAt((self.x+1+worldWidth)%worldWidth, (self.y+worldHeight)%worldHeight ) == womanId: #x+1 y
                 self.move2(1,0)
@@ -630,7 +630,7 @@ class Human(BasicAgent):
             maninneighbor=False
             for i in [0,1,-1]:
                 for j in [0,1,-1]:
-                    if not (i==0 and j==0): #not in the same case  
+                    if not (i==0 and j==0): #not in the same case
                         if getAgentAt((self.x+i+worldWidth)%worldWidth, (self.y+j+worldHeight)%worldHeight )==manId: #there is a man in neighbor
                             maninneigbor=True
             if not maninneighbor:
@@ -644,7 +644,7 @@ class Human(BasicAgent):
         success = self.shoot()
         for z in zombies:
             if (met(self,z)):
-                print("combat")
+                #print("combat")
                 if success:
                     zombies.remove(z)
                     print("zombie got shot by ",id(self))
@@ -676,7 +676,7 @@ class Human(BasicAgent):
                 if self.getType()!=h.getType():#self.instanceOf(Male)&&h.instanceOf(Female) || self.instanceOf(Female)&&h.instanceOf(Male):
                     if random()<PROB_REPROD:
                         coords = self.getPosition()
-                        print("a baby is born ")
+                        #print("a baby is born ")
                         if sex_choice == ImageIdF:
                             list_humans.append(Female(sex_choice, coords[0], coords[1]))
                         else :
@@ -720,10 +720,11 @@ class Human(BasicAgent):
         return
 
     def check_transition(h, zombies):
-        if h.infected == 15:
+        if h.infected == 20:
             h.die()
             Tx=h.x
             Ty=h.y
+            #print("Human turned into a zombie")
             zombies.append(Zombie(zombieId,Tx,Ty))
         return
 
@@ -854,6 +855,7 @@ class Food(RandDropAgents):
         return
 
     def randomDrop(it,list):
+        print("food drops")
         if (it != 0):
             if random() < PROBDROPFOOD:
                 if it%DROPDAYFOOD==0 :
@@ -871,6 +873,7 @@ class Gun(RandDropAgents) :
         self.reset()
 
     def randomDrop(it,list):
+        print("gun drops")
         if (it != 0):
             if random() < PROBDROPGUN:
                 if it%DROPDAYGUN == 0 :
@@ -914,8 +917,6 @@ def cloudspawn():
                     else :
                         setObjectAt(w,l,cloudId,objectMapLevels-1)
                     clouds.append(1)
-
-
 
 
 def createRoad(x,y,dir='x'):
@@ -1093,74 +1094,76 @@ def createHouse(x,y):
 
 def randEnv():
 
-    nbobj=randint(1,MAXENVOBJ)
-    i=nbobj
-    while i>0 and len(occupied)<MAXSURFACE :
-        type = 0
-        if random()<0.3:
-            type=1 #if 0 then house if 1 then lake
-        nb=8 #tjrs pair
-        x = randint(0,getWorldWidth()-1)
-        y = randint(0,getWorldHeight()-1)
-        while True and len(occupied)>0:
-            nottrouve=True
-            for (a,b) in occupied:
-                if nottrouve :
-                    if (x==a) and (y==b):
-                        nottrouve=False
-                        print("trouve x,y")
+
+    if MAXENVOBJ > 0 :
+        nbobj=randint(1,MAXENVOBJ)
+        i=nbobj
+        while i>0 and len(occupied)<MAXSURFACE :
+            type = 0
+            if random()<0.3:
+                type=1 #if 0 then house if 1 then lake
+            nb=8 #tjrs pair
+            x = randint(0,getWorldWidth()-1)
+            y = randint(0,getWorldHeight()-1)
+            while True and len(occupied)>0:
+                nottrouve=True
+                for (a,b) in occupied:
+                    if nottrouve :
+                        if (x==a) and (y==b):
+                            nottrouve=False
+                            print("trouve x,y")
+                            break
+                        elif (((x+nb+worldWidth)%worldWidth)==a and ((y+nb+worldHeight)%worldHeight)==b) :
+                            nottrouve=False
+                            print("trouve x+,y+")
+                            break
+                        elif ((x==a) and ((y+nb+worldHeight)%worldHeight)==b) :
+                            nottrouve=False
+                            print("trouve x,y+")
+                            break
+                        elif (((x+nb+worldWidth)%worldWidth)==a and y==b) :
+                            nottrouve=False
+                            print("trouve x+,y")
+                            break
+                        elif (((x+nb/2+worldWidth)%worldWidth)==a and y==b):
+                            nottrouve=False
+                            print("trouve x/,y mil")
+                            break
+                        elif ((x==a) and ((y+nb/2+worldHeight)%worldHeight)):
+                            nottrouve=False
+                            print("trouve x,y/ mil")
+                            break
+                        elif (((x+nb/2+worldWidth)%worldWidth)==a and ((y+nb+worldHeight)%worldHeight)==b) :
+                            nottrouve=False
+                            print("trouve x/,y+ mil")
+                            break
+                        elif (((x+nb+worldWidth)%worldWidth)==a and ((y+nb/2+worldHeight)%worldHeight)==b) :
+                            nottrouve=False
+                            print("trouve x+,y/ mil")
+                            break
+                    else :
                         break
-                    elif (((x+nb+worldWidth)%worldWidth)==a and ((y+nb+worldHeight)%worldHeight)==b) :
-                        nottrouve=False
-                        print("trouve x+,y+")
-                        break
-                    elif ((x==a) and ((y+nb+worldHeight)%worldHeight)==b) :
-                        nottrouve=False
-                        print("trouve x,y+")
-                        break
-                    elif (((x+nb+worldWidth)%worldWidth)==a and y==b) :
-                        nottrouve=False
-                        print("trouve x+,y")
-                        break
-                    elif (((x+nb/2+worldWidth)%worldWidth)==a and y==b):
-                        nottrouve=False
-                        print("trouve x/,y mil")
-                        break
-                    elif ((x==a) and ((y+nb/2+worldHeight)%worldHeight)):
-                        nottrouve=False
-                        print("trouve x,y/ mil")
-                        break
-                    elif (((x+nb/2+worldWidth)%worldWidth)==a and ((y+nb+worldHeight)%worldHeight)==b) :
-                        nottrouve=False
-                        print("trouve x/,y+ mil")
-                        break
-                    elif (((x+nb+worldWidth)%worldWidth)==a and ((y+nb/2+worldHeight)%worldHeight)==b) :
-                        nottrouve=False
-                        print("trouve x+,y/ mil")
-                        break
+                if (not  nottrouve) :
+                    x = randint(0,getWorldWidth()-1)
+                    y = randint(0,getWorldHeight()-1)
+                    continue
                 else :
                     break
-            if (not  nottrouve) :
-                x = randint(0,getWorldWidth()-1)
-                y = randint(0,getWorldHeight()-1)
-                continue
-            else :
-                break
-        if type == 0 :
-            createHouse(x,y)
-            i-=1
-        elif type == 1 :
-            createlake(x,y)
-            i-=1
-    if worldWidth>20 and worldHeight>20:
-        #adding details : flower, plant or grass
-        for i in range(nbDetails):
-            x = randint(0,getWorldWidth()-6)
-            y = randint(0,20)
-            while getTerrainAt(x,y) != 0 or getObjectAt(x,y) != 0:
-                x = randint(0,getWorldWidth()-1)
+            if type == 0 :
+                createHouse(x,y)
+                i-=1
+            elif type == 1 :
+                createlake(x,y)
+                i-=1
+        if worldWidth>20 and worldHeight>20:
+            #adding details : flower, plant or grass
+            for i in range(nbDetails):
+                x = randint(0,getWorldWidth()-6)
                 y = randint(0,20)
-            setObjectAt(x,y,grassDetId)
+                while getTerrainAt(x,y) != 0 or getObjectAt(x,y) != 0:
+                    x = randint(0,getWorldWidth()-1)
+                    y = randint(0,20)
+                setObjectAt(x,y,grassDetId)
     return
 
 def fixEnv():
@@ -1456,14 +1459,14 @@ def stepWorld( it = 0):
 
 def stepAgents(it = 0 ):
     # move agent
-    if it % (maxFps/16) == 0: 
-        print("stepped agents human count :",len(humans),"zombie count :",len(zombies))
+    if it % (maxFps/16) == 0:
+        #print("stepped agents human count :",len(humans),"zombie count :",len(zombies))
         shuffle(foods)
         shuffle(zombies)
         shuffle(humans)
         Food.randomDrop(it, foods)
         Food.decomposition(foods)
-        Gun.randomDrop(it, guns)
+        #Gun.randomDrop(it, guns)
 
         for objList in [foods, guns, cure]:
             for i in objList:
@@ -1487,7 +1490,7 @@ def stepAgents(it = 0 ):
 
             if h.age>MAXAGEH or h.hunger==-1:
                 h.die()
-                
+
             h.check_transition(zombies)
 
             if h.dead:
@@ -1633,24 +1636,20 @@ while userExit == False:
     render(it)
 
     stepAgents(it)
-    stepWorld(it)
+    #stepWorld(it)
 
     perdu = False
     winner = 0
 
-
+    """
     if (len(zombies)==0):
         print("all zombies are dead")
         perdu = True
         winner = 1 #1 if humans win(all zombies are dead), 2 if zombies win
-
-
     if (len(humans)==0):
         print("all humans are dead")
         perdu = True
         winner = 2
-
-
     if perdu == True :
         if winner == 1:
             print ("")
@@ -1664,7 +1663,6 @@ while userExit == False:
             print ("")
             pygame.quit()
             sys.exit()
-
     if perdu == True :
         if winner == 2:
             print ("")
@@ -1677,7 +1675,7 @@ while userExit == False:
             print (">>> Score:",it,"--> BRAVO! ")
             print ("")
             pygame.quit()
-            sys.exit()
+            sys.exit()"""
 
     if it % 60 == 0:
         DAY=False
@@ -1687,6 +1685,7 @@ while userExit == False:
             WEATHER=True
         else:
             WEATHER=False
+
 
 
     # continuous stroke
