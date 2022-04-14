@@ -105,11 +105,12 @@ foods = []
 zombies = []
 humans = []
 cure = []
-lightning=[]
+
 
 #occupied land by objects lists
 clouds = []
 occupied=[]  #occupied surface by objects
+lightning=[]
 
 
 
@@ -118,7 +119,7 @@ occupied=[]  #occupied surface by objects
 ### ### ### ### ### ### ### ### ### ### ### ### ### ### ### ###
 ### ### ### ### ### ### ### ### ### ### ### ### ### ### ### ###
 ###
-### PARAMETERS: rendering
+### PARAMETERS: rendering 
 ###
 ### ### ### ### ### ### ### ### ### ### ### ### ### ### ### ###
 
@@ -126,17 +127,17 @@ occupied=[]  #occupied surface by objects
 
 
 # display screen dimensions
-screenWidth =  1400 #930 #
-screenHeight = 900 #640 #
+screenWidth =  930 #1400 #
+screenHeight = 640 #900 #
 
 # world dimensions (ie. nb of cells in total)
 #ALWAYS A PAIR NUMBER AND MINIMUM 10 (no env if <20) #
-worldWidth = 40#64 
-worldHeight = 40 #64
+worldWidth = 32#64 
+worldHeight = 32#64
 
 # set surface of displayed tiles (ie. nb of cells that are rendered) -- must be superior to worldWidth and worldHeight
-viewWidth = 40 #32 #after 64 it lags
-viewHeight = 40#32
+viewWidth = 32 #32 #after 64 it lags
+viewHeight = 32#32
 
 scaleMultiplier = 0.25 # re-scaling of loaded images = zoom
 
@@ -182,6 +183,8 @@ pygame.display.set_caption('Zombieland')
 ###
 ### CORE/USER: Image management
 ###
+### ### ### ### ### ### ### ### ### ### ### ### ### ### ### ###
+### ### ### ### ### ### ### ### ### ### ### ### ### ### ### ###
 ### ### ### ### ### ### ### ### ### ### ### ### ### ### ### ###
 
 #creating background images
@@ -256,9 +259,13 @@ def loadAllImages():
     lightningimage = pygame.transform.scale((lightningimage), (50, 50))
     objectType.append(lightningimage)
 
+    #cure image
+    cure=loadImage('assets/basic111x128/vaccine.png')
+    cure = pygame.transform.scale((cure), (20, 20))
+
     #agent images
     agentType.append(None) # default -- never drawn
-    agentType.append(loadImage('assets/basic111x128/vaccine.png')) # cure
+    agentType.append(cure) # cure
     agentType.append(loadImage('assets/basic111x128/zomb.png')) # zombie
     agentType.append(loadImage('assets/basic111x128/manwalking.png')) # man
     agentType.append(loadImage('assets/basic111x128/combat.png')) #human wins
@@ -468,7 +475,7 @@ def setAgentAt(x,y,type):
 class BasicAgent:
     def __init__(self,imageId, newx, newy):
         self.type = imageId
-        self.dead=False
+        self.dead=False #commune for all agents
         if newx<0:
             self.reset()
         else :
@@ -503,6 +510,7 @@ class BasicAgent:
 
     def getPosition(self):
         return (self.x,self.y)
+
     def move(self):
         xNew = self.x
         yNew = self.y
@@ -562,34 +570,55 @@ class Human(BasicAgent):
 
 
     def move3(self):
-        PROB=0.5 #less than zombies to be able to get caught
+        PROB=0.6 #less than zombies to be able to get caught
         nozombie=False
+        new=0
+        if self.sex=='M':
+                new=manRunningId
+        elif self.sex=='F':
+                new=womanRunningId
         if not DAY:
             PROB=0.3 #during night they can't see
         if random()<PROB:
             if getAgentAt((self.x+1+worldWidth)%worldWidth, (self.y+worldHeight)%worldHeight ) == zombieId: #x+1 y
+                self.type=new
                 self.move2(-1,0)
+                print("running")
             elif getAgentAt((self.x-1+worldWidth)%worldWidth, (self.y+worldHeight)%worldHeight ) == zombieId: #x-1 y
+                self.type=new
                 self.move2(1,0)
+                print("running")
             elif getAgentAt((self.x+worldWidth)%worldWidth, (self.y+1+worldHeight)%worldHeight ) == zombieId: #x y+1
+                self.type=new
                 self.move2(0,-1)
+                print("running")
             elif getAgentAt((self.x+worldWidth)%worldWidth, (self.y-1+worldHeight)%worldHeight ) == zombieId: #x y-1
+                self.type=new
                 self.move2(0,1)
+                print("running")
             elif getAgentAt((self.x-1+worldWidth)%worldWidth, (self.y-1+worldHeight)%worldHeight ) == zombieId: #x-1 y-1
+                self.type=new
                 self.move2(1,1)
+                print("running")
             elif getAgentAt((self.x+1+worldWidth)%worldWidth, (self.y-1+worldHeight)%worldHeight ) == zombieId: #x+1 y-1
+                self.type=new
                 self.move2(-1,1)
+                print("running")
             elif getAgentAt((self.x+1+worldWidth)%worldWidth, (self.y+1+worldHeight)%worldHeight ) == zombieId: #x+1 y+1
+                self.type=new
                 self.move2(-1,-1)
+                print("running")
             elif getAgentAt((self.x-1+worldWidth)%worldWidth, (self.y+1+worldHeight)%worldHeight ) == zombieId: #x-1 y+1
+                self.type=new
                 self.move2(1,-1)
+                print("running")
             elif random()<0.3: #not a high probability because if they always try to stay in the same case they will not move around
                 self.move4()
                 nozombie=True
             else:
                 self.move() #they can ignore if there is an opposite sex near them and go in a random direction
                 nozombie=True
-        if nozombie: #not necessary just to be cautious
+        """if nozombie: #not necessary just to be cautious
             if self.sex=='M':
                 self.type=manId
             elif self.sex=='F':
@@ -598,8 +627,7 @@ class Human(BasicAgent):
             if self.sex=='M':
                 self.type=manRunningId
             elif self.sex=='F':
-                self.type=womanRunningId
-
+                self.type=womanRunningId"""
 
         return
 
@@ -647,23 +675,20 @@ class Human(BasicAgent):
                 #print("combat")
                 if success:
                     zombies.remove(z)
-                    print("zombie got shot by ",id(self))
+                    #print("zombie got shot by ",id(self))
                     self.type=winnerhumanId
                 else:
                     Tx=self.x
                     Ty=self.y
-                    print("Human", id(self), "was infected and had gun :",self.gun)
+                    #print("Human", id(self), "was infected and had gun :",self.gun)
                     self.infected += 1
                     if self.sex=='M':
                         self.type = manInfId
-                        print("infected M")
+                        #print("infected M")
                     else:
                         self.type = womanInfId
-                        print("infected F")
+                        #print("infected F")
                 break
-                   # print("will remove a Z now")
-                    #zombies.append(Zombie(winnerzombieId,Tx,Ty))
-                   # print("Z removed")
 
         return
 
@@ -684,15 +709,15 @@ class Human(BasicAgent):
                     break
         return
 
-    def eat(self, foods) : #when they eat food they become younger
+    def eat(self, foods) : #when they eat food they become younger and their energy increases
         food=False
         for f in foods :
             if self.x== f.x and self.y==f.y :
                 self.hunger+=f.energy
-                self.age-=f.energy
+                self.age-=f.energy//2
                 foods.remove(f)
                 food=True
-                print("human ate")
+                #print("human ate")
         if not food :
             self.hunger-=1
 
@@ -700,7 +725,7 @@ class Human(BasicAgent):
         for g in guns :
             if self.x== g.x and self.y==g.y :
                 self.gun+=1
-                print("armed")
+                #print("armed")
                 guns.remove(g)
 
     def takeCure(self, cure, manId, womanId):
@@ -710,10 +735,10 @@ class Human(BasicAgent):
                     self.infected = 0
                     if self.sex =='M':
                         self.type = manId
-                        print("Female ", id(self), " cured")
+                        #print("Female ", id(self), " cured")
                     else:
                         self.type = womanId
-                        print("Male ", id(self), " cured")
+                        #print("Male ", id(self), " cured")
 
                 #cure.remove(i)
                 break
@@ -848,14 +873,14 @@ class Food(RandDropAgents):
     def decomposition(foods) :
         for f in foods :
             if f.decomp==DECOMPDAYFOOD :
-                print("food decomposition")
+                #print("food decomposition")
                 foods.remove(f)
             else :
                 f.decomp+=1
         return
 
     def randomDrop(it,list):
-        print("food drops")
+        #print("food drops")
         if (it != 0):
             if random() < PROBDROPFOOD:
                 if it%DROPDAYFOOD==0 :
@@ -873,7 +898,7 @@ class Gun(RandDropAgents) :
         self.reset()
 
     def randomDrop(it,list):
-        print("gun drops")
+        #print("gun drops")
         if (it != 0):
             if random() < PROBDROPGUN:
                 if it%DROPDAYGUN == 0 :
@@ -898,8 +923,8 @@ def cloudspawn():
     #creating the cloud matrix
     #interaction points are the corners and if they are touching every x iteration we hear lightning (maybe their color change)
     if worldWidth>20 and worldHeight>20:
-        maxx=worldWidth/2
-        maxy=worldHeight/2
+        maxx=worldWidth//2
+        maxy=worldHeight//2
         cx=randint(0,worldWidth)
         cy=randint(0,worldHeight)
 
@@ -1111,35 +1136,35 @@ def randEnv():
                     if nottrouve :
                         if (x==a) and (y==b):
                             nottrouve=False
-                            print("trouve x,y")
+                            #print("trouve x,y")
                             break
                         elif (((x+nb+worldWidth)%worldWidth)==a and ((y+nb+worldHeight)%worldHeight)==b) :
                             nottrouve=False
-                            print("trouve x+,y+")
+                            #print("trouve x+,y+")
                             break
                         elif ((x==a) and ((y+nb+worldHeight)%worldHeight)==b) :
                             nottrouve=False
-                            print("trouve x,y+")
+                            #print("trouve x,y+")
                             break
                         elif (((x+nb+worldWidth)%worldWidth)==a and y==b) :
                             nottrouve=False
-                            print("trouve x+,y")
+                            #print("trouve x+,y")
                             break
                         elif (((x+nb/2+worldWidth)%worldWidth)==a and y==b):
                             nottrouve=False
-                            print("trouve x/,y mil")
+                            #print("trouve x/,y mil")
                             break
                         elif ((x==a) and ((y+nb/2+worldHeight)%worldHeight)):
                             nottrouve=False
-                            print("trouve x,y/ mil")
+                            #print("trouve x,y/ mil")
                             break
                         elif (((x+nb/2+worldWidth)%worldWidth)==a and ((y+nb+worldHeight)%worldHeight)==b) :
                             nottrouve=False
-                            print("trouve x/,y+ mil")
+                            #print("trouve x/,y+ mil")
                             break
                         elif (((x+nb+worldWidth)%worldWidth)==a and ((y+nb/2+worldHeight)%worldHeight)==b) :
                             nottrouve=False
-                            print("trouve x+,y/ mil")
+                            #print("trouve x+,y/ mil")
                             break
                     else :
                         break
@@ -1388,8 +1413,6 @@ def initWorld():
             humans.append(Male(manId))
         else:
             humans.append(Female(womanId))
-        #ch = choice((m,f))
-        #humans.append(ch)
 
     Cure.randomDrop(cure,it=1)
 
@@ -1417,7 +1440,7 @@ def stepWorld( it = 0):
                     if getObjectAt(x,y,objectMapLevels-1) == chargedCloudId:
                         for neighbours in ((-1,0),(+1,0),(0,-1),(0,+1)):
                             if getObjectAt((x+neighbours[0]+worldWidth)%worldWidth,(y+neighbours[1]+worldHeight)%worldHeight,objectMapLevels-1) == chargedCloudId:
-                                if random()<0.03:
+                                if random()<0.003:
                                     lightning.append((x,y))
                                     setObjectAt(x,y,lightningId,objectMapLevels-2)
                                     #if random()<0.0012: #plays the sound of thunder but it is annoying
@@ -1427,10 +1450,11 @@ def stepWorld( it = 0):
                     elif getObjectAt(x,y,objectMapLevels-1) == cloudId:
                         for neighbours in ((-1,0),(+1,0),(0,-1),(0,+1)):
                             if getObjectAt((x+neighbours[0]+worldWidth)%worldWidth,(y+neighbours[1]+worldHeight)%worldHeight,objectMapLevels-1) == chargedCloudId:
-                                if random()<0.3:
+                                if random()<0.1:
                                     setObjectAt(x,y,chargedCloudId,objectMapLevels-1)
 
         else:
+            
             #if we want random clouds every once in a while
             if random()<0.1:
                 for x in range(worldWidth):
@@ -1442,7 +1466,7 @@ def stepWorld( it = 0):
 
                 cloudspawn()
             #if we reinitialize the clouds as mostly uncharged
-            """
+            """"
             if random()<0.1:
                 for x in range(worldWidth):
                     for y in range(worldHeight):
@@ -1459,19 +1483,47 @@ def stepWorld( it = 0):
 
 def stepAgents(it = 0 ):
     # move agent
-    if it % (maxFps/16) == 0: 
+    if it % (maxFps/8) == 0: 
         #print("stepped agents human count :",len(humans),"zombie count :",len(zombies))
         shuffle(foods)
         shuffle(zombies)
         shuffle(humans)
         Food.randomDrop(it, foods)
         Food.decomposition(foods)
-        #Gun.randomDrop(it, guns)
+        Gun.randomDrop(it, guns)
 
-        for objList in [foods, guns, cure]:
+        for objList in [foods, guns, cure]: #spawning static agents 
             for i in objList:
                 setAgentAt(i.x, i.y, i.type)
-        for z in zombies:
+
+        for h in humans:
+            if (h.type==winnerhumanId or h.type==babyBoyId or h.type==babyGirlId or h.type==womanRunningId or h.type==manRunningId ): #reinitialising the images
+                if h.sex=='M':
+                    h.type=manId
+                else:
+                    h.type=womanId
+
+            if h.age>MAXAGEH or h.hunger==-1: #death from old age and hunger
+                h.die()
+                 
+            h.check_transition(zombies) #if at the end of the transformation period kill the human (to remove) and add a zombie in the same place
+
+            if h.dead: #removing the dead
+                humans.remove(h)
+            else:
+                if h.infected != 0:
+                    h.infected +=1
+                    h.takeCure(cure, manId, womanId) #checks if there is a cure in the same spot
+                else:
+                    h.eat(foods) #checks if there is any food in the same spot, if yes eats it
+                    h.arming(guns) #checks if there is any gun in the same spot, if yes takes it
+                    h.combat(zombies, met) # if has a gun and probability is on his side, kills the zombie otherwise becomes infected 
+                    h.reproduire(humans, babyBoyId, babyGirlId, met) #if there is an opposite sex in the same case reproduction (possible to have twins)
+                h.age+=1
+                h.hunger-=1
+                h.move3()
+
+        for z in zombies: #removing dead zombies, moving them
             if z.type!=zombieId:
                 z.type=zombieId  # shuffle agents in in-place (i.e. agents is modified)
             if z.decomp>MAXAGEZ:
@@ -1481,32 +1533,6 @@ def stepAgents(it = 0 ):
                 z.decomp+=1
                 z.move3()
                 z.direction=randint(0,3)
-        for h in humans:
-            if (h.type==winnerhumanId or h.type==babyBoyId or h.type==babyGirlId or h.type==womanRunningId or h.type==manRunningId ): #if s/he won the combat
-                if h.sex=='M':
-                    h.type=manId
-                else:
-                    h.type=womanId
-
-            if h.age>MAXAGEH or h.hunger==-1:
-                h.die()
-                
-            h.check_transition(zombies)
-
-            if h.dead:
-                humans.remove(h)
-            else:
-                if h.infected != 0:
-                    h.infected +=1
-                    h.takeCure(cure, manId, womanId)
-                else:
-                    h.eat(foods)
-                    h.arming(guns)
-                    h.combat(zombies, met)
-                    h.reproduire(humans, babyBoyId, babyGirlId, met)
-                h.age+=1
-                h.hunger-=1
-                h.move3()
 
     return
 
@@ -1537,7 +1563,7 @@ def render( it = 0, list_agents=iconsH_list):
 
 
     #pygame.display.update()
-
+    #go through all the cases and blit the images
     for y in range(getViewHeight()):
         for x in range(getViewWidth()):
             # assume: north-is-upper-right
@@ -1628,6 +1654,8 @@ while userExit == False:
 
     if it != 0 and it % 100 == 0 and verboseFps:
         print ("[fps] ", ( it - itStamp ) / ( datetime.datetime.now().timestamp()-timeStamp ) )
+        print ("Number of humans left = ", len(humans) ) 
+        print ("Number of zombies left = ", len(zombies) ) 
         timeStamp = datetime.datetime.now().timestamp()
         itStamp = it
 
@@ -1636,11 +1664,10 @@ while userExit == False:
     render(it)
 
     stepAgents(it)
-    #stepWorld(it)
+    stepWorld(it)
 
     perdu = False
     winner = 0
-
     """
     if (len(zombies)==0):
         print("all zombies are dead")
