@@ -1,3 +1,4 @@
+# Adaptation of:
 #
 # World of Isotiles
 # Author: nicolas.bredeche(at)sorbonne-universite.fr
@@ -12,24 +13,6 @@
 # Credits for third party resources used in this project:
 # - Assets: https://www.kenney.nl/ (great assets by Kenney Vleugels with *public domain license*)
 # - https://www.uihere.com/free-cliparts/space-medicines-extreme-2-video-game-arcade-game-8-bit-space-medicines-3996521
-#
-# Random bookmarks:
-# - scaling images: https://stackoverflow.com/questions/43196126/how-do-you-scale-a-design-resolution-to-other-resolutions-with-pygame
-# - thoughts on grid worlds: http://www-cs-students.stanford.edu/~amitp/game-programming/grids/
-# - key pressed? https://stackoverflow.com/questions/16044229/how-to-get-keyboard-input-in-pygame
-# - basic example to display tiles: https://stackoverflow.com/questions/20629885/how-to-render-an-isometric-tile-based-world-in-python
-# - pygame key codes: https://www.pygame.org/docs/ref/key.html
-# - pygame capture key combination: https://stackoverflow.com/questions/24923078/python-keydown-combinations-ctrl-key-or-shift-key
-# - methods to initialize a 2D array: https://stackoverflow.com/questions/2397141/how-to-initialize-a-two-dimensional-array-in-python
-# - bug with SysFont - cf. https://www.reddit.com/r/pygame/comments/1fhq6d/pygamefontsysfont_causes_my_script_to_freeze_why/
-#       myfont = pygame.font.SysFont(pygame.font.get_default_font(), 16)
-#       myText = myfont.render("Hello, World", True, (0, 128, 0))
-#       screen.blit(myText, (screenWidth/2 - text.get_width() / 2, screenHeight/2 - text.get_height() / 2))
-#       ... will fail.
-#
-# TODO list
-# - double buffer
-# -.multiple agents
 
 
 import sys
@@ -609,6 +592,36 @@ class Human(BasicAgent):
     #when a human sees another human they go towards them
 
     def move4(self): # poursuit of a sexual partner
+
+        if self.type==manId:
+            if getAgentAt((self.x+1+worldWidth)%worldWidth, (self.y+worldHeight)%worldHeight ) == womanId: #x+1 y
+                self.move2(1,0)
+            elif getAgentAt((self.x-1+worldWidth)%worldWidth, (self.y+worldHeight)%worldHeight ) == womanId: #x-1 y
+                self.move2(-1,0)
+            elif getAgentAt((self.x+worldWidth)%worldWidth, (self.y+1+worldHeight)%worldHeight ) == womanId: #x y+1
+                self.move2(0,1)
+            elif getAgentAt((self.x+worldWidth)%worldWidth, (self.y-1+worldHeight)%worldHeight ) == womanId: #x y-1
+                self.move2(0,-1)
+            elif getAgentAt((self.x-1+worldWidth)%worldWidth, (self.y-1+worldHeight)%worldHeight ) == womanId: #x-1 y-1
+                self.move2(-1,-1)
+            elif getAgentAt((self.x+1+worldWidth)%worldWidth, (self.y-1+worldHeight)%worldHeight ) ==womanId: #x+1 y-1
+                self.move2(1,-1)
+            elif getAgentAt((self.x+1+worldWidth)%worldWidth, (self.y+1+worldHeight)%worldHeight ) == womanId: #x+1 y+1
+                self.move2(1,1)
+            elif getAgentAt((self.x-1+worldWidth)%worldWidth, (self.y+1+worldHeight)%worldHeight ) == womanId: #x-1 y+1
+                self.move2(-1,1)
+            else :
+                self.move()
+        elif self.type==womanId:
+            maninneighbor=False
+            for i in [0,1,-1]:
+                for j in [0,1,-1]:
+                    if not (i==0 and j==0): #not in the same case
+                        if getAgentAt((self.x+i+worldWidth)%worldWidth, (self.y+j+worldHeight)%worldHeight )==manId: #there is a man in neighbor
+                            maninneigbor=True
+            if not maninneighbor:
+                self.move() #if there is no man then woman moves randomly if there is a man she does not move
+
         return
 
     def move5(self):
@@ -728,42 +741,10 @@ class Male(Human):
         super().__init__(imageId, newx=-1, newy=-1)
         self.sex='M'
 
-        def move4(self):
-            if getAgentAt((self.x+1+worldWidth)%worldWidth, (self.y+worldHeight)%worldHeight ) == womanId: #x+1 y
-                self.move2(1,0)
-            elif getAgentAt((self.x-1+worldWidth)%worldWidth, (self.y+worldHeight)%worldHeight ) == womanId: #x-1 y
-                self.move2(-1,0)
-            elif getAgentAt((self.x+worldWidth)%worldWidth, (self.y+1+worldHeight)%worldHeight ) == womanId: #x y+1
-                self.move2(0,1)
-            elif getAgentAt((self.x+worldWidth)%worldWidth, (self.y-1+worldHeight)%worldHeight ) == womanId: #x y-1
-                self.move2(0,-1)
-            elif getAgentAt((self.x-1+worldWidth)%worldWidth, (self.y-1+worldHeight)%worldHeight ) == womanId: #x-1 y-1
-                self.move2(-1,-1)
-            elif getAgentAt((self.x+1+worldWidth)%worldWidth, (self.y-1+worldHeight)%worldHeight ) ==womanId: #x+1 y-1
-                self.move2(1,-1)
-            elif getAgentAt((self.x+1+worldWidth)%worldWidth, (self.y+1+worldHeight)%worldHeight ) == womanId: #x+1 y+1
-                self.move2(1,1)
-            elif getAgentAt((self.x-1+worldWidth)%worldWidth, (self.y+1+worldHeight)%worldHeight ) == womanId: #x-1 y+1
-                self.move2(-1,1)
-            else :
-                self.move()
-            return
-
 class Female(Human):
     def __init__(self,imageId, newx=-1, newy=-1):
         super().__init__(imageId, newx=-1, newy=-1)
         self.sex='F'
-
-        def move4(self):
-            maninneighbor=False
-            for i in [0,1,-1]:
-                for j in [0,1,-1]:
-                    if not (i==0 and j==0): #not in the same case
-                        if getAgentAt((self.x+i+worldWidth)%worldWidth, (self.y+j+worldHeight)%worldHeight )==manId: #there is a man in neighbor
-                            maninneigbor=True
-            if not maninneighbor:
-                self.move() #if there is no man then woman moves randomly if there is a man she does not move
-            return
 
 
 class Zombie(BasicAgent):
