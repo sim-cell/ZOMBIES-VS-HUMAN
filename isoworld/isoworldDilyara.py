@@ -126,17 +126,17 @@ occupied=[]  #occupied surface by objects
 
 
 # display screen dimensions
-screenWidth =  930 #1400 #
-screenHeight = 640 #900 #
+screenWidth =  1400 #930 #
+screenHeight = 900 #640 #
 
 # world dimensions (ie. nb of cells in total)
 #ALWAYS A PAIR NUMBER AND MINIMUM 10 (no env if <20) #
-worldWidth = 30#64 
-worldHeight = 30 #64
+worldWidth = 40#64 
+worldHeight = 40 #64
 
 # set surface of displayed tiles (ie. nb of cells that are rendered) -- must be superior to worldWidth and worldHeight
-viewWidth = 32 #32 #after 64 it lags
-viewHeight = 32#32
+viewWidth = 40 #32 #after 64 it lags
+viewHeight = 40#32
 
 scaleMultiplier = 0.25 # re-scaling of loaded images = zoom
 

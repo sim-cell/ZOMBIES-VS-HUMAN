@@ -1,3 +1,35 @@
+# PROGRAMME . isoworld.py
+Welcome to our post apocalyptic world!
+
+Nous remercions a M. Bredeche pour nous fournir le code initial.
+
+Notre concept est avoir un monde avec des zombies et des humains. En principe, le programme simule un combat entre les humains et zombies ou les humains ont des armes pour se proteger et ils peuvent s'enfuir mais en même temps, les zombies peuvent les chasser. Notre environnement est cree aleatoirement. 
+Le sujet est mieux detaille dans le rapport.
+
+Le code principal (appele isoworld.py) est dans le repertoire appele isoworld et pour l'executer il faut simplement taper dans terminal:
+ cd isoworld
+ python3 ./isoworld.py dans terminal 
+
+ (peut varier selon les versions)
+
+ La plupart des probabilites et les parametres du monde et du simulation sont au debut du code pour les faire varier.
+
+ On a quelques versions du code pour facilement tester le code (pour avoir des exemplaires du fonctionnement du code ).  
+ Risques des petit bugs etant donne que les programmes contiennent une petit partie du code original 
+ - prison.py -> pour voir l'interaction objet-agent
+ - agentsOnly.py -> un monde sans objets pour observer seulement les agents (basic et dropped)
+ - boxingRing.py -> un monde petit avec un seul humain et un seul zombie pour observer le combat. (boucle infini jusqu'a 'esc')
+ - droppedExample.py -> un monde avec un seul humain et beaucoup de food drops pour voir la fonction eat (tres similaire a gun et cure)
+
+ Nous vous remercions 
+
+
+
+
+
+
+INITIAL CODE :
+
 World of Isotiles
 =================
 
