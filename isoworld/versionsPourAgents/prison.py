@@ -1446,7 +1446,7 @@ def stepAgents(it = 0 ):
                 else:
                     h.type=womanId
 
-            if h.age>MAXAGEH or h.hunger=-1: #death from old age and hunger
+            if h.age>MAXAGEH or h.hunger<-1: #death from old age and hunger
                 h.die()
                  
             h.check_transition(zombies) #if at the end of the transformation period kill the human (to remove) and add a zombie in the same place
