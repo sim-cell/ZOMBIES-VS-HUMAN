@@ -1720,34 +1720,6 @@ while userExit == False:
         pygame.quit()
         sys.exit()
 
-    if perdu == True :
-        if winner == 1:
-            print ("")
-            print ("#### #### #### #### ####")
-            print ("####                ####")
-            print ("####     HUMANS WIN !    ####")
-            print ("####                ####")
-            print ("#### #### #### #### ####")
-            print ("")
-            print (">>> Score:",it,"--> BRAVO! ")
-            print ("")
-            pygame.quit()
-            sys.exit()
-
-    if perdu == True :
-        if winner == 2:
-            print ("")
-            print ("#### #### #### #### ####")
-            print ("####                ####")
-            print ("####     ZOMBIES WIN !    ####")
-            print ("####                ####")
-            print ("#### #### #### #### ####")
-            print ("")
-            print (">>> Score:",it,"--> BRAVO! ")
-            print ("")
-            pygame.quit()
-            sys.exit()
-
     if it % 60 == 0:
         DAY=False
     if it % 120 == 0:
