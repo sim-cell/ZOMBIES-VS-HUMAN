@@ -49,7 +49,7 @@ MAXAGEH=50
 MAXAGEZ=50
 PSHOOT=0.75
 PROB_REPROD = 0.045
-MAXHUNGER=30
+MAXHUNGER=50
 
 #probs for foods
 PROBDROPFOOD=0.3
@@ -107,8 +107,8 @@ screenHeight = 640 #900 #
 
 # world dimensions (ie. nb of cells in total)
 #ALWAYS A PAIR NUMBER AND MINIMUM 10 (no env if <20) #
-worldWidth = 30#64 
-worldHeight = 30 #64
+worldWidth = 32#64 
+worldHeight = 32 #64
 
 # set surface of displayed tiles (ie. nb of cells that are rendered) -- must be superior to worldWidth and worldHeight
 viewWidth = 32 #32 #after 64 it lags
@@ -642,6 +642,26 @@ class Human(BasicAgent):
 
         return
 
+    def move5(self):
+        if getAgentAt((self.x+1+worldWidth)%worldWidth, (self.y+worldHeight)%worldHeight ) == medicineId: #x+1 y
+            self.move2(1,0)
+        elif getAgentAt((self.x-1+worldWidth)%worldWidth, (self.y+worldHeight)%worldHeight ) == medicineId: #x-1 y
+            self.move2(-1,0)
+        elif getAgentAt((self.x+worldWidth)%worldWidth, (self.y+1+worldHeight)%worldHeight ) == medicineId: #x y+1
+            self.move2(0,1)
+        elif getAgentAt((self.x+worldWidth)%worldWidth, (self.y-1+worldHeight)%worldHeight ) == medicineId: #x y-1
+            self.move2(0,-1)
+        elif getAgentAt((self.x-1+worldWidth)%worldWidth, (self.y-1+worldHeight)%worldHeight ) == medicineId: #x-1 y-1
+            self.move2(-1,-1)
+        elif getAgentAt((self.x+1+worldWidth)%worldWidth, (self.y-1+worldHeight)%worldHeight ) == medicineId: #x+1 y-1
+            self.move2(1,-1)
+        elif getAgentAt((self.x+1+worldWidth)%worldWidth, (self.y+1+worldHeight)%worldHeight ) == medicineId: #x+1 y+1
+            self.move2(1,1)
+        elif getAgentAt((self.x-1+worldWidth)%worldWidth, (self.y+1+worldHeight)%worldHeight ) == medicineId: #x-1 y+1
+            self.move2(-1,1)
+        else :
+            self.move()
+        return
 
     def combat(self,zombies,met):
         success = self.shoot()
@@ -710,13 +730,13 @@ class Human(BasicAgent):
                     self.infected = 0
                     if self.sex =='M':
                         self.type = manId
-                        #print("Female ", id(self), " cured")
+
+                        print("Male ", id(self), " cured")
                     else:
                         self.type = womanId
-                        #print("Male ", id(self), " cured")
-
-                #cure.remove(i)
-                break
+                        print("Female ", id(self), " cured")
+                    cure.remove(i)
+                    break
         return
 
     def check_transition(h, zombies):
@@ -860,7 +880,7 @@ class Food(RandDropAgents):
             if random() < PROBDROPFOOD:
                 if it%DROPDAYFOOD==0 :
                     for i in range(0, randint(5, 10)):
-                        if len(list)== MAXFOOD :
+                        if len(list)+i>= MAXFOOD :
                             break
                         list.append(Food())
         return
@@ -878,7 +898,7 @@ class Gun(RandDropAgents) :
             if random() < PROBDROPGUN:
                 if it%DROPDAYGUN == 0 :
                     for i in range(0,randint(5, 10)):
-                        if len(list)== MAXGUN :
+                        if len(list)+i>= MAXGUN :
                             break
                         list.append(Gun())
         return
@@ -1420,7 +1440,7 @@ def stepAgents(it = 0 ):
                 else:
                     h.type=womanId
 
-            if h.age>MAXAGEH or h.hunger==-1: #death from old age and hunger
+            if h.age>MAXAGEH or h.hunger<=-1: #death from old age and hunger
                 h.die()
                  
             h.check_transition(zombies) #if at the end of the transformation period kill the human (to remove) and add a zombie in the same place
@@ -1431,14 +1451,15 @@ def stepAgents(it = 0 ):
                 if h.infected != 0:
                     h.infected +=1
                     h.takeCure(cure, manId, womanId) #checks if there is a cure in the same spot
+                    h.move5() # by default, an infected human moves towards the cure objects
                 else:
                     h.eat(foods) #checks if there is any food in the same spot, if yes eats it
                     h.arming(guns) #checks if there is any gun in the same spot, if yes takes it
                     h.combat(zombies, met) # if has a gun and probability is on his side, kills the zombie otherwise becomes infected 
                     h.reproduire(humans, babyBoyId, babyGirlId, met) #if there is an opposite sex in the same case reproduction (possible to have twins)
+                    h.move3() # by default, a healthy human runs away from zombies
                 h.age+=1
                 h.hunger-=1
-                h.move3()
 
         for z in zombies: #removing dead zombies, moving them
             if z.type!=zombieId:

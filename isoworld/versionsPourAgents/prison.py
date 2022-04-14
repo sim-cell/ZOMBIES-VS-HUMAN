@@ -233,7 +233,7 @@ def loadAllImages():
     lightningimage=loadImage('assets/basic111x128/lightning.png') #lightning
     lightningimage = pygame.transform.scale((lightningimage), (50, 50))
     objectType.append(lightningimage)
-    
+
     #cure image
     cure=loadImage('assets/basic111x128/vaccine.png')
     cure = pygame.transform.scale((cure), (20, 20))
@@ -1376,30 +1376,22 @@ def fixEnv():
 
 def initWorld():
     global nbTrees, nbBurningTrees, zombies, humans, nbDetails
-
-    if getWorldWidth() >= 100 :
-        fixEnv()
-        randEnv()
-        addingTrees()
-
-    for x in [14,18]:
-        for y in range (14,18):
-            setObjectAt(x,y,treeId,2)
-            setObjectAt(x,y, -1,0)
-    for y in [14,18]:
-        for x in range (14,18):
-            setObjectAt(x,y,treeId,2)
-            setObjectAt(x,y, -1,0)
-
-
-    #adding agents
-    for i in range(1):
-        #zombies.append(Zombie(zombieId,-1,-
-        humans.append(Male(manId))
+    
+    humans.append(Male(manId))
 
     h=humans[0]
-    h.x=16
-    h.y=16
+    h.x=worldWidth//2
+    h.y=worldHeight//2
+    for x in [(h.x-2),(h.x+2)]:
+        for y in range (h.y-2,h.y+2):
+            setObjectAt(x,y,treeId,2)
+            setObjectAt(x,y, -1,0)
+    for y in [h.y-2,h.y+2]:
+        for x in range ((h.x-2),(h.x+2)):
+            setObjectAt(x,y,treeId,2)
+            setObjectAt(x,y, -1,0)
+
+
     setAgentAt(h.x,h.y,h.type)
 
 
@@ -1454,7 +1446,7 @@ def stepAgents(it = 0 ):
                 else:
                     h.type=womanId
 
-            if h.age>MAXAGEH or h.hunger==-1: #death from old age and hunger
+            if h.age>MAXAGEH or h.hunger<-1: #death from old age and hunger
                 h.die()
                  
             h.check_transition(zombies) #if at the end of the transformation period kill the human (to remove) and add a zombie in the same place
